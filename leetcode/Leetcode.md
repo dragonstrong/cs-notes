@@ -43,7 +43,7 @@
 请注意，顺序不同的序列被视作不同的组合。
 ```
 
-![Untitled](%E7%AE%97%E6%B3%95%204c486dd119b24f67aff1b9e9dcdd1813/Untitled.png)
+![Untitled](assets/Untitled.png)
 
 有顺序的组合背包问题固定公式：
 
