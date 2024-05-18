@@ -735,73 +735,44 @@ class Solution
 **双向dp**
 
 记$len=prices.length$,遍历数组$prices$, 以$price[i]$为界劈成2个数组：$prices[0:i]$和$prices[i:len-1]$。
-从前往后$dp$得到数组$pre\_{dp}$,其中$pre\_{dp}[i]$为$prices[0:i]$一次交易的最大值，
-从后往前$dp$得到数组$post\_{dp}$,其中$post\_{dp}[i]$为$prices[len-1-i:len-1]$一次交易的最大值。
-$pre\_{dp}[i]+post\_{dp}[len-i-1]$就是以$prices[i]$劈开的最大收益。
+从左往右$dp$得到数组$left$,其中$left[i]$为$prices[0:i]$一次交易的最大值，
+从右往左$dp$得到数组$right$,其中$right[i]$为$prices[i:len-1]$一次交易的最大值。
+$left[i]+right[i]$就是以$prices[i]$劈开的最大收益。
 
 ```java
-class Solution   ///9:00-10:30(暴力20min超时，改进1h)
-{
-    public int maxProfit(int[] prices) 
-    {
-        if(prices.length==1)
-        return 0;
-        else
-        {
-            int len=prices.length;
-            int res=0;
-						//从前往后dp,dp[i]为prices[0:i]一次交易的最大值
-            int[] pre_dp=max_pre(prices);  
-						//从后往前dp，dp[i]为prices[len-1-i:len-1]一次交易的最大值
-            int[] post_dp=max_post(prices); 
-        
-            for(int i=0;i<len;i++)  //遍历，以price[i]为界分成两个数组：prices[0:i]和prices[i:len-1]
-                res=Math.max(res,pre_dp[i]+post_dp[len-i-1]);  
-            return  res;
+class Solution {
+    public int maxProfit(int[] prices) {
+        int n=prices.length;
+        int[] left=new int[n]; // 从左往右dp, left[i]表示prices[0:i]一笔交易最大利润  
+        int minValue=prices[0];
+        left[0]=0;
+        for(int i=1;i<n;i++){
+            if(prices[i]-minValue>0){
+                left[i]=Math.max(prices[i]-minValue,left[i-1]);
+            }else{
+                left[i]=left[i-1];
+            }
+            minValue=Math.min(minValue,prices[i]);
         }
-    }
-   
 
-     public static int[] max_pre(int[] prices) //从前往后dp
-    {
-        if(prices.length<=1)
-        return new int[] {0};
-        else
-        {
-            int[]  dp=new int[prices.length]; //dp[i]表示数组prices[0:i]一次交易的最大利润
-            dp[0]=0;
-            int min=prices[0]; //记录prices[0:i-1]的最小值
-            for(int i=1;i<prices.length;i++)
-            {
-                int tem=prices[i]-min;
-                dp[i]=tem>0?Math.max(dp[i-1],tem):dp[i-1];
-
-                if(min>prices[i])  
-                min=prices[i];
-            } 
-            return dp;          
+        int[] right=new int[n]; // 从右往左dp，right[i]表示prices[i:n-1]一笔交易最大利润
+        int maxValue=prices[n-1];
+        right[n-1]=0;
+        for(int i=n-2;i>=0;i--){
+            if(maxValue-prices[i]>0){
+                right[i]=Math.max(maxValue-prices[i],right[i+1]);
+            }else{
+                right[i]=right[i+1];
+            }
+            maxValue=Math.max(maxValue,prices[i]);
         }
-    }
 
-     public static int[] max_post(int[] prices) //从后往前dp
-    {
-        if(prices.length<=1)
-        return new int[] {0};
-        else
-        {
-						int len=prices.length;
-            int[]  dp=new int[len]; //dp[i]表示数组prices[len-1-i:len-1]一次交易的最大利润
-            dp[0]=0; 
-            int max=prices[len-1]; //记录prices[len-i:len-1]的最大值
-            for(int i=1;i<len;i++)
-            {
-                int tem=max-prices[len-i-1];  
-                dp[i]=tem>0?Math.max(dp[i-1],tem):dp[i-1];
-                if(max<prices[len-i-1])
-                max=prices[len-i-1];
-            } 
-            return dp;          
+        int res=0;
+        for(int i=0;i<n;i++){  // 遍历，以price[i]为界分成两个数组：prices[0:i]和prices[i:len-1]
+            System.out.println(left[i]+" "+right[i]);
+            res=Math.max(res,left[i]+right[i]);
         }
+        return res;
     }
 }
 ```
