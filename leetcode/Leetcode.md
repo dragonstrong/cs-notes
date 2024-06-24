@@ -4,7 +4,7 @@
 
 [toc]
 
-# 一、动态规划(DP)
+# 一. 动态规划(DP)
 
 **类型：**
 
@@ -24,7 +24,7 @@
 
 [**[剑指 Offer 47. 礼物的最大价值](https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof/)**]
 
-## 1、完全背包，有顺序(leetcode 377)
+## 1. 完全背包，有顺序(leetcode 377)
 
 [力扣](https://leetcode-cn.com/problems/combination-sum-iv/)
 
@@ -114,7 +114,7 @@ class Solution   //16:40-16:52
 
 $O(target*n)$                             $n$为数组长度
 
-## 2、组合问题（无顺序，要避免重复）(518 零钱兑换)
+## 2. 组合问题（无顺序，要避免重复）(518 零钱兑换)
 
 [力扣](https://leetcode-cn.com/problems/coin-change-2/)
 
@@ -150,7 +150,7 @@ class Solution {
 
 ![Untitled](assets/Untitled 1.png)
 
-## 3、零钱兑换
+## 3. 零钱兑换
 
 ![Untitled](assets/Untitled 2.png)
 
@@ -175,7 +175,7 @@ public class Solution {
 }
 ```
 
-## 4、剪绳子
+## 4. 剪绳子
 
 ![Untitled](assets/Untitled 4.png)
 
@@ -252,7 +252,7 @@ class Solution
 }
 ```
 
-## 5、最小路径和
+## 5. 最小路径和
 
 ![Untitled](assets/Untitled 5.png)
 
@@ -294,7 +294,7 @@ class Solution
 
 **注意：if 不写else时的情况，后面的还要执行（很容易出错），如果不执行后面，勤快点加个continue**
 
-## 7、二维动态规划
+## 7. 二维动态规划
 
 **[剑指 Offer 47. 礼物的最大价值](https://leetcode.cn/problems/li-wu-de-zui-da-jie-zhi-lcof/)**
 
@@ -341,7 +341,7 @@ class Solution
 }
 ```
 
-## 8、**[连续子数组的最大和](https://leetcode.cn/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)**
+## 8. **[连续子数组的最大和](https://leetcode.cn/problems/lian-xu-zi-shu-zu-de-zui-da-he-lcof/)**
 
 ![Untitled](assets/Untitled 6.png)
 
@@ -373,7 +373,7 @@ class Solution  //7:09-
 }
 ```
 
-## 9、**乘积最大子数组**
+## 9. **乘积最大子数组**
 
 ![Untitled](assets/Untitled 7.png)
 
@@ -406,13 +406,13 @@ class Solution
 }
 ```
 
-## 9、**[圆圈中最后剩下的数字](https://leetcode.cn/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)**
+## 10. **[圆圈中最后剩下的数字](https://leetcode.cn/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)**
 
 [16、**[剑指 Offer 62. 圆圈中最后剩下的数字](https://leetcode.cn/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/)**](https://www.notion.so/16-Offer-62-0c804beb48544c849aa6905aab38b6c7?pvs=21) 
 
-## 10、 **[打家劫舍](https://leetcode.cn/problems/house-robber/)（简单，作为参考）**
+## 11.   **[打家劫舍](https://leetcode.cn/problems/house-robber/)（简单，作为参考）**
 
-## [11]()、 **[最大正方形](https://leetcode.cn/problems/maximal-square/)**
+## 12.  **[最大正方形](https://leetcode.cn/problems/maximal-square/)**
 
 ![Untitled](assets/Untitled 8.png)
 
@@ -469,7 +469,7 @@ class Solution  //14:30-  19:46-
 }
 ```
 
-## 12、**[最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)(**二维动态规划)
+## 13. **[最长公共子序列](https://leetcode.cn/problems/longest-common-subsequence/)(**二维动态规划)
 
 ![Untitled](assets/Untitled 10.png)
 
@@ -515,7 +515,7 @@ class Solution
 
 [力扣](https://leetcode.cn/problems/longest-common-subsequence/solution/fu-xue-ming-zhu-er-wei-dong-tai-gui-hua-r5ez6/)
 
-## 13、一维**[接雨水](https://leetcode.cn/problems/trapping-rain-water/)**
+## 14. 一维**[接雨水](https://leetcode.cn/problems/trapping-rain-water/)**
 
 ![Untitled](assets/Untitled 11.png)
 
@@ -547,7 +547,7 @@ class Solution
 }
 ```
 
-## 14、**[最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)**
+## 15. **[最长递增子序列](https://leetcode.cn/problems/longest-increasing-subsequence/)**
 
 ![Untitled](assets/Untitled 13.png)
 
@@ -587,7 +587,7 @@ class Solution  //9:36-10:06
 }
 ```
 
-## 15、**[子集](https://leetcode.cn/problems/subsets/)（组合类问题）**
+## 16. **[子集](https://leetcode.cn/problems/subsets/)（组合类问题）**
 
 ![Untitled](assets/Untitled 14.png)
 
@@ -634,7 +634,7 @@ class Solution  //8:52-10:23
 }
 ```
 
-## 16、**[全排列](https://leetcode.cn/problems/permutations/)**
+## 17. **[全排列](https://leetcode.cn/problems/permutations/)**
 
 ![Untitled](assets/Untitled 15.png)
 
@@ -676,7 +676,7 @@ class Solution
 }
 ```
 
-## 17、**[买卖股票的最佳时机 III](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iii/)**
+## 18. **[买卖股票的最佳时机 III](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iii/)**
 
 ![Untitled](assets/Untitled 16.png)
 
@@ -779,7 +779,7 @@ class Solution {
 
 ![Untitled](assets/Untitled 19.png)
 
-## 18、**跳跃游戏 VI  （DP+滑动窗口）**
+## 19. **跳跃游戏 VI  （DP+滑动窗口）**
 
 ![Untitled](assets/Untitled 20.png)
 
@@ -832,11 +832,11 @@ class Solution
 }
 ```
 
-## 19、预测赢家
+## 20. 预测赢家
 
 [2、预测赢家（486）](%E7%AE%97%E6%B3%95%204c486dd119b24f67aff1b9e9dcdd1813.md) 
 
-## 20、**最长等差数列**
+## 21. **最长等差数列**
 
 ![Untitled](assets/Untitled 22.png)
 
@@ -916,7 +916,7 @@ class Solution
 }
 ```
 
-## **21. 最大矩形**
+## 22.  最大矩形
 
 [https://leetcode.cn/problems/maximal-rectangle/description/](https://leetcode.cn/problems/maximal-rectangle/description/)
 
@@ -1019,7 +1019,7 @@ class Solution {
 }
 ```
 
-## 22、[分割数组的最大值](https://leetcode.cn/problems/split-array-largest-sum/)
+## 23. [分割数组的最大值](https://leetcode.cn/problems/split-array-largest-sum/)
 
 给定一个非负整数数组 `nums` 和一个整数 `k` ，你需要将这个数组分成 `k` 个非空的连续子数组。
 
@@ -1133,7 +1133,7 @@ class Solution {
 
 
 
-## 23.[编辑距离](https://leetcode.cn/problems/edit-distance/)
+## 24. [编辑距离](https://leetcode.cn/problems/edit-distance/)
 
 给你两个单词 `word1` 和 `word2`， *请返回将 `word1` 转换成 `word2` 所使用的最少操作数* 。
 
@@ -1180,7 +1180,7 @@ exection -> execution (插入 'u')
 
 
 
-# 二、深度优先搜索(DFS, Depth First Search)
+# 二. 深度优先搜索(DFS, Depth First Search)
 
 **总结：dfs就是不断往下搜，搜到底（设置终止条件）。且不能重复访问（已经访问过的点，return)。适合解决存不存在、给定和种类、路径之类的题目**
 
@@ -1190,7 +1190,7 @@ exection -> execution (插入 'u')
 
 不恢复：题3 机器人
 
-## 1、矩阵中的路径
+## 1. 矩阵中的路径
 
 [力扣](https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/)
 
@@ -1291,7 +1291,7 @@ class Solution {
 }
 ```
 
-## 2、新员工考试（华为机试)
+## 2. 新员工考试（华为机试)
 
 ![Untitled](assets/Untitled 30.png)
 
@@ -1353,7 +1353,7 @@ public class Main {
 }
 ```
 
-## 3、机器人的运动范围
+## 3. 机器人的运动范围
 
 ![Untitled](assets/Untitled 32.png)
 
@@ -1361,7 +1361,7 @@ public class Main {
 
 **不用恢复现场**
 
-## 4、课程表
+## 4. 课程表
 
 ![Untitled](assets/Untitled 34.png)
 
@@ -1462,7 +1462,7 @@ class Solution
 }
 ```
 
-## 5、**[岛屿数量](https://leetcode.cn/problems/number-of-islands/)**
+## 5. **[岛屿数量](https://leetcode.cn/problems/number-of-islands/)**
 
 ![Untitled](assets/Untitled 35.png)
 
@@ -1649,7 +1649,7 @@ class Solution //9:02-9:18
 }
 ```
 
-## 6、二叉树中和为某一值的路径
+## 6. 二叉树中和为某一值的路径
 
 [力扣](https://leetcode-cn.com/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
 
@@ -1681,7 +1681,7 @@ class Solution {
 }
 ```
 
-## 7、**[剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode.cn/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)**
+## 7. **[剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode.cn/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)**
 
 ![Untitled](assets/Untitled 37.png)
 
@@ -1769,7 +1769,7 @@ class Solution
 }
 ```
 
-## 8、 **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
+## 8.  **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
 
 ![Untitled](assets/Untitled 38.png)
 
@@ -1911,7 +1911,7 @@ class UF  //并查集
 }
 ```
 
-## 9、**[路径总和 III](https:/!/leetcode.cn/problems/path-sum-iii/)（简单）**
+## 9. **[路径总和 III](https:/!/leetcode.cn/problems/path-sum-iii/)（简单）**
 
 ![Untitled](assets/Untitled 39.png)
 
@@ -2002,7 +2002,7 @@ class Solution {
 
 ![Untitled](assets/Untitled 42.png)
 
-## 10、**[螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)**
+## 10. **[螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)**
 
 ![Untitled](assets/Untitled 43.png)
 
@@ -2046,7 +2046,7 @@ class Solution
 }
 ```
 
-## 11、**[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
+## 11. **[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
 
 ![Untitled](assets/Untitled 44.png)
 
@@ -2149,7 +2149,7 @@ class Solution
 }
 ```
 
-## 12、字节笔试
+## 12. 字节笔试
 
 [字节笔试 9.25 3/4_笔经面经_牛客网](https://www.nowcoder.com/discuss/1063783?channel=-1&source_id=discuss_terminal_nctrack&trackId=undefined)
 
@@ -2272,7 +2272,7 @@ class Node
 }
 ```
 
-## 13、**组合总和 II**
+## 13. **组合总和 II**
 
 ![Untitled](assets/Untitled 49.png)
 
@@ -2338,7 +2338,7 @@ class Solution
 
 
 
-## 14.[二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
+## 14. [二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
 
 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
 
@@ -2433,11 +2433,11 @@ class Solution {
 
 
 
-# 三、广度优先搜索（BFS, Breadth-First Search）
+# 三. 广度优先搜索（BFS, Breadth-First Search）
 
 **这种题目都是用LinkedList，后插头出，循环条件list非空： 适用于树的逐层遍历、从某一点逐层往外扩之类的题**
 
-## 1、**[腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)**
+## 1. **[腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/)**
 
 在给定的 m x n 网格 grid 中，每个单元格可以有以下三个值之一：
 
@@ -2484,103 +2484,60 @@ class Solution {
 直到list为空，统计最后好橘子的个数，若还有好橘子，返回-1，否则返回时间。
 
 ```java
-class Solution 
+class Solution  //16:15-
 {
-    boolean is=true;
-    public int orangesRotting(int[][] grid)
-    {
-        int m=grid.length;
-        int n=grid[0].length;
-
-        int[][] new_grid=new int[m+2][n+2];
-        for(int i=1;i<=m;i++)
-            for(int j=1;j<=n;j++)
-                new_grid[i][j]=grid[i-1][j-1];
-
-        int good_orange=0; //记录橘子的个数
-
-        LinkedList<Coord> list=new LinkedList<>();
-        for(int i=1;i<=m;i++)
-            for(int j=1;j<=n;j++)
-            { 
-                if(new_grid[i][j]==1)
-                    good_orange++;
-                if(new_grid[i][j]==2)  //将所有坏橘子加入LinkedList
-                    list.add(new Coord(i-1,j-1));
-            }
-
-        if(good_orange==0)
-            return 0;
-
-        int time=0;
-        while(!list.isEmpty())  
-        {
-            int list_size=list.size(); //注意不是一次弹出一个  而是将上一层的全部弹出 因此要记录上一层的个数
-            for(int k=0;k<list_size;k++)
-            {
-                Coord c=list.removeFirst();
-                int i=c.x;
-                int j=c.y;
-                if(is_bound(i-1,j,m,n)&&grid[i-1][j]==1&&!list.contains(new Coord(i-1,j)))
-                {
-                    list.add(new Coord(i-1,j)); //上
-                    grid[i-1][j]=2;  //好橘子腐烂
-                    good_orange--;
-                }
-
-                if(is_bound(i+1,j,m,n)&&grid[i+1][j]==1&&!list.contains(new Coord(i+1,j)))
-                {
-                    list.add(new Coord(i+1,j)); //下
-                    grid[i+1][j]=2;
-                    good_orange--;
-                }
-
-                if(is_bound(i,j-1,m,n)&&grid[i][j-1]==1&&!list.contains(new Coord(i,j-1)))
-                {
-                    list.add(new Coord(i,j-1)); //左
-                    grid[i][j-1]=2;
-                    good_orange--;
-                }
-
-                if(is_bound(i,j+1,m,n)&&grid[i][j+1]==1&&!list.contains(new Coord(i,j+1)))
-                {
-                    list.add(new Coord(i,j+1)); //右
-                    grid[i][j+1]=2;
-                    good_orange--;
+    public int orangesRotting(int[][] grid) {
+        int fresh=0,m=grid.length,n=grid[0].length;
+        LinkedList<int[]> list=new LinkedList<>();
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]==2){
+                    list.add(new int[]{i,j});
+                }else if(grid[i][j]==1){
+                    fresh++;
                 }
             }
-            time++;  //弹出一层时间+1 对应一轮腐坏
         }
-      
-        if(good_orange>0)  //最后还有好橘子返回-1  不要再写个dfs判断有无好橘子孤岛  太麻烦了而且易错  这多简单
-        return -1;
-        else
-        return time-1; 
+        int sum=list.size()+fresh; // 总数
+        int count=0;  //弹出计数
+
+        if(fresh>0&&list.size()==0){ // 有新鲜橘子但没腐烂橛子 
+            return -1;
+        }
+        if(fresh==0){ // 没新鲜橘子
+            return 0;
+        }
+ 
+        int res=0;
+        // BFS
+        while(!list.isEmpty()){
+            int len=list.size();
+            res++;
+            for(int k=0;k<len;k++){  // 一层层腐烂
+                int[] tem=list.remove();
+                count++;
+                int[][] direction={{-1,0},{1,0},{0,-1},{0,1}};
+                for(int[] dir:direction){
+                    int xNext=tem[0]+dir[0];
+                    int yNext=tem[1]+dir[1];
+                    if(illegal(xNext,yNext,m,n)&&grid[xNext][yNext]==1){
+                    list.add(new int[]{xNext,yNext});
+                    grid[xNext][yNext]=-1;
+                    }
+                }
+            }
+        }
+        return count==sum?res-1:-1;
     }
-
-    public boolean is_bound(int i,int j,int m,int n) //下标是否合法  grid[i][j]  
+    // 坐标是否合法
+    public boolean illegal(int i,int j,int m,int n)
     {
-        if(i>=0&&i<m&&j>=0&&j<n)
-        return true;
-        else
-        return false;
-    }
-
-}
-
-class Coord 
-{
-    public int x;
-    public int y;
-    public Coord(int x,int y)
-    {
-        this.x=x;
-        this.y=y;
+        return i>=0&&i<m&&j>=0&&j<n;
     }
 }
 ```
 
-## **[钥匙和房间](https://leetcode.cn/problems/keys-and-rooms/)**
+## 2. **[钥匙和房间](https://leetcode.cn/problems/keys-and-rooms/)**
 
 有 n 个房间，房间按从 0 到 n - 1 编号。最初，除 0 号房间外的其余所有房间都被锁住。你的目标是进入所有的房间。然而，你不能在没有获得钥匙的时候进入锁住的房间。当你进入一个房间，你可能会在里面找到一套不同的钥匙，每把钥匙上都有对应的房间号，即表示钥匙可以打开的房间。你可以拿上所有钥匙去解锁其他房间。给你一个数组 rooms 其中 rooms[i] 是你进入 i 号房间可以获得的钥匙集合。如果能进入 所有 房间返回 true，否则返回 false。
 
@@ -2619,44 +2576,35 @@ n == rooms.length
 ```java
 class Solution 
 {
-    public boolean canVisitAllRooms(List<List<Integer>> rooms) 
-    {
-        int[] state=new int[rooms.size()]; //房间状态 0为未开 1为开
-        state[0]=1;
-
+    public boolean canVisitAllRooms(List<List<Integer>> rooms) {
+        HashSet<Integer> set=new HashSet<>();
+        int n=rooms.size();
         LinkedList<Integer> list=new LinkedList<>();
-        for(Integer o:rooms.get(0))  //将第0个房间的所有钥匙加入list
-        list.add(o);
-        while(!list.isEmpty())
-        {
-            int size_num=list.size();
-            for(int i=0;i<size_num;i++)
-            {
-                Integer e=list.remove(); //弹出钥匙开对应的房门
-                if(state[e]==1) //开了就不开  要善于剪枝  不然会超时
-                continue;
-                else
-                {
-                     List<Integer> tem=rooms.get(e); //进入对应房间找到该房间里的钥匙串
-                for(Integer obj:tem)
-                list.add(obj); //将钥匙串加入list
-                state[e]=1;  //未开房间 -1
+        // 进房间0拿到钥匙
+        for(Integer o:rooms.get(0)){
+            list.add(o);
+        }
+        set.add(0);
+        // BFS
+        while(!list.isEmpty()){
+            int size=list.size();
+            for(int i=0;i<size;i++){
+                Integer tem=list.remove();
+                set.add(tem);
+                for(Integer next:rooms.get(tem)){ // 下一房间
+                    if(!set.contains(next)){
+                        list.add(next);
+                    }
                 }
-               
             }
         }
 
-        for(int k=0;k<state.length;k++)
-        {
-            if(state[k]==0)
-            return false;
-        }
-        return true;
+        return set.size()==n;
     }
 }
 ```
 
-## **[二叉树最大宽度](https://leetcode.cn/problems/maximum-width-of-binary-tree/)**
+## 3. **[二叉树最大宽度](https://leetcode.cn/problems/maximum-width-of-binary-tree/)**
 
 给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最右的非空节点，两端点间的null节点也计入长度）之间的长度。
 
@@ -2746,7 +2694,7 @@ class Solution {
 }
 ```
 
-## **[奇偶树](https://leetcode.cn/problems/even-odd-tree/)**
+## 4. **[奇偶树](https://leetcode.cn/problems/even-odd-tree/)**
 
 [](https://leetcode-cn.com/problems/even-odd-tree/)
 
@@ -2756,7 +2704,7 @@ class Solution {
 
 思路和实现比较简单 就不贴题解
 
-## 剑指offer 之字形打印二叉树
+## 5. 剑指offer 之字形打印二叉树
 
 [力扣](https://leetcode-cn.com/problems/cong-shang-dao-xia-da-yin-er-cha-shu-iii-lcof/)
 
@@ -2764,7 +2712,7 @@ class Solution {
 
 比较简单（正常层序遍历加层深度判断）
 
-## **[序列化二叉树](https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/)（困难，特别留意）**
+## 6. **[序列化二叉树](https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/)（困难，特别留意）**
 
 ![Untitled](assets/Untitled 58.png)
 
@@ -2981,7 +2929,7 @@ public class Codec {
 }
 ```
 
-## **蛇梯棋（909）**
+## 7. **蛇梯棋（909）**
 
 给你一个大小为 `n x n` 的整数矩阵 `board` ，方格按从 `1` 到 $n^2$ 编号，编号遵循 [转行交替方式](https://baike.baidu.com/item/%E7%89%9B%E8%80%95%E5%BC%8F%E8%BD%AC%E8%A1%8C%E4%B9%A6%E5%86%99%E6%B3%95/17195786) ****，**从左下角开始** （即，从 `board[n - 1][0]` 开始）每一行交替方向。
 
@@ -3074,7 +3022,7 @@ class Solution  //21:31-
 }
 ```
 
-# 四、记忆化搜索（DP+递归）
+# 四. 记忆化搜索（DP+递归）
 
 和简单递归（dfs）的区别：
 
@@ -3086,7 +3034,7 @@ class Solution  //21:31-
 
 **2、统计所有可行路径**
 
-## 1、大礼包(难)
+## 1. 大礼包(难)
 
 [](https://leetcode.cn/problems/shopping-offers/description/)
 
@@ -3175,7 +3123,7 @@ class Solution
 }
 ```
 
-## 2、**统计所有可行路径**
+## 2. **统计所有可行路径**
 
 ![Untitled](assets/Untitled 67.png)
 
@@ -3247,7 +3195,7 @@ class Solution
 }
 ```
 
-## 3、移除盒子
+## 3. 移除盒子
 
 ![Untitled](assets/Untitled 69.png)
 
@@ -3255,7 +3203,7 @@ class Solution
 
 ![Untitled](assets/Untitled 70.png)
 
-## 2、 **[打家劫舍 III](https://leetcode.cn/problems/house-robber-iii/)**
+## 4.  **[打家劫舍 III](https://leetcode.cn/problems/house-robber-iii/)**
 
 ![Untitled](assets/Untitled 71.png)
 
@@ -3323,13 +3271,13 @@ class Solution
 }
 ```
 
-## 3、**[水壶问题](https://leetcode.cn/problems/water-and-jug-problem/)**
+## 5. **[水壶问题](https://leetcode.cn/problems/water-and-jug-problem/)**
 
 ![Untitled](assets/Untitled 72.png)
 
-# 五、DFS与BFS多重解法、转换
+# 五. DFS与BFS多重解法、转换
 
-## 1、 **[被围绕的区域](https://leetcode.cn/problems/surrounded-regions/)**
+## 1.  **[被围绕的区域](https://leetcode.cn/problems/surrounded-regions/)**
 
 ![Untitled](assets/Untitled 73.png)
 
@@ -3486,11 +3434,11 @@ class Solution
 }
 ```
 
-## 2、[8、 **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**](%E7%AE%97%E6%B3%95%204c486dd119b24f67aff1b9e9dcdd1813.md)
+## 2. [**[省份数量](https://leetcode.cn/problems/number-of-provinces/)**]
 
-# 六、递归
+# 六. 递归
 
-## 1、**[排列序列](https://leetcode.cn/problems/permutation-sequence/)**
+## 1. **[排列序列](https://leetcode.cn/problems/permutation-sequence/)**
 
 ![Untitled](assets/Untitled 74.png)
 
@@ -3612,7 +3560,7 @@ class Solution //10：20-
 
 ![Untitled](assets/Untitled 78.png)
 
-## 2、预测赢家（486）
+## 2. 预测赢家（486）
 
 给你一个整数数组 `nums` 。玩家 1 和玩家 2 基于这个数组设计了一个游戏。玩家 1 和玩家 2 轮流进行自己的回合，玩家 1 先手。开始时，两个玩家的初始分值都是 `0` 。每一回合，玩家从数组的任意一端取一个数字（即，`nums[0]` 或 `nums[nums.length - 1]`），取到的数字将会从数组中移除（数组长度减 `1` ）。玩家选中的数字将会加到他的得分上。当数组中没有剩余数字可取时，游戏结束。如果玩家 1 能成为赢家，返回 `true` 。如果两个玩家得分相等，同样认为玩家 1 是游戏的赢家，也返回 `true` 。你可以假设每个玩家的玩法都会使他的分数最大化。
 
@@ -3687,7 +3635,7 @@ class Solution
 }
 ```
 
-## 3、不同的二叉搜索树
+## 3. 不同的二叉搜索树
 
 [力扣](https://leetcode-cn.com/problems/unique-binary-search-trees-ii/)
 
@@ -3722,9 +3670,9 @@ class Solution {
 }
 ```
 
-# 七、正则表达式
+# 七. 正则表达式
 
-## 1、剑指offer20 表示数值的字符串
+## 1. 剑指offer20 表示数值的字符串
 
 ![Untitled](assets/Untitled 81.png)
 
@@ -3737,7 +3685,7 @@ class Solution {
 }
 ```
 
-## 2、**字符串转换整数 (atoi)**
+## 2.  **字符串转换整数 (atoi)**
 
 ![Untitled](assets/Untitled 82.png)
 
@@ -3787,9 +3735,9 @@ class Solution {
 }
 ```
 
-# 八、位运算
+# 八.  位运算
 
-## 1、**[剑指 Offer 56 - I. 数组中数字出现的次数](https://leetcode.cn/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/)**
+## 1.  **[剑指 Offer 56 - I. 数组中数字出现的次数](https://leetcode.cn/problems/shu-zu-zhong-shu-zi-chu-xian-de-ci-shu-lcof/)**
 
 一个整型数组 `nums`里除两个数字之外，其他数字都出现了两次。请写程序找出这两个只出现一次的数字。要求时间复杂度是O(n)，空间复杂度是O(1)。
 
@@ -3886,7 +3834,7 @@ class Solution {
 }
 ```
 
-## 2、**[剑指 Offer 15. 二进制中1的个数](https://leetcode.cn/problems/er-jin-zhi-zhong-1de-ge-shu-lcof/)**
+## 2. **[剑指 Offer 15. 二进制中1的个数](https://leetcode.cn/problems/er-jin-zhi-zhong-1de-ge-shu-lcof/)**
 
 ![Untitled](assets/Untitled 84.png)
 
@@ -3919,7 +3867,7 @@ public class Solution
 }
 ```
 
-## 3、**[剑指 Offer 65. 不用加减乘除做加法](https://leetcode.cn/problems/bu-yong-jia-jian-cheng-chu-zuo-jia-fa-lcof/)**
+## 3. **[剑指 Offer 65. 不用加减乘除做加法](https://leetcode.cn/problems/bu-yong-jia-jian-cheng-chu-zuo-jia-fa-lcof/)**
 
 ![Untitled](assets/Untitled 85.png)
 
@@ -3948,9 +3896,9 @@ class Solution //12:08-
 }
 ```
 
-# 八、双指针
+# 九. 双指针
 
-## 1、**[剑指 Offer 25. 合并两个排序的链表](https://leetcode.cn/problems/he-bing-liang-ge-pai-xu-de-lian-biao-lcof/)**
+## 1. **[剑指 Offer 25. 合并两个排序的链表](https://leetcode.cn/problems/he-bing-liang-ge-pai-xu-de-lian-biao-lcof/)**
 
 其实就是归并排序中合并的变种，把数组换成了链表（**熟练掌握，15min中内写完，面试常考**）
 
@@ -4014,7 +3962,7 @@ class Solution   //21:20-21:47
 }
 ```
 
-## 2、**[剑指 Offer 57. 和为s的两个数字](https://leetcode.cn/problems/he-wei-sde-liang-ge-shu-zi-lcof/)**
+## 2. **[剑指 Offer 57. 和为s的两个数字](https://leetcode.cn/problems/he-wei-sde-liang-ge-shu-zi-lcof/)**
 
 ![Untitled](assets/Untitled 87.png)
 
@@ -4058,7 +4006,7 @@ class Solution   //20:11-20:43
 }
 ```
 
-## 3、**三数之和**
+## 3. **三数之和**
 
 ![Untitled](assets/Untitled 88.png)
 
@@ -4166,7 +4114,7 @@ class Solution
 }
 ```
 
-## 4、**删除有序数组中的重复项**
+## 4. **删除有序数组中的重复项**
 
 ![Untitled](assets/Untitled 91.png)
 
@@ -4197,7 +4145,7 @@ class Solution
 
 ```
 
-## 5、环形链表
+## 5. 环形链表
 
 https://leetcode.cn/problems/linked-list-cycle-ii/description/
 
@@ -4322,9 +4270,9 @@ public class Solution {
 }
 ```
 
-# 九、并查集
+# 十. 并查集
 
-## 1、**[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
+## 1. **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
 
 ![Untitled](assets/Untitled 92.png)
 
@@ -4448,7 +4396,7 @@ class UF{
 }
 ```
 
-## 2、**面试题 17.07. 婴儿名字**
+## 2. **面试题 17.07. 婴儿名字**
 
 每年，政府都会公布一万个最常见的婴儿名字和它们出现的频率，也就是同名婴儿的数量。有些名字有多种拼法，例如，John 和 Jon 本质上是相同的名字，但被当成了两个名字公布出来。给定两个列表，一个是名字及对应的频率，另一个是本质相同的名字对。设计一个算法打印出每个真实名字的实际频率。注意，如果 John 和 Jon 是相同的，并且 Jon 和 Johnny 相同，则 John 与 Johnny 也相同，即它们有传递和对称性。
 
@@ -4575,9 +4523,9 @@ class UF  //并查集
 }
 ```
 
-# 十、滑动窗口
+# 十一. 滑动窗口
 
-## 1、 **[滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)**
+## 1.  **[滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/)**
 
 ![Untitled](assets/Untitled 93.png)
 
@@ -4651,7 +4599,7 @@ class Solution
 }
 ```
 
-## 2、**最小覆盖子串(lc 76)**
+## 2. **最小覆盖子串(lc 76)**
 
 给你一个字符串 `s` 、一个字符串 `t` 。返回 `s` 中涵盖 `t` 所有字符的最小子串。如果 `s` 中不存在涵盖 `t` 所有字符的子串，则返回空字符串 `""` 。
 
@@ -4747,7 +4695,7 @@ class Solution
 }
 ```
 
-## 3、**合并 K 个升序链表**
+## 3. **合并 K 个升序链表**
 
 链接：[https://leetcode.cn/problems/merge-k-sorted-lists/description/](https://leetcode.cn/problems/merge-k-sorted-lists/description/)
 
@@ -4842,7 +4790,7 @@ class Solution {
 
 
 
-## 4.[长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
+## 4. [长度最小的子数组](https://leetcode.cn/problems/minimum-size-subarray-sum/)
 
 给定一个含有 `n` 个正整数的数组和一个正整数 `target` **。**
 
@@ -4957,9 +4905,9 @@ class Solution {
 
 
 
-# 十一、桶
+# 十二. 桶
 
-## 1、**[任务调度器](https://leetcode.cn/problems/task-scheduler/)**
+## 1. **[任务调度器](https://leetcode.cn/problems/task-scheduler/)**
 
 ![Untitled](assets/Untitled 99.png)
 
@@ -5008,9 +4956,9 @@ class Solution
 }
 ```
 
-# 十二、有向图的拓扑排序
+# 十三. 有向图的拓扑排序
 
-## 1、[课程表 II](https://leetcode.cn/problems/course-schedule-ii/description/?favorite=2ckc81c#:~:text=210.-,%E8%AF%BE%E7%A8%8B%E8%A1%A8%20II,-%E4%B8%AD%E7%AD%89)
+## 1. [课程表 II](https://leetcode.cn/problems/course-schedule-ii/description/?favorite=2ckc81c#:~:text=210.-,%E8%AF%BE%E7%A8%8B%E8%A1%A8%20II,-%E4%B8%AD%E7%AD%89)
 
 ![Untitled](assets/Untitled 101.png)
 
@@ -5117,7 +5065,7 @@ class Solution
 }
 ```
 
-## 2、有向无环图节点的所有祖先
+## 2. 有向无环图节点的所有祖先
 
 ![Untitled](assets/Untitled 104.png)
 
@@ -5260,9 +5208,9 @@ class Solution
 }
 ```
 
-# 十三、未分类
+# 十四. 未分类
 
-## 1、**插入区间**
+## 1. **插入区间**
 
 ![Untitled](assets/Untitled 109.png)
 
@@ -5319,7 +5267,7 @@ class Solution
 }
 ```
 
-# 十四、双链表
+# 十五. 双链表
 
 多练练，总用ArrayList接会生疏，还是经常指来指去
 
@@ -5390,7 +5338,7 @@ class Node //双向链表节点
 
 
 
-## 2. LRU缓存（阿里社招二面手撕）
+## 2.  LRU缓存（阿里社招二面手撕）
 
 请你设计并实现一个满足 [LRU (最近最少使用) 缓存](https://baike.baidu.com/item/LRU) 约束的数据结构。
 
@@ -5533,15 +5481,225 @@ class LRUCache
 
 
 
-# 十五、单调栈
+# 十六. 单调栈
 
-## 1、**移掉 K 位数字**
+## 1.  **移掉 K 位数字**
 
 ![Untitled](assets/Untitled 113.png)
 
-# 十六、栈
+## 2.  [每日温度](https://leetcode.cn/problems/daily-temperatures/)
 
-## 1、有效的括号
+给定一个整数数组 `temperatures` ，表示每天的温度，返回一个数组 `answer` ，其中 `answer[i]` 是指对于第 `i` 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。**要求时间复杂度$O(n)$**
+
+**示例 1:**
+
+```
+输入: temperatures = [73,74,75,71,69,72,76,73]
+输出: [1,1,4,2,1,1,0,0]
+```
+
+**示例 2:**
+
+```
+输入: temperatures = [30,40,50,60]
+输出: [1,1,1,0]
+```
+
+**示例 3:**
+
+```
+输入: temperatures = [30,60,90]
+输出: [1,1,0]
+```
+
+ 
+
+**提示：**
+
+- `1 <= temperatures.length <= 105`
+- `30 <= temperatures[i] <= 100`
+
+
+
+
+
+思路：**单调栈**
+
+用栈存储尚未找到下一次温度更高 元素的下标
+
+```java
+class Solution {
+    public int[] dailyTemperatures(int[] temperatures) {
+        int n=temperatures.length;
+        int[] res=new int[n];
+        LinkedList<Integer> stack=new LinkedList<>(); //栈里存尚未找到下一次温度更高 元素的下标
+        for(int i=0;i<n;i++){
+            while(!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
+                res[stack.peek()]=i-stack.pop();  // 当前温度大于它，出栈并计算天数
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+}
+```
+
+
+
+模拟：$temperatures = [73,74,75,71,69,72,76,73]$
+
+![image-20240624171707040](assets/image-20240624171707040.png)
+
+注意：LinkedList没加锁，比Stack快，Stack加了锁（继承自Vector，线程安全）。
+
+使用LinkedList：
+
+<img src="assets/image-20240624171959082.png" alt="image-20240624171959082" style="zoom: 50%;" />
+
+使用Stack:
+
+<img src="assets/image-20240624171930407.png" alt="image-20240624171930407" style="zoom:50%;" />
+
+<img src="assets/image-20240624171843511.png" alt="image-20240624171843511" style="zoom:50%;" />
+
+
+
+## 3. [柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+
+给定 *n* 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+ 
+
+**示例 1:**
+
+![img](assets/histogram.jpg)
+
+```
+输入：heights = [2,1,5,6,2,3]
+输出：10
+解释：最大的矩形为图中红色区域，面积为 10
+```
+
+**示例 2：**
+
+![img](assets/histogram-1.jpg)
+
+```
+输入： heights = [2,4]
+输出： 4
+```
+
+ 
+
+**提示：**
+
+- `1 <= heights.length <=105`
+- `0 <= heights[i] <= 104`
+
+
+
+暴力枚举引入：
+
+法1：宽固定，求最小高
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        int res=0;
+        for(int i=0;i<n;i++){
+            int minHeight=heights[i];
+            for(int j=i;j>=0;j--){
+                minHeight=Math.min(minHeight,heights[j]);
+                res=Math.max(minHeight*(i-j+1),res);
+            }
+        }
+        return res;
+
+    }
+}
+```
+
+
+
+法2：高固定，左右外扩求最大宽
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        int res=Integer.MIN_VALUE;
+        for(int i=0;i<n;i++){
+            // 向左扩散求左边界
+            int leftIndex=i-1;
+            while(leftIndex>=0&&heights[leftIndex]>=heights[i]){
+                leftIndex--;
+            }
+            // 向右扩散求右边界
+            int rightIndex=i+1;
+            while(rightIndex<n&&heights[rightIndex]>=heights[i]){
+                rightIndex++;
+            }
+            // 求面积
+            res=Math.max(res,(rightIndex-leftIndex-1)*heights[i]);  
+        }
+        return res;
+    }
+}
+```
+
+
+
+上面两种暴力枚举时间复杂度都是$O(n^2)$
+
+
+
+下面基于 法2，使用单调栈进行优化到$O(n)$
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        // 固定柱子高度height[i]，以它为中心向左右外扩，下标left[i]+1~right[i]-1的柱子高度都不小于height[i]
+        // 面积为height[i]*(right[i]-left[i]-1)
+        int[] left=new int[n]; //left[i]：小于柱子高度height[i]的左边界下标  
+        int[] right=new int[n]; //right[i]：小于柱子高度height[i]的右边界下标 
+        LinkedList<Integer> list=new LinkedList<>();
+        for(int i=0;i<n;i++){
+            while(!list.isEmpty()&&heights[list.peek()]>=heights[i]){ // 将左边大于等于heights[i]的都弹出
+                list.pop();
+            }
+            left[i]=list.isEmpty()?-1:list.peek(); // 左边界
+            list.push(i);
+        }
+
+        list.clear();
+        for(int i=n-1;i>=0;i--){
+            while(!list.isEmpty()&&heights[list.peek()]>=heights[i]){ // 将右边大于等于heights[i]的都弹出
+                list.pop();
+            }
+            right[i]=list.isEmpty()?n:list.peek(); // 右边界
+            list.push(i);
+        }
+
+        int res=Integer.MIN_VALUE;
+        for(int i=0;i<n;i++){
+            res=Math.max(res,(right[i]-left[i]-1)*heights[i]);  // 面积
+        }
+        return res;
+    }
+}
+```
+
+
+
+
+
+# 十七. 栈
+
+## 1. 有效的括号
 
 ![Untitled](assets/Untitled 114.png)
 
@@ -5588,13 +5746,17 @@ class Solution
 }
 ```
 
-# 十七、贪心
 
-## 1、最小会议室数量（联通数科笔试）
+
+
+
+# 十八. 贪心
+
+## 1. 最小会议室数量（联通数科笔试）
 
 [算法训练--最少会议室_java萌新凌的博客-CSDN博客_最少会议室](https://blog.csdn.net/qq_57205114/article/details/123899267?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22123899267%22%2C%22source%22%3A%22unlogin%22%7D)
 
-# 十八、排序+二分变种
+# 十九. 排序+二分变种
 
 1、**供暖器（475）**
 
@@ -5653,9 +5815,9 @@ class Solution
 }
 ```
 
-# 十九、最短路径
+# 二十. 最短路径
 
-## 1、**前往目标的最小代价（2662）**
+## 1. **前往目标的最小代价（2662）**
 
 ![Untitled](assets/Untitled 118.png)
 
@@ -5665,17 +5827,112 @@ class Solution
 
 Dijkstra算法： [**Dijkstra算法**](https://www.notion.so/Dijkstra-e30f0a3dc1b04d2eac90220af1df132d?pvs=21) 
 
-# 二十、状态压缩
+# 二一. 状态压缩
 
-## 1、 **贴纸拼词（691）**
+## 1.  **贴纸拼词（691）**
 
 [https://leetcode.cn/problems/stickers-to-spell-word/description/](https://leetcode.cn/problems/stickers-to-spell-word/description/)
 
 
 
+# 二二. 大小堆
+
+## 1. [数据流的中位数](https://leetcode.cn/problems/find-median-from-data-stream/)
+
+**中位数**是有序整数列表中的中间值。如果列表的大小是偶数，则没有中间值，中位数是两个中间值的平均值。
+
+- 例如 `arr = [2,3,4]` 的中位数是 `3` 。
+- 例如 `arr = [2,3]` 的中位数是 `(2 + 3) / 2 = 2.5` 。
+
+实现 MedianFinder 类:
+
+- `MedianFinder() `初始化 `MedianFinder` 对象。
+- `void addNum(int num)` 将数据流中的整数 `num` 添加到数据结构中。
+- `double findMedian()` 返回到目前为止所有元素的中位数。与实际答案相差 `10-5` 以内的答案将被接受。
+
+**示例 1：**
+
+```
+输入
+["MedianFinder", "addNum", "addNum", "findMedian", "addNum", "findMedian"]
+[[], [1], [2], [], [3], []]
+输出
+[null, null, null, 1.5, null, 2.0]
+
+解释
+MedianFinder medianFinder = new MedianFinder();
+medianFinder.addNum(1);    // arr = [1]
+medianFinder.addNum(2);    // arr = [1, 2]
+medianFinder.findMedian(); // 返回 1.5 ((1 + 2) / 2)
+medianFinder.addNum(3);    // arr[1, 2, 3]
+medianFinder.findMedian(); // return 2.0
+```
+
+**提示:**
+
+- `-105 <= num <= 105`
+- 在调用 `findMedian` 之前，数据结构中至少有一个元素
+- 最多 `5 * 104` 次调用 `addNum` 和 `findMedian`
 
 
-# 二十一、其他
+
+思路：
+
+插入排序维持有序可解，但时间复杂度高，此处利用大小对进行优化
+
+创建小顶堆A：存较大的一半，堆顶元素为最小值，假设为a
+
+创建大顶堆B：存较小的一半，堆顶元素为最大值，假设为b
+
+
+
+若A B元素数量相等，则中位数为(a+b)/2.0；若A B元素数量不相等，则中位数为a b其中一个，取决于如何插入。总之**都可以通过<font color=red>获取堆顶元素计算中位数<。**
+
+时间复杂度: $O(n log n)$
+
+
+
+```java
+class MedianFinder {
+    PriorityQueue<Integer> A;
+    PriorityQueue<Integer> B;
+    public MedianFinder() {
+        A=new PriorityQueue<>((o1,o2)->o1-o2); // 小顶堆，存较大的一半，堆顶元素为最小值
+        B=new PriorityQueue<>((o1,o2)->o2-o1); // 大顶堆，存较小的一半，堆顶元素为最大值
+    }
+    
+    public void addNum(int num) {
+        if(A.size()==B.size()){
+            A.add(num);
+            B.add(A.poll()); // 将A中的最小值放入B中，平衡A B元素个数，使得二者元素个数相差不超过1
+        }else{
+            B.add(num);
+            A.add(B.poll()); // 将B中的最大值放入A中，平衡A B元素个数
+        }
+          
+    }
+    
+    public double findMedian() {
+        return A.size()!=B.size()?B.peek():(A.peek()+B.peek())/2.0;
+    }
+}
+```
+
+
+
+但是时间复杂度感觉还是不是很好，官解103ms ，上面的代码122ms， 插入排序527ms，插入排序用二分查找优化328ms
+
+
+
+<img src="assets/image-20240624212131825.png" alt="image-20240624212131825" style="zoom:50%;" />
+
+
+
+
+
+
+
+# 二三. 其他
 
 ## 1. [删除有序数组中的重复项 II](https://leetcode.cn/problems/remove-duplicates-from-sorted-array-ii/)
 
@@ -5769,7 +6026,7 @@ class Solution {
 
 
 
-## 2.[轮转数组](https://leetcode.cn/problems/rotate-array/)
+## 2. [轮转数组](https://leetcode.cn/problems/rotate-array/)
 
 给定一个整数数组 `nums`，将数组中的元素向右轮转 `k` 个位置，其中 `k` 是非负数。要求空间复杂度为 `O(1)` 的 **原地** 算法
 
@@ -5841,7 +6098,7 @@ class Solution {
 
 
 
-## 3.[分发糖果](https://leetcode.cn/problems/candy/)
+## 3. [分发糖果](https://leetcode.cn/problems/candy/)
 
 `n` 个孩子站成一排。给你一个整数数组 `ratings` 表示每个孩子的评分。
 
@@ -5924,4 +6181,1675 @@ class Solution {
 }
 
 ```
+
+
+
+
+
+
+
+# Hot100 重刷
+
+## 1. LRU缓存（阿里社招二面手撕）
+
+请你设计并实现一个满足 [LRU (最近最少使用) 缓存](https://baike.baidu.com/item/LRU) 约束的数据结构。
+
+实现 `LRUCache` 类：
+
+- `LRUCache(int capacity)` 以 **正整数** 作为容量 `capacity` 初始化 LRU 缓存
+- `int get(int key)` 如果关键字 `key` 存在于缓存中，则返回关键字的值，否则返回 `-1` 。
+- `void put(int key, int value)` 如果关键字 `key` 已经存在，则变更其数据值 `value` ；如果不存在，则向缓存中插入该组 `key-value` 。如果插入操作导致关键字数量超过 `capacity` ，则应该 **逐出** 最久未使用的关键字。
+
+函数 `get` 和 `put` 必须以 `O(1)` 的平均时间复杂度运行。
+
+ 
+
+**示例：**
+
+```
+输入
+["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+输出
+[null, null, null, 1, null, -1, null, -1, 3, 4]
+
+解释
+LRUCache lRUCache = new LRUCache(2);
+lRUCache.put(1, 1); // 缓存是 {1=1}
+lRUCache.put(2, 2); // 缓存是 {1=1, 2=2}
+lRUCache.get(1);    // 返回 1
+lRUCache.put(3, 3); // 该操作会使得关键字 2 作废，缓存是 {1=1, 3=3}
+lRUCache.get(2);    // 返回 -1 (未找到)
+lRUCache.put(4, 4); // 该操作会使得关键字 1 作废，缓存是 {4=4, 3=3}
+lRUCache.get(1);    // 返回 -1 (未找到)
+lRUCache.get(3);    // 返回 3
+lRUCache.get(4);    // 返回 4
+```
+
+ 
+
+**提示：**
+
+- `1 <= capacity <= 3000`
+- `0 <= key <= 10000`
+- `0 <= value <= 105`
+- 最多调用 `2 * 105` 次 `get` 和 `put`
+
+
+
+关键：
+
+- 双向链表+HashMap实现（LinkedHashMap）
+- 双向链表的节点Node存: key、value，前驱prev，后继next；借助HashMap<key, Node> 保证时间复杂度为O（1）
+- 每次访问（get或put操作）都将该节点移动到头节点，以确保尾节点是最久未访问的。当size超过容量capacity时直接删除尾节点和map里对应的键值对即可。
+
+```java
+class LRUCache 
+{
+    private int capacity;
+    int size;
+    Node head;
+    Node tail;
+    class Node{
+        public int key;
+        public int value;
+        public Node prev;
+        public Node next;
+        public Node(){
+        }
+        public Node(int key,int value){
+            this.key=key;
+            this.value=value;
+        }
+    }
+
+    HashMap<Integer,Node> cache=new HashMap<>();
+    public LRUCache(int capacity) 
+    {
+       this.capacity=capacity;
+       this.size=0;
+       // 创建两个哑节点，省去判空
+       this.head=new Node();
+       this.tail=new Node();
+       this.head.next=this.tail;
+       this.tail.prev=this.head;
+    }
+    
+    public int get(int key) 
+    {
+        Node node=cache.get(key);
+        if(node==null){
+            return -1;
+        }else{
+            // 删除并移到头节点
+            deleteNode(node);
+            addToHead(node);
+            return node.value;
+        }
+    }
+
+    public void addToHead(Node node){
+        head.next.prev=node;
+        node.next=head.next;
+        head.next=node;
+        node.prev=head;
+    }
+
+    public void deleteNode(Node node){
+        node.prev.next=node.next;
+        node.next.prev=node.prev;
+    }
+    
+    public void put(int key, int value) 
+    {
+        Node node=cache.get(key);
+        Node tem=null;
+        if(node==null){
+            tem=new Node(key,value);
+            size++;
+        }else{  // 更新值
+        node.value=value;
+        tem=node;
+        //  删除该节点
+        deleteNode(node);
+        }
+
+        //加到头节点
+        addToHead(tem);
+        cache.put(key,tem);
+        if(size>capacity){ // 超出最大容量,移除尾节点
+        Node delete=tail.prev;
+        deleteNode(delete);
+        delete.next=null;
+        delete.prev=null;
+        cache.remove(delete.key);
+        size--;
+        }
+    }
+}
+```
+
+
+
+## 2.[和为 K 的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/)
+
+给你一个整数数组 `nums` 和一个整数 `k` ，请你统计并返回 *该数组中和为 `k` 的子数组的个数* 。
+
+子数组是数组中元素的连续非空序列。要求时间复杂度为O（n)
+
+
+
+**示例 1：**
+
+```
+输入：nums = [1,1,1], k = 2
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,2,3], k = 3
+输出：2
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 2 * 104`
+- `-1000 <= nums[i] <= 1000`
+- `-107 <= k <= 107`
+
+
+
+暴力枚举时间复杂度$O(n^2)$
+
+
+
+思路：前缀和+哈希表
+
+时间复杂度$O(n)$ , 空间复杂度$O(n)$
+
+设下标$i$的前缀和为$prefixSum[i]$，则下标$[j:i]$的和为$prefixSum[i]-prefixSum[j-1]$,对于以下标$i$结尾的子序列，若$prefixSum[i]-prefixSum[j-1]=k$则满足条件，因此问题转化为在下标$0 \leq j<i$中寻找满足条件的前缀和$prefixSum[i]-k$。
+
+```java
+class Solution {
+    public int subarraySum(int[] nums, int k) {
+        HashMap<Integer,Integer> map=new HashMap<>();  // key-前缀和  value:出现的次数
+        map.put(0,1);  //  预置前缀和为0出现的次数为1  举例： 3 4 7 ....  k=7, 那么prefixSum[2]=3+4=7  找7-7=0出现的次数  1
+        int count=0;  //最终结果
+        int prefixSum=0; // 前缀和
+        for(int i=0;i<nums.length;i++){
+            prefixSum +=nums[i];
+            Integer tem=map.get(prefixSum-k); //找前缀和prefixSum-k出现的次数，prefixSum-(prefixSum-k)=k
+            if(tem!=null){
+                count +=tem;
+            }
+            map.put(prefixSum,map.getOrDefault(prefixSum,0)+1); // 可能下标i和j的前缀和相同
+        }
+        return count;
+        
+    }
+}
+```
+
+
+
+## 3.[找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
+
+给定两个字符串 `s` 和 `p`，找到 `s` 中所有 `p` 的 **异位词** 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+
+**异位词** 指由相同字母重排列形成的字符串（包括相同的字符串）。
+
+ 
+
+**示例 1:**
+
+```
+输入: s = "cbaebabacd", p = "abc"
+输出: [0,6]
+解释:
+起始索引等于 0 的子串是 "cba", 它是 "abc" 的异位词。
+起始索引等于 6 的子串是 "bac", 它是 "abc" 的异位词。
+```
+
+ **示例 2:**
+
+```
+输入: s = "abab", p = "ab"
+输出: [0,1,2]
+解释:
+起始索引等于 0 的子串是 "ab", 它是 "ab" 的异位词。
+起始索引等于 1 的子串是 "ba", 它是 "ab" 的异位词。
+起始索引等于 2 的子串是 "ab", 它是 "ab" 的异位词。
+```
+
+ 
+
+**提示:**
+
+- `1 <= s.length, p.length <= 3 * 104`
+- `s` 和 `p` 仅包含小写字母
+
+
+
+方法一：用HashMap统计每个字母出现的次数，比较两个Map中的元素是否相等，同时用第三个Map缓存判断过的字符串
+
+注意：**<font color=red size=3>判断两个Integer数字是否相等用equals，包括所有的包装类型，==是判断引用地址是否相等，只有在缓存数组中的才相等（比如12)，而不在的是判断地址（如1000）, 二者是不相等的。</font>**
+
+方法二：滑动串口，关键点：
+
+- 使用长度为26的数组统计字符的数量，判断两个数组是否相等调Arrays.equals
+- 串口长度p字符串的长度，每次s的窗口往右滑动一格
+
+
+
+```java
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        List<Integer> res=new ArrayList<>();
+        int sLen=s.length(),pLen=p.length();
+        if(sLen<pLen){
+            return res;
+        }
+        // 统计每个字母出现的次数
+        int[] sCount=new int[26];
+        int[] pCount=new int[26];
+
+        for(int i=0;i<pLen;i++){  
+            sCount[s.charAt(i)-'a']++;   // 窗口长度pLen
+            pCount[p.charAt(i)-'a']++;
+        }
+        if(Arrays.equals(sCount,pCount)){ // 直接调Arrays.equals判断数组中所有元素是否相等，不用自己再写循环
+            res.add(0);
+        }
+        // s的窗口每次往右移动一格
+        for(int i=1;i<=sLen-pLen;i++){
+            sCount[s.charAt(i-1)-'a']--;  
+            sCount[s.charAt(i+pLen-1)-'a']++;
+            if(Arrays.equals(sCount,pCount)){
+            res.add(i);
+            }
+        }
+        return res;
+    }
+}
+```
+
+
+
+
+
+## 4. [除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/)
+
+给你一个整数数组 `nums`，返回 数组 `answer` ，其中 `answer[i]` 等于 `nums` 中除 `nums[i]` 之外其余各元素的乘积 。
+
+题目数据 **保证** 数组 `nums`之中任意元素的全部前缀元素和后缀的乘积都在 **32 位** 整数范围内。
+
+请 **不要使用除法，**且在 `O(n)` 时间复杂度内完成此题。
+
+ 
+
+**示例 1:**
+
+```
+输入: nums = [1,2,3,4]
+输出: [24,12,8,6]
+```
+
+**示例 2:**
+
+```
+输入: nums = [-1,1,0,-3,3]
+输出: [0,0,9,0,0]
+```
+
+ 
+
+**提示：**
+
+- `2 <= nums.length <= 105`
+- `-30 <= nums[i] <= 30`
+- **保证** 数组 `nums`之中任意元素的全部前缀元素和后缀的乘积都在 **32 位** 整数范围内
+
+ 
+
+**进阶：**你可以在 `O(1)` 的额外空间复杂度内完成这个题目吗？（ 出于对空间复杂度分析的目的，输出数组 **不被视为** 额外空间。）
+
+
+
+思路：前缀积+后缀积
+
+假设前缀积为prefixMul， 后缀积为suffixMul，那么除nums[i]的积等于prefixMul[i-1]*suffixMul[i+1]
+
+空间复杂度O(n)
+
+```java
+class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int n=nums.length;
+        int[] prefixMul=new int[n];  // 前缀积
+        int[] suffixMul=new int[n];  // 后缀积
+        int mul=1;
+        for(int i=0;i<n;i++){
+            mul *=nums[i];
+            prefixMul[i]=mul;
+        }
+        mul=1;
+        for(int i=n-1;i>=0;i--){
+            mul *=nums[i];
+            suffixMul[i]=mul;
+        }
+
+        int[] res=new int[n];
+        res[0]=suffixMul[1];
+        res[n-1]=prefixMul[n-2];
+        for(int i=1;i<n-1;i++){
+            res[i]=prefixMul[i-1]*suffixMul[i+1];  // 左前缀积*右前缀积
+        }
+        return res;
+    }
+}
+```
+
+
+
+进阶：将后缀积先用结果数组保存
+
+```java
+class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int n=nums.length;
+        int[] suffixMul=new int[n];  // 后缀积 ，复用输出数组
+        int mul=1;
+        for(int i=n-1;i>=0;i--){
+            mul *=nums[i];
+            suffixMul[i]=mul;
+        }
+        suffixMul[0]=suffixMul[1];
+    
+        mul=1;
+        for(int i=0;i<n-2;i++){
+            mul *=nums[i];
+            suffixMul[i+1]=mul*suffixMul[i+2];
+        }
+        
+        suffixMul[n-1]=mul*nums[n-2];
+        return suffixMul;
+    }
+}
+```
+
+
+
+## 5.[两两交换链表中的节点](https://leetcode.cn/problems/swap-nodes-in-pairs/)
+
+给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。
+
+**示例 1：**
+
+![img](assets/swap_ex1.jpg)
+
+```
+输入：head = [1,2,3,4]
+输出：[2,1,4,3]
+```
+
+**示例 2：**
+
+```
+输入：head = []
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：head = [1]
+输出：[1]
+```
+
+ 
+
+**提示：**
+
+- 链表中节点的数目在范围 `[0, 100]` 内
+- `0 <= Node.val <= 100`
+
+
+
+思路：递归，要有整体思维
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if(head==null||head.next==null){
+            return head;
+        }
+
+        ListNode newHead=head.next;
+        head.next=swapPairs(newHead.next);
+        newHead.next=head;
+        return newHead;  
+    } 
+}
+```
+
+
+
+## 6.[随机链表的复制](https://leetcode.cn/problems/copy-list-with-random-pointer/)
+
+给你一个长度为 `n` 的链表，每个节点包含一个额外增加的随机指针 `random` ，该指针可以指向链表中的任何节点或空节点。
+
+构造这个链表的 **[深拷贝](https://baike.baidu.com/item/深拷贝/22785317?fr=aladdin)**。 深拷贝应该正好由 `n` 个 **全新** 节点组成，其中每个新节点的值都设为其对应的原节点的值。新节点的 `next` 指针和 `random` 指针也都应指向复制链表中的新节点，并使原链表和复制链表中的这些指针能够表示相同的链表状态。**复制链表中的指针都不应指向原链表中的节点** 。
+
+例如，如果原链表中有 `X` 和 `Y` 两个节点，其中 `X.random --> Y` 。那么在复制链表中对应的两个节点 `x` 和 `y` ，同样有 `x.random --> y` 。
+
+返回复制链表的头节点。
+
+用一个由 `n` 个节点组成的链表来表示输入/输出中的链表。每个节点用一个 `[val, random_index]` 表示：
+
+- `val`：一个表示 `Node.val` 的整数。
+- `random_index`：随机指针指向的节点索引（范围从 `0` 到 `n-1`）；如果不指向任何节点，则为 `null` 。
+
+你的代码 **只** 接受原链表的头节点 `head` 作为传入参数。
+
+ 
+
+**示例 1：**
+
+![img](assets/e1.png)
+
+```
+输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
+输出：[[7,null],[13,0],[11,4],[10,2],[1,0]]
+```
+
+**示例 2：**
+
+![img](assets/e2.png)
+
+```
+输入：head = [[1,1],[2,1]]
+输出：[[1,1],[2,1]]
+```
+
+**示例 3：**
+
+**![img](assets/e3.png)**
+
+```
+输入：head = [[3,null],[3,0],[3,null]]
+输出：[[3,null],[3,0],[3,null]]
+```
+
+ 
+
+**提示：**
+
+- `0 <= n <= 1000`
+- `-104 <= Node.val <= 104`
+- `Node.random` 为 `null` 或指向链表中的节点。
+
+
+
+思路：回溯+哈希表
+
+```java
+class Solution {
+    Map<Node, Node> cachedNode = new HashMap<Node, Node>();
+
+    public Node copyRandomList(Node head) {
+        if (head == null) {
+            return null;
+        }
+        if (!cachedNode.containsKey(head)) {
+            Node headNew = new Node(head.val);
+            cachedNode.put(head, headNew);
+            headNew.next = copyRandomList(head.next);
+            headNew.random = copyRandomList(head.random);
+        }
+        return cachedNode.get(head);
+    }
+}
+```
+
+
+
+
+
+## 7.[对称二叉树](https://leetcode.cn/problems/symmetric-tree/)
+
+给你一个二叉树的根节点 `root` ， 检查它是否轴对称。
+
+ 
+
+**示例 1：**
+
+![img](assets/1698026966-JDYPDU-image.png)
+
+```
+输入：root = [1,2,2,3,4,4,3]
+输出：true
+```
+
+**示例 2：**
+
+![img](assets/1698027008-nPFLbM-image.png)
+
+```
+输入：root = [1,2,2,null,3,null,3]
+输出：false
+```
+
+ 
+
+**提示：**
+
+- 树中节点数目在范围 `[1, 1000]` 内
+- `-100 <= Node.val <= 100`
+
+
+
+思路：判断左右子树是否镜像对称
+
+如果同时满足下面的条件，两个树互为镜像：
+
+- 它们的两个根结点具有相同的值
+- 每个树的右子树都与另一个树的左子树镜像对称
+
+
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        return check(root, root);
+    }
+
+    public boolean check(TreeNode p, TreeNode q) {
+        if (p == null && q == null) {
+            return true;
+        }
+        if (p == null || q == null) {
+            return false;
+        }
+        return p.val == q.val && check(p.left, q.right) && check(p.right, q.left);
+    }
+}
+```
+
+
+
+思路二：先保存一份副本，然后将root翻转得到新树newRoot，若root和newRoot结构一致则对称
+
+```java
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        TreeNode back=copy(root);
+        TreeNode newRoot=inverse(root);
+        return judge(back,newRoot);
+    }
+    // 保存副本
+    public TreeNode copy(TreeNode root){
+        if(root==null){
+            return null;
+        }
+        if(root.left==null&&root.right==null){
+            return new TreeNode(root.val);
+        }
+        TreeNode newRoot=new TreeNode(root.val);
+        newRoot.left=copy(root.left);
+        newRoot.right=copy(root.right);
+        return newRoot;
+    }
+    
+    // 翻转二叉树
+
+    public TreeNode inverse(TreeNode root){
+        if(root==null||(root.left==null&&root.right==null)){
+            return root;
+        }
+
+        TreeNode tem=inverse(root.right);
+        root.right=inverse(root.left);
+        root.left=tem;
+        return root;
+    }
+
+    // 判断两棵树是否相等
+    public boolean judge(TreeNode node1,TreeNode node2){
+        if(node1==null&&node2==null){
+            return true;
+        }
+        if((node1==null&&node2!=null)||(node1!=null&&node2==null)){
+            return false;
+        }
+        return node1.val==node2.val&&judge(node1.left,node2.left)&&judge(node1.right,node2.right);
+    }
+
+}
+```
+
+
+
+
+
+## 8.[二叉树的直径](https://leetcode.cn/problems/diameter-of-binary-tree/)（最长路径）
+
+**<font color=red size=3>拼多多三面，求二叉树中的最长路径并打印出路径</font>**
+
+给你一棵二叉树的根节点，返回该树的 **直径** 。
+
+二叉树的 **直径** 是指树中任意两个节点之间最长路径的 **长度** 。这条路径可能经过也可能不经过根节点 `root` 。
+
+两节点之间路径的 **长度** 由它们之间边数表示。
+
+ 
+
+**示例 1：**
+
+![img](assets/diamtree.jpg)
+
+```
+输入：root = [1,2,3,4,5]
+输出：3
+解释：3 ，取路径 [4,2,1,3] 或 [5,2,1,3] 的长度。
+```
+
+**示例 2：**
+
+```
+输入：root = [1,2]
+输出：1
+```
+
+ 
+
+**提示：**
+
+- 树中节点数目在范围 `[1, 104]` 内
+- `-100 <= Node.val <= 100`
+
+
+
+思路：遍历所有节点，找出以它为顶点的最长路径就可得到整体最长。而以节点A为顶点的最长路径=A的左子树到叶子节点的最长路径+A的右子树到叶子节点的最长路径+2（假设左右子树都存在）
+
+因此可以先求出从某顶点到叶子节点的最长路径
+
+官解：
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    int ans;
+    public int diameterOfBinaryTree(TreeNode root) {
+        ans = 1;
+        depth(root);
+        return ans - 1; // 路经长=顶点数-1
+    }
+    // 求一棵树的最大深度（根节点到叶子节点的最大节点数量）
+    public int depth(TreeNode node) {
+        if (node == null) {
+            return 0; // 访问到空节点了，返回0
+        }
+        int L = depth(node.left); // 左儿子为根的子树的深度
+        int R = depth(node.right); // 右儿子为根的子树的深度
+        ans = Math.max(ans, L+R+1); // 计算d_node即L+R+1 并更新ans
+        return Math.max(L, R) + 1; // 返回该节点为根的子树的深度
+    }
+}
+```
+
+
+
+自己写的：
+
+```java
+class Solution {
+    HashMap<TreeNode,Integer> cache=new HashMap<>(); // 缓存
+
+    public int diameterOfBinaryTree(TreeNode root) {
+        if(root==null){
+            return 0;
+        }
+        if(root.left==null&&root.right==null){
+            return 0;
+        }
+      
+        int longestDiameter=0;
+        LinkedList<TreeNode> list=new LinkedList<>();
+        list.add(root);
+        // 遍历所有节点，以它为顶点的最长路径，得到整体最长
+        while(!list.isEmpty()){
+            TreeNode tem=list.remove();
+            int temDiameter=0;
+            if(tem.left!=null){
+                if(cache.get(tem.left)==null){
+                    cache.put(tem.left,maxDiameter(tem.left)); // 左子树的最长路径
+                }
+                temDiameter +=1+cache.get(tem.left); // 加上左子树路径长
+                list.add(tem.left);
+            }
+             if(tem.right!=null){
+                if(cache.get(tem.right)==null){
+                    cache.put(tem.right,maxDiameter(tem.right));
+                }
+                temDiameter  +=1+cache.get(tem.right);  // 加上右子树路径长
+                list.add(tem.right);
+            }
+
+            longestDiameter=Math.max(longestDiameter,temDiameter); 
+        }
+        return longestDiameter;
+    }
+
+    // 求一棵树从根节点到叶子节点的最长路径
+    int maxDepth=0;
+    int depth=-1;
+    public int maxDiameter(TreeNode node){
+        if(node==null){
+            return 0;
+        }
+        if(node.left==null&&node.right==null){
+            return 0;
+        }
+        maxDepth=0;
+        depth=-1;
+        dfs(node);
+        return maxDepth;
+    }
+
+    public void dfs(TreeNode node){
+        depth +=1;
+        maxDepth=Math.max(maxDepth,depth);
+        if(node.left!=null){
+            dfs(node.left);
+        }
+        if(node.right!=null){
+            dfs(node.right);
+        }
+        depth -=1;
+    }
+}
+```
+
+
+
+## 9.[将有序数组转换为二叉搜索树](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/)
+
+给你一个整数数组 `nums` ，其中元素已经按 **升序** 排列，请你将其转换为一棵 **平衡** 二叉搜索树。
+
+**示例 1：**
+
+![img](assets/btree1.jpg)
+
+```
+输入：nums = [-10,-3,0,5,9]
+输出：[0,-3,9,-10,null,5]
+解释：[0,-10,5,null,-3,null,9] 也将被视为正确答案：
+```
+
+**示例 2：**
+
+![img](assets/btree.jpg)
+
+```
+输入：nums = [1,3]
+输出：[3,1]
+解释：[1,null,3] 和 [3,1] 都是高度平衡二叉搜索树。
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 104`
+- `-104 <= nums[i] <= 104`
+- `nums` 按 **严格递增** 顺序排列
+
+
+
+思路：平衡二叉树为左右子树深度相差不超过1
+
+**因此每次选择数组中间的数作为根节点**即可，无需自己写平衡翻转代码
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    //TreeNode root; // 根节点
+    public TreeNode sortedArrayToBST(int[] nums) {
+        int n=nums.length;
+        int med=n/2;
+        if(n==0){
+            return null;
+        }
+        if(n==1){
+            return new TreeNode(nums[0]);
+        }
+
+        TreeNode root=new TreeNode(nums[med]); // 每次选中间值作为根节点就可保证平衡
+        int[] leftSub=new int[med];
+        System.arraycopy(nums,0,leftSub,0,med);
+        int[] rightSub=new int[n-med-1];
+        System.arraycopy(nums,med+1,rightSub,0,n-med-1);
+        root.left=sortedArrayToBST(leftSub);
+        root.right=sortedArrayToBST(rightSub);
+        return root;
+    }
+}
+```
+
+
+
+
+
+## 10. [分割回文串](https://leetcode.cn/problems/palindrome-partitioning/)
+
+给你一个字符串 `s`，请你将 `s` 分割成一些子串，使每个子串都是 **回文串**   返回 `s` 所有可能的分割方案。
+
+**示例 1：**
+
+```
+输入：s = "aab"
+输出：[["a","a","b"],["aa","b"]]
+```
+
+**示例 2：**
+
+```
+输入：s = "a"
+输出：[["a"]]
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 16`
+- `s` 仅由小写英文字母组成
+
+
+
+思路:  设字符串长度为$n$，则最多可切$n-1$刀，dfs穷举所有的切法可能。记上一刀在下标$j$ ，当前刀在下标$i$，有$1\leq j<i\leq n-1$,被这两刀分隔出来的字符串为$s.substring(j,i)$, 
+
+- 当前刀$i$切： 前提是$s.substring(j,i)$为回文串，并将$s.substring(j,i)$加入临时列表，上一刀更新为$i$, 同时继续穷举下一刀$i+1$
+- 当前刀$i$不切：没有限制，上一刀不更新，并继续穷举下一刀$i+1$
+- 走到$i=n$时表示切到了最后，前面的都是回文串，此时再判断最后一个字符串$s.substring(j,n)$是否为回文串，若是表示该方案可行。
+
+
+
+法一：dfs+判断回文串用双指针   耗时14ms ，打败7%   (**自己的**)
+
+判断回文串用双指针会有重复判断，虽然用了缓存存
+
+```java
+class Solution {
+    public List<List<String>> partition(String s) {
+        int n=s.length();
+        if(n==1){
+            List<List<String>> res=new ArrayList<>();
+            res.add(Arrays.asList(s));
+            return res;
+        }
+
+        dfs(0,1,s);
+        return res;
+    }
+
+    HashMap<String,Boolean>  cache=new HashMap<>(); // 存储判断过的字符串
+    List<String> tem=new ArrayList<>();
+    List<List<String>> res=new ArrayList<>();
+    public void dfs(int j,int i,String s){ // j：上一次切的下标 下标i之前切不切  1<=i<=n-1  (最后一个字符串留待最后判断-> 因为不切是不加进去的，统一二者)
+        int n=s.length();
+        if(i>n-1){
+            String t=s.substring(j,n);
+            if(illegal(t)){
+                tem.add(t);
+                res.add(new ArrayList<>(tem));
+                tem.remove(tem.size()-1);
+            }
+            return;
+        }
+
+        String sub=s.substring(j,i);
+
+        if(illegal(sub)){ // 下标i切（前提是j->i 字符串为合法回文串，否则中断）
+            tem.add(sub);
+            dfs(i,i+1,s);
+            tem.remove(tem.size()-1);
+        }
+        // 下标i不切
+        dfs(j,i+1,s); 
+        
+    }
+
+
+    public boolean illegal(String s){
+        int n=s.length();
+        if(n==1){
+            cache.put(s,true);
+        }
+        if(cache.get(s)!=null){
+            return cache.get(s);
+        }
+        
+        int left=0,right=n-1;
+        while(left<right){
+            if(s.charAt(left)==s.charAt(right)){
+                left++;
+                right--;
+            }else{
+                cache.put(s,false);
+                return false;
+            }
+        }
+        cache.put(s,true);
+        return true;
+    }
+}
+```
+
+
+
+法二：dfs+判断回文串用动态规划    耗时14ms ，打败99%  （**官解**）
+
+判断回文串用动态规划，设字符串$s，dp[i][j]$表示$s.substring(i,j+1)$是否为回文串，有递推公式：
+
+```java
+dp[i][j]=dp[i+1][j-1]&&s.charAt(i)==s.charAt(j)
+```
+
+
+
+```java
+class Solution {
+    public List<List<String>> partition(String s) {
+        int n=s.length();
+        if(n==1){
+            List<List<String>> res=new ArrayList<>();
+            res.add(Arrays.asList(s));
+            return res;
+        }
+
+        boolean[][] dp=new boolean[n][n]; //dp[i][j]： 下标i~j是否为回文串
+        for(int i=0;i<n;i++){
+            Arrays.fill(dp[i],true);
+        }
+        for(int i=n-2;i>=0;i--){
+            for(int j=i+1;j<n;j++){
+                dp[i][j]=dp[i+1][j-1]&&s.charAt(i)==s.charAt(j); // 特殊：当字符串长度为2时，i+1>j-1 预置dp[i+1][j-1]=true
+            }
+        }
+        
+        dfs(0,1,s,dp);
+        return res;
+    }
+
+    HashMap<String,Boolean>  cache=new HashMap<>(); // 存储判断过的字符串
+    List<String> tem=new ArrayList<>();
+    List<List<String>> res=new ArrayList<>();
+    public void dfs(int j,int i,String s,boolean[][] dp){ // j：上一次切的下标 下标i之前切不切  1<=i<=n-1  (最后一个字符串留待最后判断-> 因为不切是不加进去的，统一二者)
+        int n=s.length();
+        if(i>n-1){
+            String t=s.substring(j,n);
+            if(dp[j][n-1]){
+                tem.add(t);
+                res.add(new ArrayList<>(tem));
+                tem.remove(tem.size()-1);
+            }
+            return;
+        }
+
+        String sub=s.substring(j,i);
+        if(dp[j][i-1]){ // 下标i切（前提是j->i 字符串为合法回文串，否则中断）
+            tem.add(sub);
+            dfs(i,i+1,s,dp);
+            tem.remove(tem.size()-1);
+        }
+        // 下标i不切
+        dfs(j,i+1,s,dp); 
+    }
+}
+```
+
+
+
+## 11.[括号生成](https://leetcode.cn/problems/generate-parentheses/)
+
+数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
+
+**示例 1：**
+
+```
+输入：n = 3
+输出：["((()))","(()())","(())()","()(())","()()()"]
+```
+
+**示例 2：**
+
+```
+输入：n = 1
+输出：["()"]
+```
+
+ 
+
+**提示：**
+
+- `1 <= n <= 8`
+
+
+
+思路：
+
+- 判断是否为合法括号：
+
+从左往右遍历字符串s，用count记录左括号的数量，遇到 **'('**  自增，遇到 **')'** 自减，若$count<0$必非法返回
+
+- dfs穷举所有可能，共$2*n$个位置，每个位置只有 **'('** 和 **')'** 两种可能 ，且合法括号首位必须为 **'('** 和 **')'** ,实际只有$2*n-2$个位置需要判断，共$2^{2*n-2}$种可能
+
+
+
+```java
+class Solution {
+    public List<String> generateParenthesis(int n) {
+        dfs("(",2,n);
+        return res;   
+    }
+
+    // dfs遍历所有可能，代替2*n重循环 且合法的括号首末必是 '(' 和')'  因此实际只需探索2^(2n-2)种可能
+    List<String> res=new ArrayList<>();
+    public void dfs(String s,int i,int n){  // i：下标位置
+        if(i>2*n-1){
+            if(illegal(s+")")&&!res.contains(s+")")){  // 字符串s为回文串且res中不包含
+                res.add(s+")");
+            }
+            return;
+        }
+
+        dfs(s+"(",i+1,n);  // 下标i处为'('
+        dfs(s+")",i+1,n);  // 下标i处为')'
+    }
+    
+    // 判断字符串是否为合法括号：count记录左括号的数量，遇到'(' 自增，遇到')'自减，若count<0必非法返回
+    public boolean illegal(String s){
+        int count=0;  // 左括号数量
+        for(int i=0;i<s.length();i++){
+            if(s.charAt(i)=='('){
+                count++;
+            }else{
+                count--;
+            }
+            if(count<0){
+                return false;
+            }
+        }
+        return count==0;
+    }
+}
+```
+
+
+
+
+
+## 12.[寻找旋转排序数组中的最小值](https://leetcode.cn/problems/find-minimum-in-rotated-sorted-array/)
+
+已知一个长度为 `n` 的数组，预先按照升序排列，经由 `1` 到 `n` 次 **旋转** 后，得到输入数组。例如，原数组 `nums = [0,1,2,4,5,6,7]` 在变化后可能得到：
+
+- 若旋转 `4` 次，则可以得到 `[4,5,6,7,0,1,2]`
+- 若旋转 `7` 次，则可以得到 `[0,1,2,4,5,6,7]`
+
+注意，数组 `[a[0], a[1], a[2], ..., a[n-1]]` **旋转一次** 的结果为数组 `[a[n-1], a[0], a[1], a[2], ..., a[n-2]]` 。
+
+给你一个元素值 **互不相同** 的数组 `nums` ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 **最小元素** 。
+
+你必须设计一个时间复杂度为 `O(log n)` 的算法解决此问题。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [3,4,5,1,2]
+输出：1
+解释：原数组为 [1,2,3,4,5] ，旋转 3 次得到输入数组。
+```
+
+**示例 2：**
+
+```
+输入：nums = [4,5,6,7,0,1,2]
+输出：0
+解释：原数组为 [0,1,2,4,5,6,7] ，旋转 3 次得到输入数组。
+```
+
+**示例 3：**
+
+```
+输入：nums = [11,13,15,17]
+输出：11
+解释：原数组为 [11,13,15,17] ，旋转 4 次得到输入数组。
+```
+
+ 
+
+**提示：**
+
+- `n == nums.length`
+- `1 <= n <= 5000`
+- `-5000 <= nums[i] <= 5000`
+- `nums` 中的所有整数 **互不相同**
+- `nums` 原来是一个升序排序的数组，并进行了 `1` 至 `n` 次旋转
+
+
+
+思路：二分查找
+
+旋转后仅有两种形态：
+
+- 不旋转：直线上升，最小值为$nums[0]$
+- 旋转：左段的最小值必大于右段最大值，全局最小在中间，可视化的折线图如下
+
+<img src="assets/3.png" alt="fig3" style="zoom:60%;" />
+
+因此采用如下算法：$low$记录数组的最小下标，$high$记录最大下标，$pivot=（low+high）/2$为中间下标，当$low<high$时，不断比较$nums[pivot]$和$nums[high]$的大小，
+
+- 若$nums[pivot]>nums[high]$：则表明最小值在$pivot$右边，此时令$low=pivot+1$
+- 若$nums[pivot]\leq  nums[high]$：则表明最小值在$pivot$左边，此时令$high=pivot$
+
+当$low=high$时，仅1个元素也即全局最小元素。
+
+```java
+class Solution {
+    public int findMin(int[] nums) {
+        return binarySearch(nums);
+    }
+    
+    public int binarySearch(int[] nums){
+        int left=0,right=nums.length-1;
+        while(left<right){
+            int med=(left+right)/2;
+            if(nums[med]>nums[right]){
+                left=med+1;
+            }else{
+                right=med;
+            }
+        }
+        return nums[left];
+
+    }
+}
+```
+
+
+
+## 13. [最小栈](https://leetcode.cn/problems/min-stack/)
+
+设计一个最小栈类，要求 `push` ，`pop` ，`top`和 `getMin` 操作的**时间复杂度都为$O(1)$**，其中`getMin`为获取栈中的最小元素。
+
+实现 `MinStack` 类:
+
+- `MinStack()` 初始化栈对象。
+- `void push(int val)` 将元素val推入栈。
+- `void pop()` 删除栈顶部的元素。
+- `int top()` 获取栈顶部的元素。
+- `int getMin()` 获取栈中的最小元素。
+
+ 
+
+**示例 1:**
+
+```
+输入：
+["MinStack","push","push","push","getMin","pop","top","getMin"]
+[[],[-2],[0],[-3],[],[],[],[]]
+
+输出：
+[null,null,null,null,-3,null,0,-2]
+
+解释：
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin();   --> 返回 -3.
+minStack.pop();
+minStack.top();      --> 返回 0.
+minStack.getMin();   --> 返回 -2.
+```
+
+ 
+
+**提示：**
+
+- `-231 <= val <= 231 - 1`
+- `pop`、`top` 和 `getMin` 操作总是在 **非空栈** 上调用
+- `push`, `pop`, `top`, and `getMin`最多被调用 `3 * 104` 次
+
+
+
+思路：利用一个辅助栈，用于同步主栈中的最小元素
+
+```java
+class MinStack {
+    
+    Stack<Integer> stack=new Stack<>();
+    Stack<Integer> minStack=new Stack<>(); // 栈顶总保存stack中的最小值
+
+    public MinStack() {
+        minStack.push(Integer.MAX_VALUE);
+    }
+    
+    public void push(int val) {
+        stack.push(val);
+        minStack.push(Math.min(minStack.peek(),val));
+    }
+    
+    // 栈顶总保存stack中的最小值  二者保持一致
+    public void pop() {
+        stack.pop(); 
+        minStack.pop();
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMin() {
+        return minStack.peek();
+    }
+}
+```
+
+
+
+## 14.[每日温度](https://leetcode.cn/problems/daily-temperatures/)
+
+给定一个整数数组 `temperatures` ，表示每天的温度，返回一个数组 `answer` ，其中 `answer[i]` 是指对于第 `i` 天，下一个更高温度出现在几天后。如果气温在这之后都不会升高，请在该位置用 `0` 来代替。**要求时间复杂度$O(n)$**
+
+**示例 1:**
+
+```
+输入: temperatures = [73,74,75,71,69,72,76,73]
+输出: [1,1,4,2,1,1,0,0]
+```
+
+**示例 2:**
+
+```
+输入: temperatures = [30,40,50,60]
+输出: [1,1,1,0]
+```
+
+**示例 3:**
+
+```
+输入: temperatures = [30,60,90]
+输出: [1,1,0]
+```
+
+ 
+
+**提示：**
+
+- `1 <= temperatures.length <= 105`
+- `30 <= temperatures[i] <= 100`
+
+
+
+
+
+思路：**单调栈**
+
+用栈存储尚未找到下一次温度更高 元素的下标
+
+```java
+class Solution {
+    public int[] dailyTemperatures(int[] temperatures) {
+        int n=temperatures.length;
+        int[] res=new int[n];
+        LinkedList<Integer> stack=new LinkedList<>(); //栈里存尚未找到下一次温度更高 元素的下标
+        for(int i=0;i<n;i++){
+            while(!stack.isEmpty()&&temperatures[i]>temperatures[stack.peek()]){
+                res[stack.peek()]=i-stack.pop();  // 当前温度大于它，出栈并计算天数
+            }
+            stack.push(i);
+        }
+        return res;
+    }
+}
+```
+
+
+
+模拟：$temperatures = [73,74,75,71,69,72,76,73]$
+
+![image-20240624171707040](assets/image-20240624171707040.png)
+
+使用LinkedList：
+
+<img src="assets/image-20240624171959082.png" alt="image-20240624171959082" style="zoom: 50%;" />
+
+使用Stack:
+
+<img src="assets/image-20240624171930407.png" alt="image-20240624171930407" style="zoom:50%;" />
+
+注意：**<font color=red>LinkedList没加锁，比Stack快，Stack加了锁</font>**（继承自Vector，线程安全）。
+
+<img src="assets/image-20240624171843511.png" alt="image-20240624171843511" style="zoom:50%;" />
+
+
+
+## 15. [字符串解码](https://leetcode.cn/problems/decode-string/)（栈的典型应用）
+
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: `k[encoded_string]`，表示其中方括号内部的 `encoded_string` 正好重复 `k` 次。注意 `k` 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 `k` ，例如不会出现像 `3a` 或 `2[4]` 的输入。
+
+**示例 1：**
+
+```
+输入：s = "3[a]2[bc]"
+输出："aaabcbc"
+```
+
+**示例 2：**
+
+```
+输入：s = "3[a2[c]]"
+输出："accaccacc"
+```
+
+**示例 3：**
+
+```
+输入：s = "2[abc]3[cd]ef"
+输出："abcabccdcdcdef"
+```
+
+**示例 4：**
+
+```
+输入：s = "abc3[cd]xyz"
+输出："abccdcdcdxyz"
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 30`
+- `s` 由小写英文字母、数字和方括号 `'[]'` 组成
+- `s` 保证是一个 **有效** 的输入。
+- `s` 中所有整数的取值范围为 `[1, 300]` 
+
+
+
+细节比较多，麻烦
+
+
+
+## 16.[柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
+
+给定 *n* 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+ 
+
+**示例 1:**
+
+![img](assets/histogram.jpg)
+
+```
+输入：heights = [2,1,5,6,2,3]
+输出：10
+解释：最大的矩形为图中红色区域，面积为 10
+```
+
+**示例 2：**
+
+![img](assets/histogram-1.jpg)
+
+```
+输入： heights = [2,4]
+输出： 4
+```
+
+ 
+
+**提示：**
+
+- `1 <= heights.length <=105`
+- `0 <= heights[i] <= 104`
+
+
+
+暴力枚举引入：
+
+法1：宽固定，求最小高
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        int res=0;
+        for(int i=0;i<n;i++){
+            int minHeight=heights[i];
+            for(int j=i;j>=0;j--){
+                minHeight=Math.min(minHeight,heights[j]);
+                res=Math.max(minHeight*(i-j+1),res);
+            }
+        }
+        return res;
+
+    }
+}
+```
+
+
+
+法2：高固定，左右外扩求最大宽
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        int res=Integer.MIN_VALUE;
+        for(int i=0;i<n;i++){
+            // 向左扩散求左边界
+            int leftIndex=i-1;
+            while(leftIndex>=0&&heights[leftIndex]>=heights[i]){
+                leftIndex--;
+            }
+            // 向右扩散求右边界
+            int rightIndex=i+1;
+            while(rightIndex<n&&heights[rightIndex]>=heights[i]){
+                rightIndex++;
+            }
+            // 求面积
+            res=Math.max(res,(rightIndex-leftIndex-1)*heights[i]);  
+        }
+        return res;
+    }
+}
+```
+
+
+
+上面两种暴力枚举时间复杂度都是$O(n^2)$
+
+
+
+下面基于 法2，使用单调栈进行优化到$O(n)$
+
+```java
+class Solution {
+    public int largestRectangleArea(int[] heights) {
+        int n=heights.length;
+        // 固定柱子高度height[i]，以它为中心向左右外扩，下标left[i]+1~right[i]-1的柱子高度都不小于height[i]
+        // 面积为height[i]*(right[i]-left[i]-1)
+        int[] left=new int[n]; //left[i]：小于柱子高度height[i]的左边界下标  
+        int[] right=new int[n]; //right[i]：小于柱子高度height[i]的右边界下标 
+        LinkedList<Integer> list=new LinkedList<>();
+        for(int i=0;i<n;i++){
+            while(!list.isEmpty()&&heights[list.peek()]>=heights[i]){ // 将左边大于等于heights[i]的都弹出
+                list.pop();
+            }
+            left[i]=list.isEmpty()?-1:list.peek(); // 左边界
+            list.push(i);
+        }
+
+        list.clear();
+        for(int i=n-1;i>=0;i--){
+            while(!list.isEmpty()&&heights[list.peek()]>=heights[i]){ // 将右边大于等于heights[i]的都弹出
+                list.pop();
+            }
+            right[i]=list.isEmpty()?n:list.peek(); // 右边界
+            list.push(i);
+        }
+
+        int res=Integer.MIN_VALUE;
+        for(int i=0;i<n;i++){
+            res=Math.max(res,(right[i]-left[i]-1)*heights[i]);  // 面积
+        }
+        return res;
+    }
+}
+```
+
+
+
+## 17.[数据流的中位数](https://leetcode.cn/problems/find-median-from-data-stream/)
+
+**中位数**是有序整数列表中的中间值。如果列表的大小是偶数，则没有中间值，中位数是两个中间值的平均值。
+
+- 例如 `arr = [2,3,4]` 的中位数是 `3` 。
+- 例如 `arr = [2,3]` 的中位数是 `(2 + 3) / 2 = 2.5` 。
+
+实现 MedianFinder 类:
+
+- `MedianFinder() `初始化 `MedianFinder` 对象。
+- `void addNum(int num)` 将数据流中的整数 `num` 添加到数据结构中。
+- `double findMedian()` 返回到目前为止所有元素的中位数。与实际答案相差 `10-5` 以内的答案将被接受。
+
+**示例 1：**
+
+```
+输入
+["MedianFinder", "addNum", "addNum", "findMedian", "addNum", "findMedian"]
+[[], [1], [2], [], [3], []]
+输出
+[null, null, null, 1.5, null, 2.0]
+
+解释
+MedianFinder medianFinder = new MedianFinder();
+medianFinder.addNum(1);    // arr = [1]
+medianFinder.addNum(2);    // arr = [1, 2]
+medianFinder.findMedian(); // 返回 1.5 ((1 + 2) / 2)
+medianFinder.addNum(3);    // arr[1, 2, 3]
+medianFinder.findMedian(); // return 2.0
+```
+
+**提示:**
+
+- `-105 <= num <= 105`
+- 在调用 `findMedian` 之前，数据结构中至少有一个元素
+- 最多 `5 * 104` 次调用 `addNum` 和 `findMedian`
+
+
+
+思路：
+
+插入排序维持有序可解，但时间复杂度高，此处利用大小对进行优化
+
+创建小顶堆A：存较大的一半，堆顶元素为最小值，假设为a
+
+创建大顶堆B：存较小的一半，堆顶元素为最大值，假设为b
+
+
+
+若A B元素数量相等，则中位数为(a+b)/2.0；若A B元素数量不相等，则中位数为a b其中一个，取决于如何插入。总之都可以通过获取堆顶元素计算中位数。
+
+时间复杂度: $O(n log n)$
+
+
+
+```java
+class MedianFinder {
+    PriorityQueue<Integer> A;
+    PriorityQueue<Integer> B;
+    public MedianFinder() {
+        A=new PriorityQueue<>((o1,o2)->o1-o2); // 小顶堆，存较大的一半，堆顶元素为最小值
+        B=new PriorityQueue<>((o1,o2)->o2-o1); // 大顶堆，存较小的一半，堆顶元素为最大值
+    }
+    
+    public void addNum(int num) {
+        if(A.size()==B.size()){
+            A.add(num);
+            B.add(A.poll()); // 将A中的最小值放入B中，平衡A B元素个数，使得二者元素个数相差不超过1
+        }else{
+            B.add(num);
+            A.add(B.poll()); // 将B中的最大值放入A中，平衡A B元素个数
+        }
+          
+    }
+    
+    public double findMedian() {
+        return A.size()!=B.size()?B.peek():(A.peek()+B.peek())/2.0;
+    }
+}
+```
+
+
+
+但是时间复杂度感觉还是不是很好，官解103ms ，上面的代码122ms， 插入排序527ms，插入排序用二分查找优化328ms
+
+
+
+<img src="assets/image-20240624212131825.png" alt="image-20240624212131825" style="zoom:50%;" />
 
