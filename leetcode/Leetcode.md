@@ -1178,6 +1178,185 @@ exection -> execution (插入 'u')
 
 
 
+## 25. [分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [1,5,11,5]
+输出：true
+解释：数组可以分割成 [1, 5, 5] 和 [11] 。
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,2,3,5]
+输出：false
+解释：数组不能分割成两个元素和相等的子集。
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 200`
+- `1 <= nums[i] <= 100`
+
+
+
+关键：将该问题转化为 ”**<font color=red>是否存在和为数组元素综合一半的组合</font>**“  ，设nums元素总和为sum，则寻找有无方案可使和为target=sum/2。
+
+剪枝：排除下列情况直接返回false
+
+- sum为奇数
+- 数组长度小于2
+- 数组中最大元素大于target
+
+
+
+接下来使用动态规划求数组nums中是否存在组合使得和为target。
+
+定义状态数组 $dp[n][target+1]$， 其中$dp[i][j]$表示”**从下标$0~i$ 是否存在组合使得和为$j$**“
+
+转移方程如下：
+
+- 若$nums[i]>j$: 必不可能选下标$nums[i]$，$dp[i][j]=dp[i-1][j]$
+- 若$num[i]\leq j$： $nums[i]$可选可不选，任一满足即可，$dp[i][j]=dp[j-1][j-nums[i]]$  |  $dp[i-1][j]$
+
+
+
+初始化：
+
+- 所有都置$false$
+- 和为0都满足，$dp[i][0]=true$
+- 若$nums[0]<=target$，有$dp[0][nums[0]]=true$
+
+```java
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int n=nums.length;
+        int sum=0,maxNum=0;
+        for(int i=0;i<n;i++){
+            sum +=nums[i];
+            maxNum=Math.max(maxNum,nums[i]);
+        }
+
+        int target=sum/2;  // 找出是否可由nums中的元素组成目标和target
+        if(sum%2!=0||n<2||maxNum>target){ // 总和为奇数 或数组长度小于2 或数组元素最大值大于target 必不可能
+            return false;
+        }
+       
+        // 默认false
+        boolean[][] dp=new boolean[n][target+1]; // dp[i][j]: 从下标0~i 是否存在组合使得和为j
+        for(int i=0;i<n;i++){
+            dp[i][0]=true;
+        }
+        if(nums[0]<=target){
+            dp[0][nums[0]]=true;
+        }
+
+        for(int i=1;i<n;i++){
+            for(int j=1;j<=target;j++){
+                if(nums[i]>j){ // 不选nums[i]
+                    dp[i][j]=dp[i-1][j];
+                }else { //  nums[i]可选可不选
+                    dp[i][j]=dp[i-1][j]|dp[i-1][j-nums[i]];
+                }
+            }
+        }
+        return dp[n-1][target];
+    }
+}
+```
+
+## 26.  [最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)
+
+给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号
+
+子串
+
+的长度。
+
+
+
+**示例 1：**
+
+```
+输入：s = "(()"
+输出：2
+解释：最长有效括号子串是 "()"
+```
+
+**示例 2：**
+
+```
+输入：s = ")()())"
+输出：4
+解释：最长有效括号子串是 "()()"
+```
+
+**示例 3：**
+
+```
+输入：s = ""
+输出：0
+```
+
+ 
+
+**提示：**
+
+- `0 <= s.length <= 3 * 104`
+- `s[i]` 为 `'('` 或 `')'`
+
+
+
+思路：常规判断有效括号（遍历）的方法也能过，但时间复杂度太高且需要注意细节，下面用动态规划，下图为两种方法的耗时对比：
+
+<img src="assets/image-20240625162932422.png" alt="image-20240625162932422" style="zoom:50%;" />
+
+
+
+$dp[i]$ ：表示以下标 $i$字符结尾的最长有效括号的长度
+
+当s.charAt(i)='('时，$dp[i]=0$，合法括号只需考虑s.charAt(i)==')'的情况：
+
+- s.charAt(i-1)=='('$时，$$dp[i]=dp[i-2]+2$
+- s.charAt(i-1)==')'时，以$s.charAt(i-1)$结尾的合法括号开始下标为$i-dp[i-1]$，若其前一个字符$s.charAt(i-dp[i-1]-1)$为')'，则$dp[i]=0$；否则$s.charAt(i)$和$s.charAt(i-dp[i-1]-1)$可以组一对括号，同时拼接上以下标$i-dp[i-1]-2$结尾的有效括号，因此$dp[i]=dp[i-1]+2+dp[i-dp[i-1]-2]$
+
+
+
+```java
+class Solution {
+    public int longestValidParentheses(String s) {
+        int n=s.length();
+        if(n<2){
+            return 0;
+        }
+        int[] dp=new int[n]; // dp[i]: 以下标i结尾的最长有效括号字串长度
+        int maxLength=0; // 总体最长有效括号
+        for(int i=1;i<n;i++){
+            if(s.charAt(i)==')'){
+                if(s.charAt(i-1)=='('){
+                    dp[i]=(i-2>=0?dp[i-2]:0)+2;
+                }else if(i-dp[i-1]-1>=0&&s.charAt(i-dp[i-1]-1)=='('){
+                    dp[i]=dp[i-1]+2+(i-dp[i-1]-2>=0?dp[i-dp[i-1]-2]:0);
+                }
+            }
+            maxLength=Math.max(maxLength,dp[i]);
+        }
+        return maxLength; 
+    }
+}
+```
+
+
+
 
 
 # 二. 深度优先搜索(DFS, Depth First Search)
@@ -2250,9 +2429,7 @@ public class Main
         System.out.println("各层节点个数：");
         for(Integer r:res)
             System.out.print(r+" ");
-
     }
-
 }
 
 //多叉树
@@ -5886,7 +6063,7 @@ medianFinder.findMedian(); // return 2.0
 
 
 
-若A B元素数量相等，则中位数为(a+b)/2.0；若A B元素数量不相等，则中位数为a b其中一个，取决于如何插入。总之**都可以通过<font color=red>获取堆顶元素计算中位数<。**
+若A B元素数量相等，则中位数为(a+b)/2.0；若A B元素数量不相等，则中位数为a b其中一个，取决于如何插入。总之**都可以通过<font color=red>获取堆顶元素计算中位数</font>。**
 
 时间复杂度: $O(n log n)$
 
@@ -7852,4 +8029,185 @@ class MedianFinder {
 
 
 <img src="assets/image-20240624212131825.png" alt="image-20240624212131825" style="zoom:50%;" />
+
+
+
+## 18.[分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
+
+给你一个 **只包含正整数** 的 **非空** 数组 `nums` 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+
+**示例 1：**
+
+```
+输入：nums = [1,5,11,5]
+输出：true
+解释：数组可以分割成 [1, 5, 5] 和 [11] 。
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,2,3,5]
+输出：false
+解释：数组不能分割成两个元素和相等的子集。
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 200`
+- `1 <= nums[i] <= 100`
+
+
+
+关键：将该问题转化为 ”**<font color=red>是否存在和为数组元素综合一半的组合</font>**“  ，设nums元素总和为sum，则寻找有无方案可使和为target=sum/2。
+
+剪枝：排除下列情况直接返回false
+
+- sum为奇数
+- 数组长度小于2
+- 数组中最大元素大于target
+
+
+
+接下来使用动态规划求数组nums中是否存在组合使得和为target。
+
+定义状态数组 $dp[n][target+1]$， 其中$dp[i][j]$表示”**从下标$0~i$ 是否存在组合使得和为$j$**“
+
+转移方程如下：
+
+- 若$nums[i]>j$: 必不可能选下标$nums[i]$，$dp[i][j]=dp[i-1][j]$
+- 若$num[i]\leq j$： $nums[i]$可选可不选，任一满足即可，$dp[i][j]=dp[j-1][j-nums[i]]$  |  $dp[i-1][j]$
+
+
+
+初始化：
+
+- 所有都置$false$
+- 和为0都满足，$dp[i][0]=true$
+- 若$nums[0]<=target$，有$dp[0][nums[0]]=true$
+
+```java
+class Solution {
+    public boolean canPartition(int[] nums) {
+        int n=nums.length;
+        int sum=0,maxNum=0;
+        for(int i=0;i<n;i++){
+            sum +=nums[i];
+            maxNum=Math.max(maxNum,nums[i]);
+        }
+
+        int target=sum/2;  // 找出是否可由nums中的元素组成目标和target
+        if(sum%2!=0||n<2||maxNum>target){ // 总和为奇数 或数组长度小于2 或数组元素最大值大于target 必不可能
+            return false;
+        }
+       
+        // 默认false
+        boolean[][] dp=new boolean[n][target+1]; // dp[i][j]: 从下标0~i 是否存在组合使得和为j
+        for(int i=0;i<n;i++){
+            dp[i][0]=true;
+        }
+        if(nums[0]<=target){
+            dp[0][nums[0]]=true;
+        }
+
+        for(int i=1;i<n;i++){
+            for(int j=1;j<=target;j++){
+                if(nums[i]>j){ // 不选nums[i]
+                    dp[i][j]=dp[i-1][j];
+                }else { //  nums[i]可选可不选
+                    dp[i][j]=dp[i-1][j]|dp[i-1][j-nums[i]];
+                }
+            }
+        }
+        return dp[n-1][target];
+    }
+}
+```
+
+
+
+## 19. [最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)
+
+给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号
+
+子串
+
+的长度。
+
+
+
+**示例 1：**
+
+```
+输入：s = "(()"
+输出：2
+解释：最长有效括号子串是 "()"
+```
+
+**示例 2：**
+
+```
+输入：s = ")()())"
+输出：4
+解释：最长有效括号子串是 "()()"
+```
+
+**示例 3：**
+
+```
+输入：s = ""
+输出：0
+```
+
+ 
+
+**提示：**
+
+- `0 <= s.length <= 3 * 104`
+- `s[i]` 为 `'('` 或 `')'`
+
+
+
+思路：常规判断有效括号（遍历）的方法也能过，但时间复杂度太高且需要注意细节，下面用动态规划，下图为两种方法的耗时对比：
+
+<img src="assets/image-20240625162932422.png" alt="image-20240625162932422" style="zoom:50%;" />
+
+
+
+$dp[i]$ ：表示以下标 $i$字符结尾的最长有效括号的长度
+
+当s.charAt(i)='('时，$dp[i]=0$，合法括号只需考虑s.charAt(i)==')'的情况：
+
+- s.charAt(i-1)=='('$时，$$dp[i]=dp[i-2]+2$
+- s.charAt(i-1)==')'时，以$s.charAt(i-1)$结尾的合法括号开始下标为$i-dp[i-1]$，若其前一个字符$s.charAt(i-dp[i-1]-1)$为')'，则$dp[i]=0$；否则$s.charAt(i)$和$s.charAt(i-dp[i-1]-1)$可以组一对括号，同时拼接上以下标$i-dp[i-1]-2$结尾的有效括号，因此$dp[i]=dp[i-1]+2+dp[i-dp[i-1]-2]$
+
+
+
+```java
+class Solution {
+    public int longestValidParentheses(String s) {
+        int n=s.length();
+        if(n<2){
+            return 0;
+        }
+        int[] dp=new int[n]; // dp[i]: 以下标i结尾的最长有效括号字串长度
+        int maxLength=0; // 总体最长有效括号
+        for(int i=1;i<n;i++){
+            if(s.charAt(i)==')'){
+                if(s.charAt(i-1)=='('){
+                    dp[i]=(i-2>=0?dp[i-2]:0)+2;
+                }else if(i-dp[i-1]-1>=0&&s.charAt(i-dp[i-1]-1)=='('){
+                    dp[i]=dp[i-1]+2+(i-dp[i-1]-2>=0?dp[i-dp[i-1]-2]:0);
+                }
+            }
+            maxLength=Math.max(maxLength,dp[i]);
+        }
+        return maxLength; 
+    }
+}
+```
+
+
 
