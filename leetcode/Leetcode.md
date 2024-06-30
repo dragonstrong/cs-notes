@@ -1176,7 +1176,61 @@ exection -> execution (插入 'u')
 - `0 <= word1.length, word2.length <= 500`
 - `word1` 和 `word2` 由小写英文字母组成
 
+思路:
 
+操作等价：
+
+- A插入一个字符和B删除一个字符等价
+- A删除一个字符和B插入一个字符等价
+- A修改一个字符和B修改一个字符等价
+
+因此可以简化为如下3种操作：
+
+- A插入一个字符
+- B插入一个字符
+- A修改一个字符
+
+以A=horse  B=ros为例：
+
+- A插入一个字符：假设horse到ro的编辑距离是a，那么horse到ros的编辑距离最大为a+1
+- B中插入一个字符：假设hors到ros的编辑距离是b，那么horse到ros的编辑距离最大为b+1
+- A中修改一个字符：假设hors到ro的编辑距离是c，那么horse到ros的编辑距离最大为c+1
+
+详细证明：https://dl.acm.org/doi/pdf/10.1145/321796.321811
+
+设$dp[i][j]$为： $word1[0:i]$到$word2[0:j]$的编辑距离，那么有递推公式：
+
+- $word1.charAt(i)==word2.charAt(j)$:    $dp[i][j]=min(dp[i][j-1]+1,dp[i-1][j]+1,dp[i-1][j-1])$
+- $word1.charAt(i)!=word2.charAt(j)$:    $dp[i][j]=min(dp[i][j-1]+1,dp[i-1][j]+1,dp[i-1][j-1]+1)$
+
+
+
+```java
+class Solution {
+    public int minDistance(String word1, String word2) {
+        int m=word1.length(),n=word2.length();
+        if(m==0||n==0){
+            return m==0?n:m;
+        }
+        int[][] dp=new int[m][n];  //dp[i][j]: word1[0:i]到word2[0:j]的最小编辑距离
+        // 填充边界
+        for(int i=0;i<Math.max(m,n);i++){ 
+            if(i<m){
+                dp[i][0]=word1.substring(0,i+1).indexOf(word2.charAt(0))!=-1?i:i+1;
+            }
+            if(i<n){
+                dp[0][i]=word2.substring(0,i+1).indexOf(word1.charAt(0))!=-1?i:i+1;   
+            } 
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                dp[i][j]=word1.charAt(i)==word2.charAt(j)?Math.min(Math.min(dp[i][j-1]+1,dp[i-1][j]+1),dp[i-1][j-1]):Math.min(Math.min(dp[i][j-1]+1,dp[i-1][j]+1),dp[i-1][j-1]+1);    
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+```
 
 ## 25. [分割等和子集](https://leetcode.cn/problems/partition-equal-subset-sum/)
 
@@ -1356,6 +1410,42 @@ class Solution {
 ```
 
 
+
+## 27.[给墙壁刷油漆](https://leetcode.cn/problems/painting-the-walls/)
+
+给你两个长度为 `n` 下标从 **0** 开始的整数数组 `cost` 和 `time` ，分别表示给 `n` 堵不同的墙刷油漆需要的开销和时间。你有两名油漆匠：
+
+- 一位需要 **付费** 的油漆匠，刷第 `i` 堵墙需要花费 `time[i]` 单位的时间，开销为 `cost[i]` 单位的钱。
+- 一位 **免费** 的油漆匠，刷 **任意** 一堵墙的时间为 `1` 单位，开销为 `0` 。但是必须在付费油漆匠 **工作** 时，免费油漆匠才会工作。
+
+请你返回刷完 `n` 堵墙最少开销为多少。
+
+ 
+
+**示例 1：**
+
+```
+输入：cost = [1,2,3,2], time = [1,2,3,2]
+输出：3
+解释：下标为 0 和 1 的墙由付费油漆匠来刷，需要 3 单位时间。同时，免费油漆匠刷下标为 2 和 3 的墙，需要 2 单位时间，开销为 0 。总开销为 1 + 2 = 3 。
+```
+
+**示例 2：**
+
+```
+输入：cost = [2,3,4,2], time = [1,1,1,1]
+输出：4
+解释：下标为 0 和 3 的墙由付费油漆匠来刷，需要 2 单位时间。同时，免费油漆匠刷下标为 1 和 2 的墙，需要 2 单位时间，开销为 0 。总开销为 2 + 2 = 4 。
+```
+
+ 
+
+**提示：**
+
+- `1 <= cost.length <= 500`
+- `cost.length == time.length`
+- `1 <= cost[i] <= 106`
+- `1 <= time[i] <= 500`
 
 
 
@@ -3936,80 +4026,34 @@ class Solution {
 
 由于空间复杂度的限制，排除HashSet去重
 
-1、异或性质
+
+
+位运算：
+
+1、异或
 
 $0\oplus N=N(展开为二进制)$ 
 
 $N\oplus N=0$
 
-$3\oplus 8={(0011)}_B\oplus {(1000)}_B={(1011)}_B=11$
-
 2、设整型数组 $nums$中出现一次的数字为 $x$，出现两次的数字为$a,a,b,b,...$，即$nums=[a,a,b,b,...,x]$,利用性质1有：
-
 $$
 a\oplus a\oplus b\oplus b\oplus ... \oplus x=0\oplus 0\oplus ... \oplus x=x
 $$
 
-3、设两个只出现一次的数字为 $x,y$由于$x\neq y$，则 $x$ 和 $y$ 二进制至少有一位不同，据此位可将 $nums$ 拆分为分别包含 $x$和 $y$ 的两个子数组。分别对两子数组遍历执行异或操作，即可得到两个只出现一次的数字 $x,y$。
-
-算法流程：
-
-1、遍历$nums$执行异或
-
-设$nums=\{a,a,b,b,...,x,y\}$，对所有元素异或得：
-
-$$
-a\oplus a \oplus b\oplus b\oplus ... \oplus x\oplus y=x\oplus y
-$$
-
-2、循环移位计算m
-
-设$x\oplus y=a$，找到$a$中为1的二进制位，据此位进行拆分：
-
-- 若$a\&0001\neq0$，则$a$的第一位为1；
-- 若$a\&0010\neq0$，则$a$的第二位为1；
-- 依此类推……
-
-初始化一个辅助变量 $m=1$，通过与运算从右向左循环判断，可获取整数$x\oplus y$首位1
-
-3、拆分$nums$数组
-
-遍历$nums$中每个元素$num$，$num \& m \neq0$的分为一组，$num \& m =0$的分为一组
-
-示例：
-
-$nums=\{3,3,2,4,6,6\}$
-
-$2\oplus 4=(110)_B$
-
-$m=（010)_B(第二位为1)$
-
-遍历$nums$，并与m做$\&$运算
-
-拆分成两组：
-
-$num1=\{4\}$                                       $(num\& m==0)$
-
-$num2=\{3,3,2,6,6\}$                      $(num\& m!=0)$
-
-4、两个子数组异或返回$x,y$
-
 ```java
 class Solution {
-    public int[] singleNumbers(int[] nums) {
-        int x = 0, y = 0, n = 0, m = 1;
-        for(int num : nums)               // 1. 遍历异或
-            n ^= num;
-        while((n & m) == 0)               // 2. 循环左移，计算 m
-            m <<= 1;
-        for(int num: nums) {              // 3. 遍历 nums 分组
-            if((num & m) != 0) x ^= num;  // 4. 当 num & m != 0
-            else y ^= num;                // 4. 当 num & m == 0
+    public int singleNumber(int[] nums) {
+        int res=0;
+        for(int i:nums){
+            res=res^i;
         }
-        return new int[] {x, y};          // 5. 返回出现一次的数字
+        return res;
     }
 }
 ```
+
+
 
 ## 2. **[剑指 Offer 15. 二进制中1的个数](https://leetcode.cn/problems/er-jin-zhi-zhong-1de-ge-shu-lcof/)**
 
@@ -8209,5 +8253,252 @@ class Solution {
 }
 ```
 
+## 20.[ 编辑距离](https://leetcode.cn/problems/edit-distance/)
 
+给你两个单词 `word1` 和 `word2`， *请返回将 `word1` 转换成 `word2` 所使用的最少操作数* 。
+
+你可以对一个单词进行如下三种操作：
+
+- 插入一个字符
+- 删除一个字符
+- 替换一个字符
+
+ 
+
+**示例 1：**
+
+```
+输入：word1 = "horse", word2 = "ros"
+输出：3
+解释：
+horse -> rorse (将 'h' 替换为 'r')
+rorse -> rose (删除 'r')
+rose -> ros (删除 'e')
+```
+
+**示例 2：**
+
+```
+输入：word1 = "intention", word2 = "execution"
+输出：5
+解释：
+intention -> inention (删除 't')
+inention -> enention (将 'i' 替换为 'e')
+enention -> exention (将 'n' 替换为 'x')
+exention -> exection (将 'n' 替换为 'c')
+exection -> execution (插入 'u')
+```
+
+ 
+
+**提示：**
+
+- `0 <= word1.length, word2.length <= 500`
+- `word1` 和 `word2` 由小写英文字母组成
+
+
+
+思路:
+
+操作等价：
+
+- A插入一个字符和B删除一个字符等价
+- A删除一个字符和B插入一个字符等价
+- A修改一个字符和B修改一个字符等价
+
+因此可以简化为如下3种操作：
+
+- A插入一个字符
+- B插入一个字符
+- A修改一个字符
+
+以A=horse  B=ros为例：
+
+- A插入一个字符：假设horse到ro的编辑距离是a，那么horse到ros的编辑距离最大为a+1
+- B中插入一个字符：假设hors到ros的编辑距离是b，那么horse到ros的编辑距离最大为b+1
+- A中修改一个字符：假设hors到ro的编辑距离是c，那么horse到ros的编辑距离最大为c+1
+
+详细证明：https://dl.acm.org/doi/pdf/10.1145/321796.321811
+
+设$dp[i][j]$为： $word1[0:i]$到$word2[0:j]$的编辑距离，那么有递推公式：
+
+- $word1.charAt(i)==word2.charAt(j)$:    $dp[i][j]=min(dp[i][j-1]+1,dp[i-1][j]+1,dp[i-1][j-1])$
+- $word1.charAt(i)!=word2.charAt(j)$:    $dp[i][j]=min(dp[i][j-1]+1,dp[i-1][j]+1,dp[i-1][j-1]+1)$
+
+
+
+```java
+class Solution {
+    public int minDistance(String word1, String word2) {
+        int m=word1.length(),n=word2.length();
+        if(m==0||n==0){
+            return m==0?n:m;
+        }
+        int[][] dp=new int[m][n];  //dp[i][j]: word1[0:i]到word2[0:j]的最小编辑距离
+        // 填充边界
+        for(int i=0;i<Math.max(m,n);i++){ 
+            if(i<m){
+                dp[i][0]=word1.substring(0,i+1).indexOf(word2.charAt(0))!=-1?i:i+1;
+            }
+            if(i<n){
+                dp[0][i]=word2.substring(0,i+1).indexOf(word1.charAt(0))!=-1?i:i+1;   
+            } 
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                dp[i][j]=word1.charAt(i)==word2.charAt(j)?Math.min(Math.min(dp[i][j-1]+1,dp[i-1][j]+1),dp[i-1][j-1]):Math.min(Math.min(dp[i][j-1]+1,dp[i-1][j]+1),dp[i-1][j-1]+1);    
+            }
+        }
+        return dp[m-1][n-1];
+    }
+}
+```
+
+
+
+## 21.[只出现一次的数字](https://leetcode.cn/problems/single-number/)
+
+给你一个 **非空** 整数数组 `nums` ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+
+ 
+
+**示例 1 ：**
+
+```
+输入：nums = [2,2,1]
+输出：1
+```
+
+**示例 2 ：**
+
+```
+输入：nums = [4,1,2,1,2]
+输出：4
+```
+
+**示例 3 ：**
+
+```
+输入：nums = [1]
+输出：1
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 3 * 104`
+- `-3 * 104 <= nums[i] <= 3 * 104`
+- 除了某个元素只出现一次以外，其余每个元素均出现两次。
+
+
+
+位运算：
+
+1、异或
+
+$0\oplus N=N(展开为二进制)$ 
+
+$N\oplus N=0$
+
+2、设整型数组 $nums$中出现一次的数字为 $x$，出现两次的数字为$a,a,b,b,...$，即$nums=[a,a,b,b,...,x]$,利用性质1有：
+$$
+a\oplus a\oplus b\oplus b\oplus ... \oplus x=0\oplus 0\oplus ... \oplus x=x
+$$
+
+```java
+class Solution {
+    public int singleNumber(int[] nums) {
+        int res=0;
+        for(int i:nums){
+            res=res^i;
+        }
+        return res;
+    }
+}
+```
+
+## 22.[寻找重复数](https://leetcode.cn/problems/find-the-duplicate-number/)
+
+给定一个包含 `n + 1` 个整数的数组 `nums` ，其数字都在 `[1, n]` 范围内（包括 `1` 和 `n`），可知至少存在一个重复的整数。
+
+假设 `nums` 只有 **一个重复的整数** ，返回 **这个重复的数** 。
+
+你设计的解决方案必须 **不修改** 数组 `nums` ，时间复杂度 `O(n)`，空间复杂度 `O(1)` 。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [1,3,4,2,2]
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：nums = [3,1,3,4,2]
+输出：3
+```
+
+**示例 3 :**
+
+```
+输入：nums = [3,3,3,3,3]
+输出：3
+```
+
+ 
+
+ 
+
+**提示：**
+
+- `1 <= n <= 105`
+- `nums.length == n + 1`
+- `1 <= nums[i] <= n`
+- `nums` 中 **只有一个整数** 出现 **两次或多次** ，其余整数均只出现 **一次**
+
+
+
+思路: 限制了数字范围1~n，构建有向图，令$i->nums[i]$，由于$0-n$共n个节点，却有n+1条边，因此必有环。该题转换为找有向链表中相交的节点（交点即重复数字），可用快慢指针解决。
+
+![image-20240515085903347](assets/image-20240515085903347.png)
+
+快指针fast一次走2步，慢指针slow一次走1步，若有环必相遇（模拟操场）。设相遇点为B，慢指针所走长度为***l+a***， 即图中OA-> AB； 快指针为***l+n(a+c)+a***, 即快指针比慢指针多走n个环的长度。又因为速度是慢指针的2倍，故***l+n(a+c)+a=2*(l+a)**，-->    ***l=c+(n-1)(a+c)***，即相遇后再额外使用一个指针 current=head，从O出发，慢指针从B出发，二者步幅相同，必相遇于点A。
+
+```java
+class Solution {
+    public int findDuplicate(int[] nums) {
+        // 0->1->3->2<->4   n个数字有n+1个指向，必有环
+        // 0->3->4->2 1->1  2->3 
+        // 0->3->3
+        if(nums.length==1){
+            return nums[0];
+        }
+
+        int fast=0,slow=0;
+        while(fast<=nums.length-1&&slow<=nums.length){
+            slow=nums[slow];
+            fast=nums[nums[fast]];
+            if(fast==slow){
+                break;
+            }
+        }
+        fast=0; 
+        while(fast<=nums.length-1&&slow<=nums.length){
+            slow=nums[slow];
+            fast=nums[fast];
+            if(fast==slow){
+                return fast;
+            }
+        }
+        
+        return -1;
+    }
+}
+```
 
