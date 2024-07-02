@@ -205,7 +205,33 @@ https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/
 
 # 5.Navicat
 
+安装包和破解文件：https://www.alipan.com/s/mKT4Em4uPZd
 
+Applied Path：选择安装目录
+
+然后点Patch
+
+
+
+![image-20240702205146979](assets/image-20240702205146979.png)
+
+generate生成Keygen并将其复制到navicat注册页面，填上许可证
+
+
+
+![image-20240702205601179](assets/image-20240702205601179.png)
+
+**<font color=red>确保是断网状态</font>**（否则不会出现手动激活按钮），点激活，手动激活：
+
+![image-20240702205911457](assets/image-20240702205911457.png)
+
+将请求码复制到NavicatCracker然后点generate Activation code，然后将生成的激活码复制过去点击激活
+
+![image-20240702210304379](assets/image-20240702210304379.png)
+
+
+
+![image-20240702210442580](assets/image-20240702210442580.png)
 
 # 6.服务器
 
