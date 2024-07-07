@@ -1736,42 +1736,34 @@ class Solution
 ![Untitled](assets/Untitled 35.png)
 
 ```java
-class Solution 
-{
-    public int numIslands(char[][] grid) 
-    {
-
-        int[][] visited=new int[grid.length][grid[0].length];  //记录是否访问过
-        
-        int num=0;
-        for(int i=0;i<grid.length;i++)  //遍历所有网格
-        {
-            for(int j=0;j<grid[0].length;j++)
-            {
-                if(grid[i][j]=='1'&&visited[i][j]==0)  //找到没被访问过的陆地  以它为起点开始搜
-                {
-                    dfs(grid,i,j,visited);
-                    num++;  //找到一座岛屿集群
-                }    
+class Solution {
+    public int numIslands(char[][] grid) {
+        int m=grid.length,n=grid[0].length;
+        int count=0;
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(grid[i][j]=='1'){
+                    dfs(grid,i,j);
+                    count++;
+                }
             }
         }
-        return num;
+        return count;
     }
-
-    public void dfs(char[][] grid,int i,int j,int[][] visited)  //判断grid[i,j]是否可访问  遇到水+超出边界+访问过 都不行
-    {
-
-        if(i<0||i>=grid.length||j<0||j>=grid[0].length)   //越界
-        return;
-        if(visited[i][j]==1||grid[i][j]=='0')  // 访问过 遇到水 
-        return;
-        //可访问
-        visited[i][j]=1;  //标记
-        dfs(grid,i-1,j,visited);
-        dfs(grid,i+1,j,visited);
-        dfs(grid,i,j-1,visited);
-        dfs(grid,i,j+1,visited);
-
+    public void dfs(char[][] grid,int i,int j){ // i,j 当前坐标
+        int m=grid.length,n=grid[0].length;
+        if(!illegal(i,j,m,n)||grid[i][j]=='a'||grid[i][j]=='0'){ // 边界条件返回
+            return;
+        }
+        grid[i][j]='a'; // 打标记：已访问
+        dfs(grid,i-1,j);
+        dfs(grid,i+1,j);
+        dfs(grid,i,j-1);
+        dfs(grid,i,j+1);
+    }
+    // 坐标是否合法
+    public boolean illegal(int i,int j,int m,int n){
+        return i>=0&&i<m&&j>=0&&j<n;
     }
 }
 ```
@@ -2317,106 +2309,149 @@ class Solution
 
 ## 11. **[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
 
-![Untitled](assets/Untitled 44.png)
+二叉树中的 **路径** 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 **至多出现一次** 。该路径 **至少包含一个** 节点，且不一定经过根节点。
 
-![Untitled](assets/Untitled 45.png)
+**路径和** 是路径中各节点值的总和。
 
-![Untitled](assets/Untitled 46.png)
+给你一个二叉树的根节点 `root` ，返回其 **最大路径和** 。
 
-![Untitled](assets/Untitled 47.png)
+ 
 
-法一：递归
+**示例 1：**
+
+![img](assets/exx1.jpg)
+
+```
+输入：root = [1,2,3]
+输出：6
+解释：最优路径是 2 -> 1 -> 3 ，路径和为 2 + 1 + 3 = 6
+```
+
+**示例 2：**
+
+![img](assets/exx2.jpg)
+
+```
+输入：root = [-10,9,20,null,null,15,7]
+输出：42
+解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
+```
+
+ 
+
+**提示：**
+
+- 树中节点数目范围是 `[1, 3 * 104]`
+- `-1000 <= Node.val <= 1000`
+
+
+
+思路：都是遍历所有节点，然后以它为顶点，设当前节点为node, 求出它的左子树单边最大路径和leftMax，右子树单边最大路径和rightMax，则以node为顶点的最大路径和为$root.val+Math.max(0,leftMax)+Math.max(0,rightMax)$。遍历所有节点可找到全局最大。
+
+法一：一遍dfs
 
 ```java
-class Solution   //5:00-
-{
-    
+class Solution {
+    public int maxPathSum(TreeNode root) {
+        maxPathSigle(root);
+        return res;
+    }
     int res=Integer.MIN_VALUE;
-    public int maxPathSum(TreeNode root)  
-    {
-     max_gain(root);
-     return res;
+    public int maxPathSigle(TreeNode root){ // 单边最大路径和
+        if(root.left==null&&root.right==null){
+            res=Math.max(res,root.val);
+            return root.val;
+        }
+        int leftMax=root.left==null?0:maxPathSigle(root.left);
+        int rightMax=root.right==null?0:maxPathSigle(root.right);
+        
+        res=Math.max(res,root.val+Math.max(0,leftMax)+Math.max(0,rightMax));
+        return root.val+Math.max(Math.max(0,leftMax),Math.max(0,rightMax));
     }
-
-    public int max_gain(TreeNode node)  //以node为起点的最大增益
-    {
-        if(node==null)
-        return 0;
-        int left_gain=Math.max(0,max_gain(node.left));  //正增益才计入
-        int right_gain=Math.max(0,max_gain(node.right));
-        res=Math.max(res,node.val+left_gain+right_gain);
-        return node.val+Math.max(left_gain,right_gain);
-    }
-   
 }
 ```
 
-法二：dfs(过92/94，超时)
+![image-20240706200341013](assets/image-20240706200341013.png)
+
+法二：先求以node节点开始的单向最大路径和，bfs遍历所有顶点，有重复dfs
 
 ```java
-class Solution 
-{
-    int res=Integer.MIN_VALUE;
-    int sum=0;
-    HashMap<TreeNode,TreeNode> map_parent=new HashMap<>();  //键：节点 值：键的父节点  没有为null
-    HashMap<TreeNode,Integer> map_visited=new HashMap<>();  //键：节点 值：是否访问过 没有为null 访问过为1
-    public int maxPathSum(TreeNode root)  
-    {
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    HashMap<TreeNode,Integer> cache=new HashMap<>();
+    public int maxPathSum(TreeNode root) {
+        int res=Integer.MIN_VALUE;
         LinkedList<TreeNode> list=new LinkedList<>();
-       
         list.add(root);
-        while(!list.isEmpty())  //构建map_parent
-        {
-            TreeNode tem=list.remove();
-            if(tem.left!=null)
-            {
-                map_parent.put(tem.left,tem);
-                list.add(tem.left);
+        while(!list.isEmpty()){
+            TreeNode node=list.remove();
+            int leftMax=0;
+            if(node.left!=null){
+                list.add(node.left);
+                leftMax=getMax(node.left);
             }
-            
-            if(tem.right!=null)
-            {
-                map_parent.put(tem.right,tem);
-                list.add(tem.right);
+            int rightMax=0;
+            if(node.right!=null){
+                list.add(node.right);
+                rightMax=getMax(node.right);
             }
-           
-        }
 
-        list.add(root);
-        while(!list.isEmpty())  //遍历每个节点，以它为起点开始搜
-        {
-            TreeNode tem=list.remove();   
-            sum=0;
-            map_visited.clear();
-            dfs(tem);
-            
-            if(tem.left!=null)
-            list.add(tem.left);
-            if(tem.right!=null)
-            list.add(tem.right);
+            res=Math.max(res,node.val+Math.max(leftMax,0)+Math.max(rightMax,0));
         }
 
         return res;
-
     }
-    public void dfs(TreeNode node)  
-    {
-        if(node==null||map_visited.get(node)!=null)
-        return;
-        sum +=node.val;
-        map_visited.put(node,1);
-        res=Math.max(res,sum);
-        //搜索（3个方向）：有父节点搜父节点+左右，没有则搜左右
-        if(map_parent.containsKey(node))
-        dfs(map_parent.get(node));
-        dfs(node.left);
-        dfs(node.right);
-        sum -=node.val;
-        map_visited.put(node,null);
+
+    int maxValue=Integer.MIN_VALUE;
+    int tem=0;
+    public void dfs(TreeNode node){  // 求以node节点开始的单向最大路径和
+        if(node==null){
+            return;
+        }
+        tem +=node.val;
+        maxValue=Math.max(tem,maxValue);
+        if(node.left!=null){
+            dfs(node.left);
+        }
+
+        if(node.right!=null){
+            dfs(node.right);
+        }
+        tem -=node.val;
+    }
+
+    public int getMax(TreeNode node){
+        Integer res=cache.get(node);
+        if(res==null){
+            maxValue=Integer.MIN_VALUE;
+            tem=0;
+            dfs(node);
+            cache.put(node,maxValue);
+        }
+
+        return cache.get(node);
     }
 
 }
 ```
+
+![image-20240706200359977](assets/image-20240706200359977.png)
+
+
 
 ## 12. 字节笔试
 
@@ -4859,19 +4894,17 @@ class Solution
 ```java
 class Solution
 {
-    static Map<Character, Integer> win_map = new HashMap<Character, Integer>();  //滑动窗口
-    static Map<Character, Integer> t_map = new HashMap<Character, Integer>();  //t字符串
-
-    public static String minWindow(String s, String t)
+    Map<Character, Integer> winMap = new HashMap<Character, Integer>();  //滑动窗口
+    Map<Character, Integer> tMap = new HashMap<Character, Integer>();  //t字符串
+    public String minWindow(String s, String t)
     {
-
         //统计t字符串每个字符的个数
         for (int i = 0; i < t.length(); i++)
         {
-            if(t_map.containsKey(t.charAt(i)))
-                t_map.put(t.charAt(i),t_map.get(t.charAt(i))+1);
+            if(tMap.containsKey(t.charAt(i)))
+                tMap.put(t.charAt(i),tMap.get(t.charAt(i))+1);
             else
-                t_map.put(t.charAt(i),1);
+                tMap.put(t.charAt(i),1);
         }
 
         //初始时  l r 置默认值
@@ -4881,8 +4914,8 @@ class Solution
         while (r < s.length())
         {
             r++;  //向右拓展
-            if (r < s.length() && t_map.containsKey(s.charAt(r)))
-                win_map.put(s.charAt(r), win_map.getOrDefault(s.charAt(r), 0) + 1);
+            if (r < s.length() && tMap.containsKey(s.charAt(r)))
+                winMap.put(s.charAt(r), winMap.getOrDefault(s.charAt(r), 0) + 1);
 
             while (valid() && l <= r) //满足条件,窗口收缩,左指针右移
             {
@@ -4892,8 +4925,8 @@ class Solution
                     resL = l;
                     resR = r + 1;
                 }
-                if (t_map.containsKey(s.charAt(l)))
-                    win_map.put(s.charAt(l), win_map.get(s.charAt(l)) - 1);
+                if (tMap.containsKey(s.charAt(l)))
+                    winMap.put(s.charAt(l), winMap.get(s.charAt(l)) - 1);
 
                 l++; //收缩
             }
@@ -4901,14 +4934,14 @@ class Solution
         return resL == -1 ? "" : s.substring(resL, resR);
     }
 
-    public static boolean valid()
+    public boolean valid()
     {
-        Set<Map.Entry<Character, Integer>> set=t_map.entrySet();
+        Set<Map.Entry<Character, Integer>> set=tMap.entrySet();
         Iterator<Map.Entry<Character, Integer>> ite=set.iterator();
         while (ite.hasNext())
         {
             Map.Entry<Character, Integer> tem = ite.next();
-            if (!win_map.containsKey(tem.getKey())||win_map.get(tem.getKey())<tem.getValue())
+            if (!winMap.containsKey(tem.getKey())||winMap.get(tem.getKey())<tem.getValue())
                 return false;
         }
         return true;
@@ -4916,9 +4949,94 @@ class Solution
 }
 ```
 
-## 3. **合并 K 个升序链表**
 
-链接：[https://leetcode.cn/problems/merge-k-sorted-lists/description/](https://leetcode.cn/problems/merge-k-sorted-lists/description/)
+
+官方解答：类似于上面这种写法时间复杂度也只能击败13%  (上面写法656ms，官解235ms)，关键是每移动一个都字符都调valid将tMap里的字符从头遍历到尾
+
+![image-20240706084745853](assets/image-20240706084745853.png)
+
+
+
+![image-20240706084420839](assets/image-20240706084420839.png)
+
+
+
+优化：找到第一个覆盖字串后valid判断滑动窗口内的字符串是否为覆盖字串只需上一个变动的字母
+
+```java
+class Solution
+{
+    Map<Character, Integer> winMap = new HashMap<Character, Integer>();  //滑动窗口内字符统计
+    Map<Character, Integer> tMap = new HashMap<Character, Integer>();  //t字符串
+    boolean exist=false;
+    public String minWindow(String s, String t)
+    {
+        //统计t字符串每个字符的个数
+        for (int i = 0; i < t.length(); i++){
+            tMap.put(t.charAt(i),tMap.getOrDefault(t.charAt(i),0)+1); 
+        }
+
+        //初始时  l r 置默认值
+        int l = 0, r = -1;  //窗口左右边界
+        int min_win = Integer.MAX_VALUE, resL = -1, resR = -1;  //最小窗口
+        char c='0';
+        while (r < s.length()){  // 拓展右边界
+            r++;  //向右拓展
+            if (r < s.length() && tMap.containsKey(s.charAt(r))){
+                winMap.put(s.charAt(r), winMap.getOrDefault(s.charAt(r), 0) + 1);
+                
+                while (l <= r&&valid(c)) {//找到覆盖字串,收缩窗口左边界，左指针右移
+                    exist=true;
+                    if (r - l + 1 < min_win) { //更新满足条件的最小窗口
+                        min_win = r - l + 1;
+                        resL = l;
+                        resR = r + 1;
+                    }
+                    if (tMap.containsKey(s.charAt(l))){
+                        winMap.put(s.charAt(l), winMap.get(s.charAt(l)) - 1);
+                    }                     
+                    l++; //左边界向右收缩
+                    c=s.charAt(l-1); // 下一次valid判断时只需判断字符c的情况即可（左边界往右收缩过程中只有它在变动）
+                }
+               
+                if(l>0){
+                // s = "ADOBECODEBANC", t = "ABC" 第一次匹配到ADOBEC后，往右收缩左边界l=1,指向D，A字母缺少，因此往右扩张右边界只需要判断A字母的情即可
+                    c=s.charAt(l-1);  
+                }else{
+                    exist=false;
+                }   
+            }
+        }
+        return resL == -1 ? "" : s.substring(resL, resR);
+    }
+
+    // 判断窗口内的字符串是否为t的覆盖字串
+    public boolean valid(char c){
+        if(!exist){  // 还没找到第一个满足条件的覆盖字串
+            Set<Map.Entry<Character, Integer>> set=tMap.entrySet();
+            Iterator<Map.Entry<Character, Integer>> ite=set.iterator();
+            while (ite.hasNext()){
+                Map.Entry<Character, Integer> tem = ite.next();
+                if (!winMap.containsKey(tem.getKey())||winMap.get(tem.getKey())<tem.getValue())
+                    return false;
+            }
+            return true;
+        }else{ // 找到了满足条件的覆盖字串，收缩边界过程中只需要判断变动的字符
+            return tMap.get(c)==null||(tMap.get(c)!=null&&winMap.get(c)>=tMap.get(c));
+        }
+    }
+}
+```
+
+优化后耗时44ms，击败35%，感觉得找其他方法
+
+![image-20240706084248488](assets/image-20240706084248488.png)
+
+
+
+
+
+## 3. [合并 K 个升序链表](https://leetcode.cn/problems/merge-k-sorted-lists/)
 
 给你一个链表数组，每个链表都已经按升序排列。
 
@@ -6465,87 +6583,75 @@ lRUCache.get(4);    // 返回 4
 - 每次访问（get或put操作）都将该节点移动到头节点，以确保尾节点是最久未访问的。当size超过容量capacity时直接删除尾节点和map里对应的键值对即可。
 
 ```java
-class LRUCache 
-{
-    private int capacity;
-    int size;
-    Node head;
-    Node tail;
-    class Node{
-        public int key;
-        public int value;
-        public Node prev;
-        public Node next;
-        public Node(){
-        }
-        public Node(int key,int value){
-            this.key=key;
-            this.value=value;
-        }
-    }
-
-    HashMap<Integer,Node> cache=new HashMap<>();
-    public LRUCache(int capacity) 
-    {
-       this.capacity=capacity;
-       this.size=0;
-       // 创建两个哑节点，省去判空
-       this.head=new Node();
-       this.tail=new Node();
-       this.head.next=this.tail;
-       this.tail.prev=this.head;
+class LRUCache {
+    HashMap<Integer,Node> cache;
+    int capacity; // 容量
+    Node head; // 头节点
+    Node tail; // 尾节点
+    public LRUCache(int capacity) {
+        this.capacity=capacity;
+        cache=new HashMap<>();
+        head=new Node();  // 建两个哑节点省去判空 
+        tail=new Node();
+        head.next=tail;
+        tail.pre=head;
     }
     
-    public int get(int key) 
-    {
+    public int get(int key) {
         Node node=cache.get(key);
         if(node==null){
             return -1;
         }else{
-            // 删除并移到头节点
+            // 删掉node节点并加到链表头
             deleteNode(node);
             addToHead(node);
             return node.value;
         }
     }
+    
+    public void put(int key, int value) {
+        Node node=cache.get(key);
+        if(node!=null){
+            // 更新值并移到头节点
+            node.value=value;
+            deleteNode(node);
+            addToHead(node);
+        }else{
+            Node tem=new Node(key,value);
+            addToHead(tem);
+            cache.put(key,tem);
+            if(cache.size()>capacity){ // 超出最大容量,移除尾节点
+                Node lastNode=tail.pre;
+                deleteNode(lastNode);
+                cache.remove(lastNode.key);
+            }
+        }
+
+    }
+    public void deleteNode(Node node){
+        node.pre.next=node.next;
+        node.next.pre=node.pre;
+        node.next=null;
+        node.pre=null;
+    }
 
     public void addToHead(Node node){
-        head.next.prev=node;
         node.next=head.next;
+        head.next.pre=node;
         head.next=node;
-        node.prev=head;
+        node.pre=head;
     }
+}
 
-    public void deleteNode(Node node){
-        node.prev.next=node.next;
-        node.next.prev=node.prev;
-    }
-    
-    public void put(int key, int value) 
-    {
-        Node node=cache.get(key);
-        Node tem=null;
-        if(node==null){
-            tem=new Node(key,value);
-            size++;
-        }else{  // 更新值
-        node.value=value;
-        tem=node;
-        //  删除该节点
-        deleteNode(node);
-        }
-
-        //加到头节点
-        addToHead(tem);
-        cache.put(key,tem);
-        if(size>capacity){ // 超出最大容量,移除尾节点
-        Node delete=tail.prev;
-        deleteNode(delete);
-        delete.next=null;
-        delete.prev=null;
-        cache.remove(delete.key);
-        size--;
-        }
+class Node{
+    Integer key;
+    Integer value;
+    Node next;
+    Node pre;
+    public Node(){}
+    public Node(int key,int value){
+        this.key=key;
+        this.value=value;
     }
 }
 ```
@@ -6598,7 +6704,7 @@ class LRUCache
 class Solution {
     public int subarraySum(int[] nums, int k) {
         HashMap<Integer,Integer> map=new HashMap<>();  // key-前缀和  value:出现的次数
-        map.put(0,1);  //  预置前缀和为0出现的次数为1  举例： 3 4 7 ....  k=7, 那么prefixSum[2]=3+4=7  找7-7=0出现的次数  1
+        map.put(0,1);  //  预置前缀和为0出现的次数为1  举例： 3 4 7 ....  k=7, 那么prefixSum[1]=3+4=7  找7-7=0出现的次数  1
         int count=0;  //最终结果
         int prefixSum=0; // 前缀和
         for(int i=0;i<nums.length;i++){
@@ -8176,9 +8282,7 @@ class Solution {
 
 给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号
 
-子串
-
-的长度。
+子串的长度。
 
 
 
@@ -8501,4 +8605,676 @@ class Solution {
     }
 }
 ```
+
+## 23.[盛最多水的容器](https://leetcode.cn/problems/container-with-most-water/)
+
+给定一个长度为 `n` 的整数数组 `height` 。有 `n` 条垂线，第 `i` 条线的两个端点是 `(i, 0)` 和 `(i, height[i])` 。
+
+找出其中的两条线，使得它们与 `x` 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。要求时间复杂度$O(n)$
+
+**说明：**你不能倾斜容器。
+
+ 
+
+**示例 1：**
+
+![img](assets/question_11.jpg)
+
+```
+输入：[1,8,6,2,5,4,8,3,7]
+输出：49 
+解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+```
+
+**示例 2：**
+
+```
+输入：height = [1,1]
+输出：1
+```
+
+ 
+
+**提示：**
+
+- `n == height.length`
+- `2 <= n <= 105`
+- `0 <= height[i] <= 104`
+
+
+
+思路：双指针（本质贪心）
+
+```java
+class Solution {
+    public int maxArea(int[] height) {
+        int n=height.length;
+        int left=0,right=n-1; // 左右边界
+        int res=0;
+        while(left<right){
+            res=Math.max(Math.min(height[left],height[right])*(right-left),res);
+            if(height[left]<height[right]){
+                left++; // 高取决于最小的那根，左边界右移（若右边界左移，高度不会增加，宽度减小，总面积减小）
+            }else{
+                right--;  // 右边界左移
+            }
+        }
+        return res;
+    }
+}
+```
+
+## 24. [合并区间](https://leetcode.cn/problems/merge-intervals/)
+
+以数组 `intervals` 表示若干个区间的集合，其中单个区间为 `intervals[i] = [starti, endi]` 。请你合并所有重叠的区间，并返回 *一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间* 。
+
+ 
+
+**示例 1：**
+
+```
+输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+输出：[[1,6],[8,10],[15,18]]
+解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+```
+
+**示例 2：**
+
+```
+输入：intervals = [[1,4],[4,5]]
+输出：[[1,5]]
+解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
+```
+
+ 
+
+**提示：**
+
+- `1 <= intervals.length <= 104`
+- `intervals[i].length == 2`
+- `0 <= starti <= endi <= 104`
+
+
+
+先排序再合并
+
+```java
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        Arrays.sort(intervals,(o1,o2)->o1[0]!=o2[0]?o1[0]-o2[0]:o1[1]-o2[1]); // 排序
+        int n=intervals.length;
+        int[][] res=new int[n][2];
+        res[0]=intervals[0];
+        int count=0;
+        for(int i=1;i<n;i++){
+            if(intervals[i][0]<=res[count][1]&&intervals[i][1]>res[count][1]){ // 需要合并
+                res[count][1]=intervals[i][1];
+            }else if(intervals[i][0]>res[count][1]){  // 不用合并，直接拿
+                res[++count]=intervals[i];
+            }
+        }
+        int[][] finalRes=new int[count+1][2];
+        System.arraycopy(res,0,finalRes,0,count+1);
+        return finalRes;
+    }
+}
+```
+
+
+
+## 25. [最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+
+ 给你一个字符串 `s` 、一个字符串 `t` 。返回 `s` 中涵盖 `t` 所有字符的最小子串。如果 `s` 中不存在涵盖 `t` 所有字符的子串，则返回空字符串 `""` 。
+
+**注意：**
+
+- 对于 `t` 中重复字符，我们寻找的子字符串中该字符数量必须不少于 `t` 中该字符数量。
+- 如果 `s` 中存在这样的子串，我们保证它是唯一的答案。
+
+**示例 1：**
+
+```
+输入：s = "ADOBECODEBANC", t = "ABC"
+输出："BANC"
+```
+
+**示例 2:**
+
+```
+输入: s = "a", t = "aa"
+输出: ""
+解释: t 中两个字符 'a' 均应包含在 s 的子串中，
+因此没有符合条件的子字符串，返回空字符串。
+```
+
+**提示：**
+
+- `1 <= s.length, t.length <= 10^5`
+- `s` 和 `t` 由英文字母组成
+
+![image-20240706101046387](assets/image-20240706101046387.png)
+
+**滑动窗口**：两个指针，**一个用于延伸现有窗口的 r 指针，一个用于收缩窗口的 l 指针**。在任意时刻，只有一个指针运动，另一个保持静止。在 s上滑动窗口，首先 r指针右移不断扩张窗口，直到找到满足条件的覆盖字串（窗口内字符串包含 t 全部所需的字符）；然后左指针右移收缩窗口，移动过程中不断判断窗口内的字符串是否为覆盖字串，直到得到最小窗口。
+
+模拟：
+
+- l=0,r=0，窗口内字符串为"A",不是t的覆盖字串，右移 r，直到找到第1个覆盖字串（"ABAAC"）
+- 接着收缩窗口：r不动，l指针右移，由于"BAAC"不满足条件，停止，l=1
+- 继续向右扩张窗口：l不动，r右移，直到窗口内的字符串满足条件（"BAACBA"）
+- 收缩窗口：r不动，l指针右移，会经过最小字符串"CBA"，直到窗口为"BA"停止
+- 按上面的思路循环往复：r右移...
+
+判断当前的窗口包含 t 所有字符：用哈希表统计字母出现次数
+
+```java
+class Solution
+{
+    Map<Character, Integer> winMap = new HashMap<Character, Integer>();  //滑动窗口
+    Map<Character, Integer> tMap = new HashMap<Character, Integer>();  //t字符串
+    public String minWindow(String s, String t)
+    {
+        //统计t字符串每个字符的个数
+        for (int i = 0; i < t.length(); i++)
+        {
+            if(tMap.containsKey(t.charAt(i)))
+                tMap.put(t.charAt(i),tMap.get(t.charAt(i))+1);
+            else
+                tMap.put(t.charAt(i),1);
+        }
+
+        //初始时  l r 置默认值
+        int l = 0, r = -1;  //窗口左右边界
+        int min_win = Integer.MAX_VALUE, resL = -1, resR = -1;  //最小窗口
+
+        while (r < s.length())
+        {
+            r++;  //向右拓展
+            if (r < s.length() && tMap.containsKey(s.charAt(r)))
+                winMap.put(s.charAt(r), winMap.getOrDefault(s.charAt(r), 0) + 1);
+
+            while (valid() && l <= r) //满足条件,窗口收缩,左指针右移
+            {
+                if (r - l + 1 < min_win)  //更新满足条件的最小窗口
+                {
+                    min_win = r - l + 1;
+                    resL = l;
+                    resR = r + 1;
+                }
+                if (tMap.containsKey(s.charAt(l)))
+                    winMap.put(s.charAt(l), winMap.get(s.charAt(l)) - 1);
+
+                l++; //收缩
+            }
+        }
+        return resL == -1 ? "" : s.substring(resL, resR);
+    }
+
+    public boolean valid()
+    {
+        Set<Map.Entry<Character, Integer>> set=tMap.entrySet();
+        Iterator<Map.Entry<Character, Integer>> ite=set.iterator();
+        while (ite.hasNext())
+        {
+            Map.Entry<Character, Integer> tem = ite.next();
+            if (!winMap.containsKey(tem.getKey())||winMap.get(tem.getKey())<tem.getValue())
+                return false;
+        }
+        return true;
+    }
+}
+```
+
+
+
+官方解答：类似于上面这种写法时间复杂度也只能击败13%  (上面写法656ms，官解235ms)，关键是每移动一个都字符都调valid将tMap里的字符从头遍历到尾
+
+![image-20240706084745853](assets/image-20240706084745853.png)
+
+
+
+![image-20240706084420839](assets/image-20240706084420839.png)
+
+
+
+优化：找到第一个覆盖字串后valid判断滑动窗口内的字符串是否为覆盖字串只需上一个变动的字母
+
+```java
+class Solution
+{
+    Map<Character, Integer> winMap = new HashMap<Character, Integer>();  //滑动窗口内字符统计
+    Map<Character, Integer> tMap = new HashMap<Character, Integer>();  //t字符串
+    boolean exist=false;
+    public String minWindow(String s, String t)
+    {
+        //统计t字符串每个字符的个数
+        for (int i = 0; i < t.length(); i++){
+            tMap.put(t.charAt(i),tMap.getOrDefault(t.charAt(i),0)+1); 
+        }
+
+        //初始时  l r 置默认值
+        int l = 0, r = -1;  //窗口左右边界
+        int min_win = Integer.MAX_VALUE, resL = -1, resR = -1;  //最小窗口
+        char c='0';
+        while (r < s.length()){  // 拓展右边界
+            r++;  //向右拓展
+            if (r < s.length() && tMap.containsKey(s.charAt(r))){
+                winMap.put(s.charAt(r), winMap.getOrDefault(s.charAt(r), 0) + 1);
+                
+                while (l <= r&&valid(c)) {//找到覆盖字串,收缩窗口左边界，左指针右移
+                    exist=true;
+                    if (r - l + 1 < min_win) { //更新满足条件的最小窗口
+                        min_win = r - l + 1;
+                        resL = l;
+                        resR = r + 1;
+                    }
+                    if (tMap.containsKey(s.charAt(l))){
+                        winMap.put(s.charAt(l), winMap.get(s.charAt(l)) - 1);
+                    }                     
+                    l++; //左边界向右收缩
+                    c=s.charAt(l-1); // 下一次valid判断时只需判断字符c的情况即可（左边界往右收缩过程中只有它在变动）
+                }
+               
+                if(l>0){
+                // s = "ADOBECODEBANC", t = "ABC" 第一次匹配到ADOBEC后，往右收缩左边界l=1,指向D，A字母缺少，因此往右扩张右边界只需要判断A字母的情即可
+                    c=s.charAt(l-1);  
+                }else{
+                    exist=false;
+                }   
+            }
+        }
+        return resL == -1 ? "" : s.substring(resL, resR);
+    }
+
+    // 判断窗口内的字符串是否为t的覆盖字串
+    public boolean valid(char c){
+        if(!exist){  // 还没找到第一个满足条件的覆盖字串
+            Set<Map.Entry<Character, Integer>> set=tMap.entrySet();
+            Iterator<Map.Entry<Character, Integer>> ite=set.iterator();
+            while (ite.hasNext()){
+                Map.Entry<Character, Integer> tem = ite.next();
+                if (!winMap.containsKey(tem.getKey())||winMap.get(tem.getKey())<tem.getValue())
+                    return false;
+            }
+            return true;
+        }else{ // 找到了满足条件的覆盖字串，收缩边界过程中只需要判断变动的字符
+            return tMap.get(c)==null||(tMap.get(c)!=null&&winMap.get(c)>=tMap.get(c));
+        }
+    }
+}
+```
+
+优化后耗时44ms，击败35%，感觉得找其他方法
+
+![image-20240706084248488](assets/image-20240706084248488.png)
+
+其他人的：
+
+```java
+class Solution {
+    public String minWindow(String s, String t) {
+        int[] cnt = new int[128];
+        for (int i = 0; i < t.length(); i++) cnt[t.charAt(i)]++;
+        int l = 0, r = 0, ansL = 0, ansR = 0, ans = Integer.MAX_VALUE, cntT = t.length();
+        while (r < s.length()) {
+            if (cnt[s.charAt(r++)]-- > 0) cntT--;
+            while (cntT == 0) {
+                if (r - l < ans) {
+                    ans = r - l;
+                    ansL = l;
+                    ansR = r;
+                }
+                if (cnt[s.charAt(l++)]++ == 0) cntT++;
+            }
+        }
+        return ans == Integer.MAX_VALUE ? "" : s.substring(ansL, ansR);
+    }
+}
+```
+
+![image-20240706102347396](assets/image-20240706102347396.png)
+
+## 26. [缺失的第一个正数](https://leetcode.cn/problems/first-missing-positive/)
+
+给你一个未排序的整数数组 `nums` ，请你找出其中没有出现的最小的正整数。
+
+请你实现时间复杂度为 `O(n)` 并且只使用常数级别额外空间的解决方案。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [1,2,0]
+输出：3
+解释：范围 [1,2] 中的数字都在数组中。
+```
+
+**示例 2：**
+
+```
+输入：nums = [3,4,-1,1]
+输出：2
+解释：1 在数组中，但 2 没有。
+```
+
+**示例 3：**
+
+```
+输入：nums = [7,8,9,11,12]
+输出：1
+解释：最小的正数 1 没有出现。
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 105`
+- `-231 <= nums[i] <= 231 - 1`
+
+
+
+思路：使用哈希表空间复杂度O(n)，不满足要求
+
+
+
+实际上，对于一个长度为 N 的数组，其中没有出现的最小正整数只能在 [1,N+1] 中。这是因为如果 [1,N] 都出现了，那么答案是 N+1，否则答案是 [1,N] 中没有出现的最小正整数。
+
+我们对数组进行遍历，对于遍历到的数 x，如果它在 [1,N] 的范围内，那么就将数组中的第 x−1 个位置（注意：数组下标从 0 开始）打上「标记」。在遍历结束之后，如果所有的位置都被打上了标记，那么答案是 N+1，否则答案是最小的没有打上标记的位置加 1。
+
+那么如何设计这个「标记」呢？
+
+
+
+由于数组中的数没有任何限制，因此这并不是一件容易的事情。但我们可以继续利用上面的提到的性质：由于我们只在意 [1,N] 中的数，因此我们可以先对数组进行遍历，把不在 [1,N] 范围内的数修改成任意一个大于 N 的数（例如 N+1）。这样一来，数组中的所有数就都是正数了，因此我们就可以将「标记」表示为「负号」。算法的流程如下：
+
+- 排除非正整数（因为要将标记打成负整数）：将数组中所有小于等于 0 的数修改为 N+2（只要是0~N之外的正整数就行）；
+- 遍历数组中的每一个数 x，它可能已经被打了标记，因此原本对应的数为 ∣x∣，其中 ∣∣ 为绝对值符号。如果 ∣x∣∈[1,N]，那么我们给数组中的第 ∣x∣−1 个位置的数添加一个负号。注意如果它已经有负号，不需要重复添加；
+- 遍历完成之后，如果数组中的每一个数都是负数，那么答案是 N+1，否则答案是第一个正数的位置加 1。
+
+
+
+```java
+class Solution {
+    public int firstMissingPositive(int[] nums) {
+        int n=nums.length;
+        for(int i=0;i<n;i++){
+            if(nums[i]<=0){
+                nums[i]=n+2;  // 负数转正（确保在0~n+1外）
+            }
+        }
+        // 1-n+1  
+       // 3 4 6 1
+        for(int i=0;i<n;i++){
+            int tem=Math.abs(nums[i]);
+            if(tem<=n){
+                nums[tem-1]=-Math.abs(nums[tem-1]);  // 取反是为了保留被替换的值nums[tem-1],不能随便设一个负数，因为后面的可能被打标记覆盖
+            }
+        }
+        //  3 4  -6 -1
+        // -3 4 -6 -1
+
+        for(int i=0;i<n;i++){   
+            if(nums[i]>=0){
+                return i+1;
+            }
+        }
+        return n+1;
+    }
+}
+```
+
+## 27. [排序链表](https://leetcode.cn/problems/sort-list/)
+
+给你链表的头结点 `head` ，请将其按 **升序** 排列并返回 **排序后的链表** 。要求时间复杂度`O(n log n)` 和常数级空间复杂度
+
+ 
+
+**示例 1：**
+
+![img](assets/sort_list_1.jpg)
+
+```
+输入：head = [4,2,1,3]
+输出：[1,2,3,4]
+```
+
+**示例 2：**
+
+![img](assets/sort_list_2.jpg)
+
+```
+输入：head = [-1,5,3,4,0]
+输出：[-1,0,3,4,5]
+```
+
+**示例 3：**
+
+```
+输入：head = []
+输出：[]
+```
+
+ 
+
+**提示：**
+
+- 链表中节点的数目在范围 `[0, 5 * 104]` 内
+- `-105 <= Node.val <= 105`
+
+ 
+
+**思路：**
+
+- 使用快慢指针找到中间节点：同时从头节点出发，慢指针走一步，快指针走两步，当快指针到尾部时满指针在中间。
+- 调用自身对前后两部分链表进行排序，然后老套路合并两个有序链表
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if(head==null||head.next==null){
+            return head;
+        }
+        ListNode slow=head,fast=head,parent=null;
+        while(fast!=null&&fast.next!=null){
+            parent=slow;
+            slow=slow.next;
+            fast=fast.next.next;
+        }
+        ListNode head1=head,head2=slow;
+        parent.next=null;
+        ListNode sortHead1=sortList(head1),sortHead2=sortList(head2);
+        return merge(sortHead1,sortHead2);
+    }
+    public ListNode merge(ListNode head1,ListNode head2){
+        if(head1==null||head2==null){
+            return head1==null?head2:head1;
+        }
+        ListNode current1=head1,current2=head2,current3=null,res=null;
+        if(current1.val<current2.val){
+            res=new ListNode(current1.val);
+            current3=res;
+            current1=current1.next;
+        }else{
+            res=new ListNode(current2.val);
+            current3=res;
+            current2=current2.next;
+        }
+        while(current1!=null&&current2!=null){
+            if(current1.val<current2.val){
+                current3.next=new ListNode(current1.val);
+                current3=current3.next;
+                current1=current1.next;
+            }else{
+                current3.next=new ListNode(current2.val);
+                current3=current3.next;
+                current2=current2.next;
+            }
+        }
+        if(current1!=null){
+            current3.next=current1;
+        }
+        if(current2!=null){
+            current3.next=current2;
+        }
+        return res;
+    }
+}
+```
+
+## 28. **[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
+
+二叉树中的 **路径** 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 **至多出现一次** 。该路径 **至少包含一个** 节点，且不一定经过根节点。
+
+**路径和** 是路径中各节点值的总和。
+
+给你一个二叉树的根节点 `root` ，返回其 **最大路径和** 。
+
+ 
+
+**示例 1：**
+
+![img](assets/exx1.jpg)
+
+```
+输入：root = [1,2,3]
+输出：6
+解释：最优路径是 2 -> 1 -> 3 ，路径和为 2 + 1 + 3 = 6
+```
+
+**示例 2：**
+
+![img](assets/exx2.jpg)
+
+```
+输入：root = [-10,9,20,null,null,15,7]
+输出：42
+解释：最优路径是 15 -> 20 -> 7 ，路径和为 15 + 20 + 7 = 42
+```
+
+ 
+
+**提示：**
+
+- 树中节点数目范围是 `[1, 3 * 104]`
+- `-1000 <= Node.val <= 1000`
+
+
+
+思路：都是遍历所有节点，然后以它为顶点，设当前节点为node, 求出它的左子树单边最大路径和leftMax，右子树单边最大路径和rightMax，则以node为顶点的最大路径和为$root.val+Math.max(0,leftMax)+Math.max(0,rightMax)$。遍历所有节点可找到全局最大。
+
+法一：一遍dfs
+
+```java
+class Solution {
+    public int maxPathSum(TreeNode root) {
+        maxPathSigle(root);
+        return res;
+    }
+    int res=Integer.MIN_VALUE;
+    public int maxPathSigle(TreeNode root){ // 单边最大路径和
+        if(root.left==null&&root.right==null){
+            res=Math.max(res,root.val);
+            return root.val;
+        }
+        int leftMax=root.left==null?0:maxPathSigle(root.left);
+        int rightMax=root.right==null?0:maxPathSigle(root.right);
+        
+        res=Math.max(res,root.val+Math.max(0,leftMax)+Math.max(0,rightMax));
+        return root.val+Math.max(Math.max(0,leftMax),Math.max(0,rightMax));
+    }
+}
+```
+
+![image-20240706200341013](assets/image-20240706200341013.png)
+
+法二：先求以node节点开始的单向最大路径和，bfs遍历所有顶点，有重复dfs
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    HashMap<TreeNode,Integer> cache=new HashMap<>();
+    public int maxPathSum(TreeNode root) {
+        int res=Integer.MIN_VALUE;
+        LinkedList<TreeNode> list=new LinkedList<>();
+        list.add(root);
+        while(!list.isEmpty()){
+            TreeNode node=list.remove();
+            int leftMax=0;
+            if(node.left!=null){
+                list.add(node.left);
+                leftMax=getMax(node.left);
+            }
+            int rightMax=0;
+            if(node.right!=null){
+                list.add(node.right);
+                rightMax=getMax(node.right);
+            }
+
+            res=Math.max(res,node.val+Math.max(leftMax,0)+Math.max(rightMax,0));
+        }
+
+        return res;
+    }
+
+    int maxValue=Integer.MIN_VALUE;
+    int tem=0;
+    public void dfs(TreeNode node){  // 求以node节点开始的单向最大路径和
+        if(node==null){
+            return;
+        }
+        tem +=node.val;
+        maxValue=Math.max(tem,maxValue);
+        if(node.left!=null){
+            dfs(node.left);
+        }
+
+        if(node.right!=null){
+            dfs(node.right);
+        }
+        tem -=node.val;
+    }
+
+    public int getMax(TreeNode node){
+        Integer res=cache.get(node);
+        if(res==null){
+            maxValue=Integer.MIN_VALUE;
+            tem=0;
+            dfs(node);
+            cache.put(node,maxValue);
+        }
+
+        return cache.get(node);
+    }
+
+}
+```
+
+![image-20240706200359977](assets/image-20240706200359977.png)
 
