@@ -446,7 +446,7 @@ MyISAM引擎使用 B+Tree 作为索引结构，叶子节点的data域存放的�
 
 **<font color=red>为什么选择B+树作为索引？</font>**
 
-目标：尽可能减少磁盘IO次数，磁盘IO加载耗时比内存访问耗时得多。
+目标：尽可能减少磁盘IO次数，磁盘IO比内存访问耗时得多。
 
 
 
@@ -481,8 +481,6 @@ B树：
 
 
 
-
-
 ### 6.1 全表查询
 
 这里都懒得说了。
@@ -497,7 +495,7 @@ B树：
 
 (2)哈希，例如HashMap，查询/插入/修改/删除的平均时间复杂度都是 `O(1)`; (key, value)
 
-![image-20220617162153587](MySQL索引及调优篇.assets/image-20220617162153587.png)
+![image-20240710081357642](assets/image-20240710081357642.png)
 
 <img src="MySQL索引及调优篇.assets/image-20220617162548697.png" alt="image-20220617162548697" style="float:left;" />
 
@@ -586,13 +584,13 @@ mysql> show variables like '%adaptive_hash_index';
 
 <img src="MySQL索引及调优篇.assets/image-20220617163952166.png" alt="image-20220617163952166" style="float:left;" />
 
-![image-20220617164022728](MySQL索引及调优篇.assets/image-20220617164022728.png)
+<img src="MySQL索引及调优篇.assets/image-20220617164022728.png" alt="image-20220617164022728" style="zoom:70%;" />
 
 但是特殊情况，就是有时候二叉树的深度非常大，比如：
 
-![image-20220617164053134](MySQL索引及调优篇.assets/image-20220617164053134.png)
+<img src="MySQL索引及调优篇.assets/image-20220617164053134.png" alt="image-20220617164053134" style="zoom:70%;" />
 
-为了提高查询效率，就需要 减少磁盘IO数 。为了减少磁盘IO的次数，就需要尽量 降低树的高度 ，需要把 原来“瘦高”的树结构变的“矮胖”，树的每层的分叉越多越好。
+为了提高查询效率，就需要减少磁盘IO数 。为了减少磁盘IO的次数，就需要尽量降低树的高度 ，需要把 原来“瘦高”的树结构变的“矮胖”，树的每层的分叉越多越好。
 
 ### 6.4 AVL树
 
@@ -636,7 +634,13 @@ B 树的结构如下图所示：
 
 你能看出来在 B 树的搜索过程中，我们比较的次数并不少，但如果把数据读取出来然后在内存中进行比 较，这个时间就是可以忽略不计的。而读取磁盘块本身需要进行 I/O 操作，消耗的时间比在内存中进行 比较所需要的时间要多，是数据查找用时的重要因素。 B 树相比于平衡二叉树来说磁盘 I/O 操作要少 ， 在数据查询中比平衡二叉树效率要高。所以 只要树的高度足够低，IO次数足够少，就可以提高查询性能 。
 
-<img src="MySQL索引及调优篇.assets/image-20220617170454023.png" alt="image-20220617170454023" style="float:left;" />
+**<font color='orange'>小结</font>**：
+
+1. B树在插入和删除节点时如果导致树不平衡，就通过自动调整节点的位置来保持树的自平衡
+2. 关键字集合分布在整棵树中，导致叶子节点和非叶子节点都存放数据，搜索有可能在非叶子节点结束。
+3. 搜索性能等价于在关键字全集内做一次二分查找。
+
+
 
 **再举例1：**
 
@@ -711,17 +715,23 @@ R-Tree在MySQL很少使用，仅支持 geometry数据类型 ，支持该类型�
 
 ## 1. 数据库的存储结构：页
 
-<img src="MySQL索引及调优篇.assets/image-20220617175755324.png" alt="image-20220617175755324" style="float:left;" />
+索引结构给我们提供了高效的索引方式，不过索引信息以及数据记录都是保存在文件上的，确切说是存储在页结 构中。另一方面，索引是在存储引擎中实现的，MySQL服务器上的存储引擎负责对表中数据的读取和写入工作。 不同存储引擎中存放的格式一般不同，甚至有的存储引擎比如Memory都不用磁盘来存储数据。 由于InnoDB是MySQL"的默认存储引擎, 所以本章剖析InnoDB存储引擎的数据存储结构。
 
 ### 1.1 磁盘与内存交互基本单位：页
 
-<img src="MySQL索引及调优篇.assets/image-20220617193033971.png" alt="image-20220617193033971" style="float:left;" />
+InnoDB将数据划分为若干个**<font color=red>页</font>(Page)**，页的默认大小为**<font color=red>16KB</font>**，它是**<font color=red>数据库管理存储空间和I/O操作的最小单位</font>**。
 
-![image-20220617193939742](MySQL索引及调优篇.assets/image-20220617193939742.png)
+页作为磁盘和内存交互的基本单位，单次磁盘读取和写入的最少内容都是16KB，改一条数据也得将整页写入覆盖。在数据库中，**<font color=red>行的读取需要先将其所在页进行加载</font>**。
+
+> [!IMPORTANT]
+>
+> 记录是按照行来存储的，但数据库的读取并不是以行为单位<，否则一次读取（一次IO操作）只能处理一行数据，效率非常低。
+
+![image-20240709181449726](assets/image-20240709181449726.png)
 
 ### 1.2 页结构概述
 
-<img src="MySQL索引及调优篇.assets/image-20220617193218557.png" alt="image-20220617193218557" style="float:left;" />
+页a、页b可以**<font color=orange>不在物理结构上相连</font>**，只要通过**<font color=orange>双向链表</font>**关联即可。每个数据页中的记录会按照主键值从小到大的顺序组成一个**<font color=orange>单向链表</font>**，每个数据页都会为存储在它里边的记录生成一个**<font color=orange>页目录</font>**，再通过主键查找某条记录的时候可以在页目录中使用**<font color=orange>二分查找</font>**快速定位到对应的槽，然后遍历该槽对应分组中的记录即可快速找到指定的记录。
 
 ### 1.3 页的大小
 
@@ -731,6 +741,8 @@ R-Tree在MySQL很少使用，仅支持 geometry数据类型 ，支持该类型�
 show variables like '%innodb_page_size%'
 ```
 
+![image-20240709172505890](assets/image-20240709172505890.png)
+
 SQL Server 中页的大小为 `8KB`，而在 Oracle 中我们用术语 "`块`" （Block）来表示 "页"，Oracle 支持的快大小为2KB, 4KB, 8KB, 16KB, 32KB 和 64KB。
 
 ### 1.4 页的上层结构
@@ -739,11 +751,15 @@ SQL Server 中页的大小为 `8KB`，而在 Oracle 中我们用术语 "`块`" �
 
 ![image-20220617194256988](MySQL索引及调优篇.assets/image-20220617194256988.png)
 
-<img src="MySQL索引及调优篇.assets/image-20220617194529699.png" alt="image-20220617194529699" style="float:left;" />
+<font color='orange'>**区（Extent）**</font>是一个比页大一级的存储结构，在InnoDB中，一个区会分配**<font color='orange'>64个连续的页</font>**。因为InnoDB中的页大小默认是16KB，所以一个区的大小是64*16KB=<font color='orange'>**1MB**</font>。区在文件系统是一个<font color='orange'>**连续分配**</font>的空间。
+
+<font color='orange'>**段（Segment）**</font>是由一个或多个区组成，区在文件系统是一个连续分配的空间（在InnoDB中是连续的64个页），不过在段中不要求区与区是相邻的。<font color='orange'>**段是数据库中的分配单位，不同类型的数据库对象以不同的段形式存在**</font>。当我们创建数据表、索引时，就会创建相应的段，比如创建一张表时会创建一个表段，创建一个索引时会创建一个索引段。
+
+<font color='orange'>**表空间（Tablespace）**</font>是一个逻辑容器，存储的对象是段，在一个表空间中可以有一个或多个段，但是一个段只能属于一个表空间。数据库由一个或多个表空间组成，表空间从管理上可以划分为<font color='orange'>**系统表空间、用户表空间、撤销表空间、临时表空间**</font>等。
 
 ## 2. 页的内部结构
 
-页如果按类型划分的话，常见的有 `数据页（保存B+树节点）、系统表、Undo 页 和 事务数据页` 等。数据页是我们最常使用的页。
+页如果按类型划分的话，常见的有 <font color='orange'>**数据页（保存B+树节点）、系统表、Undo 页 和 事务数据页**</font> 等。数据页是我们最常使用的页。
 
 数据页的 `16KB` 大小的存储空间被划分为七个部分，分别是文件头（File Header）、页头（Page Header）、最大最小记录（Infimum + supremum）、用户记录（User Records）、空闲空间（Free Space）、页目录（Page Directory）和文件尾（File Tailer）。
 
@@ -759,7 +775,17 @@ SQL Server 中页的大小为 `8KB`，而在 Oracle 中我们用术语 "`块`" �
 
 ### 第一部分：File Header (文件头部) 和 File Trailer (文件尾部)
 
-见文件InnoDB数据库存储结构.mmap
+首先是文件通用部分，即文件头和文件尾
+
+- [x] **<font color='orange'>文件头信息</font>**
+
+  
+
+![image-20240709200715883](assets/image-20240709200715883.png)
+
+
+
+
 
 ### 第二部分：User Records (用户记录)、最大最小记录、Free Space (空闲空间)
 
@@ -818,6 +844,14 @@ SQL Server 中页的大小为 `8KB`，而在 Oracle 中我们用术语 "`块`" �
 ## 5. 表空间
 
 <img src="MySQL索引及调优篇.assets/image-20220621142910222.png" alt="image-20220621142910222" style="float:left;" />
+
+mysql 容器中，查询文件存放路径：然后进/var/lib/mysql/每个数据库对应一个文件夹，文件夹中有很多.idb文件对应每张表。
+
+```mysql
+mysql> show global variables like '%datadir';
+```
+
+![image-20240709224609339](assets/image-20240709224609339.png)
 
 ### 5.1 独立表空间
 
@@ -907,68 +941,92 @@ InnoDB从磁盘中读取数据 `最小单位` 是数据页。而你想得到的 
 
 MySQL的索引包括普通索引、唯一性索引、全文索引、单列索引、多列索引和空间索引等。
 
-从 功能逻辑 上说，索引主要有 4 种，分别是普通索引、唯一索引、主键索引、全文索引。 
+从 <font color='orange'>**功能逻辑**</font> 上说，索引主要有 4 种，分别是普通索引、唯一索引、主键索引、全文索引。 
 
-按照 物理实现方式 ，索引可以分为 2 种：聚簇索引和非聚簇索引。 
+按照 <font color='orange'>**物理实现方式**</font> ，索引可以分为 2 种：聚簇索引和非聚簇索引。 
 
-按照 作用字段个数 进行划分，分成单列索引和联合索引。
+按照 <font color='orange'>**作用字段个数**</font> 进行划分，分成单列索引和联合索引。
 
 **1. 普通索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621202759576.png" alt="image-20220621202759576" style="float:left;" />
+在创建普通索引时，不附加任何限制条件，只是用于提高查询效率。这类索引可以创建在**<font color=orange>任何数据类型</font>**中，其值是否唯一和非空，要由字段本身的完整性约束条件决定。建立索引以后，可以通过索引进行查询。例如，在表student的字段name上建立一个普通索引，查询记录时就可以根据该索引进行查询。
 
 **2. 唯一性索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621202850551.png" alt="image-20220621202850551" style="float:left;" />
+使用**<font color=orange>UNIQUE参数</font>**可以设置唯一性索引，在创建唯一性索引时，限制索引的值必须是唯一的，但**<font color=orange>允许空值</font>。在一张数据表里**<font color=orange>可以有多个</font>**唯一索引。
+
+例如，在表student的字段email中创建唯一索引，那么字段email的值就必须唯一。要通过唯一索引可以更快速定位某条记录。
 
 **3. 主键索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621203302303.png" alt="image-20220621203302303" style="float:left;" />
+主键索引就是一种<font color='orange'>**特殊的唯一性索引**</font>，在唯一索引的基础上增加了**<font color='orange'>不为空</font>**的约束，也就是NOT NULL+UNIQUE,- 张表里**<font color=orange>最多只有一个</font>**主键索引。
+
+ **<font color=orange>Why?</font>**  这是由主键索引的物理实现方式决定的，因为数据存储在文件中只能按照一种顺序进行存储。 
 
 **4. 单列索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621203333925.png" alt="image-20220621203333925" style="float:left;" />
+在表中的单个字段上创建索引。单列索引只根据该字段进行索引。单列索引可以是普通索引，也可以是唯一性索引, 还可以是全文索引。只要保证该索引只对应一个字段即可。一个表可以有**<font color=orange>多个</font>**单列索引。
 
 **5. 多列 (组合、联合) 索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621203454424.png" alt="image-20220621203454424" style="float:left;" />
+多列索引是在表的**<font color=orange>多个字段组合</font>**上创建一个索引。该索引指向创建时对应的多个字段，可以通过这几个字段进行 查询，但是只有查询条件中使用了这些字段中的第一字段时才会被使用。例如，在表中的字段id、name和 gender上建立一个多列索引**<font color=orange>idx_id_name_gender</font>** , 只有在查询条件中使用了字段id时该索引才会被使用。使用 组合索引时遵循最左前缀集合。
 
 **6. 全文检索**
 
-<img src="MySQL索引及调优篇.assets/image-20220621203645789.png" alt="image-20220621203645789" style="float:left;" />
+全文索引（也称全文检索）是目前**<font color=orange>搜索引擎</font>**使用的一种关键技术。它能够利用【**<font color=orange>分词技术</font>**】等多种算法智能分析 出文本文字中关键词的频率和重要性，然后按照一定的算法规则智能地筛选出想要的搜索结果。全文索引非 常适合大型数据集，对于小的数据集，它的用处比较小。
+
+使用参数**<font color=orange>FULLTEXT</font>**可以设置索引为全文索引。在定义索引的列上支持值的全文查找，允许在这些索引列中插入 重复值和空值。全文索引只能创建在**<font color=orange>CHAR、VARCHAR或TEXT</font>**类型及其系列类型的字段上，**<font color=red>查询数据量较大的 字符串类型的字段时，使用全文索引可以提高查询速度</font>**。例如，表student的字段information是TEXT类型， 该字段包含了很多文字信息。在字段information上建立全文索引后，可以提高查询字段information的速度。 
+
+全文索引典型的有两种类型：自然语言的全文索引和布尔全文索引。 
+
+- 自然语言搜索引擎将计算每一个文档对象和查询的相关度。这里，相关度是基于匹配的关键词的个数，以及关键词在文档中出现的次数。**<font color=orange>在整个索引中出现次数越少的词语，匹配时的相关度就越高</font>**。相反，非常常见的单词将不会被搜索，如果一个词语在50%的记录中都出现了，那么自然语言的搜索将不会搜索这类词语。
+
+  
+
+MySQL数据库从3.23.23版开始支持全文索引，但MySQL5.6.4以前**<font color=orange>只有Myisam支持</font>**，5.6.4版本以后innodb才持，但是官方版本不支持**<font color=orange>中文分词</font>**，需要第三方分词插件。在5.7.6版本，MySQL内置了 **<font color=orange>ngram全文解析器</font>**，用支持亚洲语种的分词。测试或使用全文索引时，要先看一下自己的MySQL版本、存储引擎和数据类型是否支持全文索引。
+
+随着大数据时代的到来，系型数据库应对全文索引的需求已力不从心，逐渐被**<font color=orange>solr、Elasticsearch</font>**等专门 的搜索引擎所替代。
 
 **7. 补充：空间索引**
 
-<img src="MySQL索引及调优篇.assets/image-20220621203736098.png" alt="image-20220621203736098" style="float:left;" />
+使用**<font color=orange>参数SPATIAL</font>**可以设置索引为**<font color=orange>空间索引</font>**。空间索引只能建立在空间数据类型上，这样可以提高系统获取空间数据的效率。MySQL中的空间数据类型包括**<font color=orange>GEOMETRY、POINT、LINESTRING</font>**和**<font color=orange>POLYGON</font>**等。目前只有MyISAM存储引擎支持空间检索，而且索引的字段不能为空值。
 
-**小结：不同的存储引擎支持的索引类型也不一样 **
 
-InnoDB ：支持 B-tree、Full-text 等索引，不支持 Hash 索引； 
 
-MyISAM ： 支持 B-tree、Full-text 等索引，不支持 Hash 索引； 
+**<font color=red>小结：不同的存储引擎支持的索引类型也不一样</font> **
 
-Memory ：支持 B-tree、Hash 等 索引，不支持 Full-text 索引；
+**<font color=orange>InnoDB</font>** ：支持 B-tree、Full-text 等索引，不支持 Hash 索引； 
 
-NDB ：支持 Hash 索引，不支持 B-tree、Full-text 等索引； 
+<font color=orange>MyISAM</font> ： 支持 B-tree、Full-text 等索引，不支持 Hash 索引； 
 
-Archive ：不支 持 B-tree、Hash、Full-text 等索引；
+<font color=orange>Memory</font> ：支持 B-tree、Hash 等 索引，不支持 Full-text 索引；
+
+<font color=orange>NDB</font> ：支持 Hash 索引，不支持 B-tree、Full-text 等索引； 
+
+<font color=orange>Archive</font> ：不支持 B-tree、Hash、Full-text 等索引；
 
 ### 1.2 创建索引
 
-MySQL支持多种方法在单个或多个列上创建索引：在创建表的定义语句 CREATE TABLE 中指定索引列，使用 ALTER TABLE 语句在存在的表上创建索引，或者使用 CREATE INDEX 语句在已存在的表上添加索引。
+MySQL支持多种方法在单个或多个列上创建索引：
+
+- 使用 **<font color=orange>CREATE TABLE</font>** 创建表时指定索引列，
+- 使用 **<font color=orange>ALTER TABLE</font>** 语句为已存在的表创建索引，
+- 使用 **<font color=orange>CREATE INDEX</font>** 语句为已存在的表添加索引。
 
 #### 1. 创建表的时候创建索引
 
-使用CREATE TABLE创建表时，除了可以定义列的数据类型外，还可以定义主键约束、外键约束或者唯一性约束，而不论创建哪种约束，在定义约束的同时相当于在指定列上创建了一个索引。
+使用CREATE TABLE创建表时，**<font color=red>隐式创建索引：在声明有主键约束、唯一性约束、外键约束的字段上，会自动添加相关的索引</font>**。
 
 举例：
 
 ```mysql
+#主键dept_id自动称为索引 
 CREATE TABLE dept(
 dept_id INT PRIMARY KEY AUTO_INCREMENT,
 dept_name VARCHAR(20)
 );
 
+#emp_name唯一索引  emp_dept_id_fk外键索引
 CREATE TABLE emp(
 emp_id INT PRIMARY KEY AUTO_INCREMENT,
 emp_name VARCHAR(20) UNIQUE,
@@ -977,7 +1035,9 @@ CONSTRAINT emp_dept_id_fk FOREIGN KEY(dept_id) REFERENCES dept(dept_id)
 )
 ```
 
-但是，如果显式创建表时创建索引的话，基本语法格式如下：
+![image-20240710013652123](assets/image-20240710013652123.png)
+
+但是，如果**<font color=red>显式创建</font>**表时创建索引的话，基本语法格式如下：
 
 ```mysql
 CREATE TABLE table_name [col_name data_type]
@@ -985,12 +1045,13 @@ CREATE TABLE table_name [col_name data_type]
 DESC]
 ```
 
-* UNIQUE 、 FULLTEXT 和 SPATIAL 为可选参数，分别表示唯一索引、全文索引和空间索引； 
-* INDEX 与 KEY 为同义词，两者的作用相同，用来指定创建索引； 
-* index_name 指定索引的名称，为可选参数，如果不指定，那么MySQL默认col_name为索引名； 
-* col_name 为需要创建索引的字段列，该列必须从数据表中定义的多个列中选择； 
-* length 为可选参数，表示索引的长度，只有字符串类型的字段才能指定索引长度； 
-* ASC 或 DESC 指定升序或者降序的索引值存储。
+* **<font color=orange>UNIQUE 、 FULLTEXT</font>** 和 **<font color=orange>SPATIAL</font>** 为可选参数，分别表示唯一索引、全文索引和空间索引； 
+* **<font color=orange>INDEX</font>** 与**<font color=orange> KEY </font>**为同义词，两者的作用相同，用来**<font color=orange>指定创建索引</font>**； 
+* **<font color=orange>index_name </font>**指定索引的名称，为可选参数，如果不指定，那么MySQL默认col_name为索引名； 
+* **<font color=orange>col_name</font>** 为需要创建索引的字段列，该列必须从数据表中定义的多个列中选择； 
+* **<font color=orange>length</font>** 为可选参数，表示索引的长度，只有字符串类型的字段才能指定索引长度； 
+* **<font color=orange>ASC</font>** 或 <font color=orange>**DESC**</font> 指定升序或者降序的索引值存储。
+* **<font color=red>主键索引只能用主键约束方式创建</font>**
 
 **1. 创建普通索引**
 
@@ -1014,15 +1075,19 @@ INDEX(year_publication)
 CREATE TABLE test1(
 id INT NOT NULL,
 name varchar(30) NOT NULL,
-UNIQUE INDEX uk_idx_id(id)
+UNIQUE INDEX uk_idx_id(id)  #索引名uk_idx_id，加在字段id上,添加数据时需保证id不重复，但可为null
 );
 ```
 
-该语句执行完毕之后，使用SHOW CREATE TABLE查看表结构：
+该语句执行完毕之后，在命令行中可使用SHOW CREATE TABLE**<font color=red>查看索引</font>**：
 
 ```mysql
-SHOW INDEX FROM test1 \G
+SHOW INDEX FROM test1 \G;
+#或者
+SHOW CREATE TABLE test1 \G;
 ```
+
+![image-20240710014828544](assets/image-20240710014828544.png)
 
 **3. 主键索引**
 
@@ -1035,7 +1100,7 @@ CREATE TABLE student (
 id INT(10) UNSIGNED AUTO_INCREMENT ,
 student_no VARCHAR(200),
 student_name VARCHAR(200),
-PRIMARY KEY(id)
+PRIMARY KEY(id)  # 主键索引加载id上
 );
 ```
 
@@ -1076,7 +1141,7 @@ id INT(11) NOT NULL,
 name CHAR(30) NOT NULL,
 age INT(11) NOT NULL,
 info VARCHAR(255),
-INDEX multi_idx(id,name,age)
+INDEX multi_idx(id,name,age)  #B+树先按id排序，再按name排，最后按age排
 );
 ```
 
@@ -1086,17 +1151,22 @@ INDEX multi_idx(id,name,age)
 SHOW INDEX FROM test3 \G
 ```
 
+![image-20240710084841143](assets/image-20240710084841143.png)
+
 在test3表中，查询id和name字段，使用EXPLAIN语句查看索引的使用情况：
 
+**<font color=red>最左前缀原则</font>：**
+
 ```mysql
-EXPLAIN SELECT * FROM test3 WHERE id=1 AND name='songhongkang' \G
+EXPLAIN SELECT * FROM test3 WHERE id=1 AND name='songhongkang' \G   #可以用上索引，最左匹配原则，相当于age不用
+EXPLAIN SELECT * FROM test3 WHERE name='songhongkang' \G   #用不上索引，B+创建时严格按照id、name、age的顺序排
 ```
 
-可以看到，查询id和name字段时，使用了名称为MultiIdx的索引，如果查询 (name, age) 组合或者单独查询name和age字段，会发现结果中possible_keys和key值为NULL, 并没有使用在t3表中创建的索引进行查询。
+可以看到，查询id和name字段时，使用了名称为multi_idx的索引，如果查询 (name, age) 组合或者单独查询name和age字段，会发现结果中possible_keys和key值为NULL, 并没有使用在t3表中创建的索引进行查询。
 
 **6. 创建全文索引**
 
-FULLTEXT全文索引可以用于全文检索，并且只为 `CHAR` 、`VARCHAR` 和 `TEXT` 列创建索引。索引总是对整个列进行，不支持局部 (前缀) 索引。
+FULLTEXT全文索引可以用于全文检索，并且只为 **<font color='orange'>CHAR</font>** 、<font color='orange'>**VARCHAR**</font> 和 **<font color='orange'>TEXT</font>** 列创建索引。索引总是对整个列进行，不支持局部 (前缀) 索引。
 
 举例1：创建表test4，在表中的info字段上建立全文索引，SQL语句如下：
 
@@ -1106,7 +1176,7 @@ id INT NOT NULL,
 name CHAR(30) NOT NULL,
 age INT NOT NULL,
 info VARCHAR(255),
-FULLTEXT INDEX futxt_idx_info(info)
+FULLTEXT INDEX futxt_idx_info(info)  #全文索引，对字段info
 ) ENGINE=MyISAM;
 ```
 
@@ -1127,7 +1197,7 @@ CREATE TABLE articles (
 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR (200),
 body TEXT,
-FULLTEXT index (title, body)
+FULLTEXT index (title, body) #综合title和body做全文索引
 ) ENGINE = INNODB;
 ```
 
@@ -1163,7 +1233,7 @@ SELECT * FROM papers WHERE MATCH(title,content) AGAINST (‘查询字符串’);
 >
 > 1. 使用全文索引前，搞清楚版本支持情况； 
 > 2. 全文索引比 like + % 快 N 倍，但是可能存在精度问题；
-> 3. 如果需要全文索引的是大量数据，建议先添加数据，再创建索引。
+> 3. **<font color=orange>如果需要全文索引的是大量数据，建议先添加数据，再创建索引</font>。**
 
 **7. 创建空间索引**
 
@@ -1174,7 +1244,7 @@ SELECT * FROM papers WHERE MATCH(title,content) AGAINST (‘查询字符串’);
 ```mysql
 CREATE TABLE test5(
 geo GEOMETRY NOT NULL,
-SPATIAL INDEX spa_idx_geo(geo)
+SPATIAL INDEX spa_idx_geo(geo)  #空间索引
 ) ENGINE=MyISAM;
 ```
 
@@ -1197,11 +1267,23 @@ ALTER TABLE table_name ADD [UNIQUE | FULLTEXT | SPATIAL] [INDEX | KEY]
 [index_name] (col_name[length],...) [ASC | DESC]
 ```
 
-**2. 使用CREATE INDEX创建索引** CREATE INDEX语句可以在已经存在的表上添加索引，在MySQL中， CREATE INDEX被映射到一个ALTER TABLE语句上，基本语法结构为：
+举例：
+
+```mysql
+ALTER TABLE book5 ADD UNIQUE INDEX uk_idx_bname(book_name);
+```
+
+**2. 使用CREATE INDEX创建索引** CREATE INDEX... ON...语句可以在已经存在的表上添加索引，在MySQL中， CREATE INDEX被映射到一个ALTER TABLE语句上，基本语法结构为：
 
 ```mysql
 CREATE [UNIQUE | FULLTEXT | SPATIAL] INDEX index_name
 ON table_name (col_name[length],...) [ASC | DESC]
+```
+
+举例：
+
+```mysql
+CREATE UNIQUE INDEX ux_idx_bname ON book5(book_name); #在表book5的book_name上添加唯一索引
 ```
 
 ### 1.3 删除索引
@@ -1211,6 +1293,20 @@ ON table_name (col_name[length],...) [ASC | DESC]
 ```mysql
 ALTER TABLE table_name DROP INDEX index_name;
 ```
+
+> [!IMPORTANT]
+>
+> 提示:
+>
+> **<font color=red>添加AUTO_INCREMENT约束的唯一索引不能被删除</font>**
+
+举例：
+
+```mysql
+ALTER TABLE test3 DROP INDEX multi_idx; #删除表test3上的multi_idx索引
+```
+
+
 
 **2. 使用DROP INDEX语句删除索引** DROP INDEX删除索引的基本语法格式如下：
 
@@ -1226,12 +1322,12 @@ DROP INDEX index_name ON table_name;
 
 降序索引以降序存储键值。虽然在语法上，从MySQL 4版本开始就已经支持降序索引的语法了，但实际上DESC定义是被忽略的，直到MySQL 8.x版本才开始真正支持降序索引 (仅限于InnoDBc存储引擎)。
 
-MySQL在8.0版本之前创建的仍然是升序索引，使用时进行反向扫描，这大大降低了数据库的效率。在某些场景下，降序索引意义重大。例如，如果一个查询，需要对多个列进行排序，且顺序要求不一致，那么使用降序索引将会避免数据库使用额外的文件排序操作，从而提高性能。
+MySQL在**<font color=red>8.0版本之前创建的仍然是升序索引，使用时进行反向扫描，这大大降低了数据库的效率</font>**。在某些场景下，降序索引意义重大。例如，如果一个查询，需要对多个列进行排序，且顺序要求不一致，那么使用降序索引将会避免数据库使用额外的文件排序操作，从而提高性能。
 
 举例：分别在MySQL 5.7版本和MySQL 8.0版本中创建数据表ts1，结果如下：
 
 ```mysql
-CREATE TABLE ts1(a int,b int,index idx_a_b(a,b desc));
+CREATE TABLE ts1(a int,b int,index idx_a_b(a,b desc)); # a升序，bjiang'xu
 ```
 
 在MySQL 5.7版本中查看数据表ts1的结构，结果如下:
@@ -1266,29 +1362,33 @@ DELIMITER;
 CALL ts_insert();
 ```
 
-在MySQL 5.7版本中查看数据表ts1的执行计划，结果如下:
+分别在MySQL 5.7和8.0版本中查看数据表ts1的执行计划，执行如下查询语句:
 
 ```mysql
 EXPLAIN SELECT * FROM ts1 ORDER BY a, b DESC LIMIT 5;
 ```
 
-在MySQL 8.0版本中查看数据表 ts1 的执行计划。
+可以看出，5.7版本使用filesort，效率很低；8.0版本使用索引，效率高:
 
-从结果可以看出，修改后MySQL 5.7 的执行计划要明显好于MySQL 8.0。
+![image-20240710100408375](assets/image-20240710100408375.png)
 
-### 2.2 隐藏索引
+![image-20240710100653366](assets/image-20240710100653366.png)
+
+### 2.2 隐藏索引(<font color=orange>防误删</font>)
+
+**<font color=red>查询不用，插入、删除、更新还会按改它排序</font>。**
 
 在MySQL 5.7版本及之前，只能通过显式的方式删除索引。此时，如果发展删除索引后出现错误，又只能通过显式创建索引的方式将删除的索引创建回来。如果数据表中的数据量非常大，或者数据表本身比较 大，这种操作就会消耗系统过多的资源，操作成本非常高。
 
-从MySQL 8.x开始支持 隐藏索引（invisible indexes） ，只需要将待删除的索引设置为隐藏索引，使 查询优化器不再使用这个索引（即使使用force index（强制使用索引），优化器也不会使用该索引）， 确认将索引设置为隐藏索引后系统不受任何响应，就可以彻底删除索引。 这种通过先将索引设置为隐藏索 引，再删除索引的方式就是软删除。
+从MySQL 8.x开始支持 **<font color=orange>隐藏索引</font>**（invisible indexes） ，只需要将待删除的索引设置为隐藏索引，使 查询优化器不再使用这个索引（即使使用force index（强制使用索引），优化器也不会使用该索引）， 确认将索引设置为隐藏索引后系统不受任何响应，就可以彻底删除索引。 这种**<font color=orange>通过先将索引设置为隐藏索 引，再删除索引的方式就是软删除</font>**。
 
 同时，如果你想验证某个索引删除之后的 `查询性能影响`，就可以暂时先隐藏该索引。
 
 > 注意：
 >
-> 主键不能被设置为隐藏索引。当表中没有显式主键时，表中第一个唯一非空索引会成为隐式主键，也不能设置为隐藏索引。
+> **<font color=orange>主键不能被设置为隐藏索引</font>**。当表中没有显式主键时，表中第一个唯一非空索引会成为隐式主键，也不能设置为隐藏索引。
 
-索引默认是可见的，在使用CREATE TABLE, CREATE INDEX 或者 ALTER TABLE 等语句时可以通过 `VISIBLE` 或者 `INVISIBLE` 关键词设置索引的可见性。
+索引默认是可见的，在使用CREATE TABLE, CREATE INDEX 或者 ALTER TABLE 等语句时可以通过 **<font color=orange>VISIBLE</font>** 或者 **<font color=orange>INVISIBLE</font>** 关键词设置索引的可见性。
 
 **1. 创建表时直接创建**
 
@@ -1300,11 +1400,22 @@ propname1 type1[CONSTRAINT1],
 propname2 type2[CONSTRAINT2],
 ……
 propnamen typen,
-INDEX [indexname](propname1 [(length)]) INVISIBLE
+INDEX [indexname](propname1 [(length)]) INVISIBLE #隐藏索引
 );
 ```
 
 上述语句比普通索引多了一个关键字INVISIBLE，用来标记索引为不可见索引。
+
+```mysql
+CREATE TABLE tablename(
+propname1 VARCHAR(10),
+propname2 VARCHAR(10),
+propnamen3 VARCHAR(10),
+INDEX idx(propname2) INVISIBLE #隐藏索引
+);
+```
+
+![image-20240710105627086](assets/image-20240710105627086.png)
 
 **2. 在已经存在的表上创建**
 
@@ -1324,18 +1435,18 @@ ALTER TABLE tablename
 ADD INDEX indexname (propname [(length)]) INVISIBLE;
 ```
 
-**4. 切换索引可见状态**
+**4. 修改索引可见状态**
 
 已存在的索引可通过如下语句切换可见状态：
 
 ```mysql
-ALTER TABLE tablename ALTER INDEX index_name INVISIBLE; #切换成隐藏索引
-ALTER TABLE tablename ALTER INDEX index_name VISIBLE; #切换成非隐藏索引
+ALTER TABLE tablename ALTER INDEX index_name INVISIBLE; #修改成隐藏索引
+ALTER TABLE tablename ALTER INDEX index_name VISIBLE; #修改成非隐藏索引
 ```
 
 如果将index_cname索引切换成可见状态，通过explain查看执行计划，发现优化器选择了index_cname索引。
 
-> 注意 当索引被隐藏时，它的内容仍然是和正常索引一样实时更新的。如果一个索引需要长期被隐藏，那么可以将其删除，因为索引的存在会影响插入、更新和删除的性能。
+> 注意 **<font color=red>当索引被隐藏时，它的内容仍然是和正常索引一样实时更新的。如果一个索引需要长期被隐藏，那么可以将其删除，因为索引的存在会影响插入、更新和删除的性能</font>。**
 
 通过设置隐藏索引的可见性可以查看索引对调优的帮助。
 
@@ -1412,7 +1523,7 @@ mysql> select @@optimizer_switch \G
 
 ## 3. 索引的设计原则
 
-为了使索引的使用效率更高，在创建索引时，必须考虑在哪些字段上创建索引和创建什么类型的索引。**索引设计不合理或者缺少索引都会对数据库和应用程序的性能造成障碍。**高效的索引对于获得良好的性能非常重要。设计索引时，应该考虑相应准则。
+为了使索引的使用效率更高，在创建索引时，必须考虑在哪些字段上创建索引和创建什么类型的索引。**<font color=orange>索引设计不合理或者缺少索引都会对数据库和应用程序的性能造成障碍</font>。**高效的索引对于获得良好的性能非常重要。设计索引时，应该考虑相应准则。
 
 ### 3.1 数据准备
 
@@ -1559,11 +1670,17 @@ CALL insert_stu(1000000);
 
 ### 3.2 哪些情况适合创建索引
 
+- 索引加快查询速度的原理：创建索引按字段排序需要花费时间，维护索引（顺序）在插入、修改数据时需要花费时间，即**<font color=red>用索引创建和修改数据时维护索引耗费的时间换取查询速度</font>**。
+
+- **<font color=red>不是聚簇索引则根据排序字段和主键再生成一颗B+树索引，不会重复存放全部数据。（通过排序字段找到对应主键，再到聚簇索引的B+树中找到完整记录）</font>**
+
 #### 1. 字段的数值有唯一性的限制
 
-<img src="MySQL索引及调优篇.assets/image-20220623154615702.png" alt="image-20220623154615702" style="float:left;" />
+索引本身可以起到约束作用，比如唯一索引、主键索引都可以起到唯一性约束，因此在数据表中，如果某个字段时唯一的，就可以直接创建唯一索引，或主键索引，通过索引快速定位到某条记录。
 
-> 业务上具有唯一特性的字段，即使是组合字段，也必须建成唯一索引。（来源：Alibaba） 说明：不要以为唯一索引影响了 insert 速度，这个速度损耗可以忽略，但提高查找速度是明显的。
+例如：学生表中学号具有唯一性，为该字段建立唯一索引可快速定位到某个学生的信息，如果使用姓名，可能存在同名现象，降低查询速度。
+
+> **<font color=red>业务上具有唯一特性的字段，即使是组合字段，也必须建成唯一索引</font>**。（来源：Alibaba） 说明：**<font color=red>不要以为唯一索引影响了 insert 速度，这个速度损耗可以忽略，但提高查找速度是明显的</font>**。
 
 #### 2. 频繁作为 WHERE 查询条件的字段
 
@@ -1573,11 +1690,65 @@ CALL insert_stu(1000000);
 
 #### 3. 经常 GROUP BY 和 ORDER BY 的列
 
-索引就是让数据按照某种顺序进行存储或检索，因此当我们使用 GROUP BY 对数据进行分组查询，或者使用 ORDER BY 对数据进行排序的时候，就需要对分组或者排序的字段进行索引 。如果待排序的列有多个，那么可以在这些列上建立组合索引 。
+索引就是让数据按照某种顺序进行存储或检索，因此当我们使用 GROUP BY 对数据进行分组查询，或者使用 ORDER BY 对数据进行排序的时候，就需要**<font color=red>对分组或者排序的字段进行索引</font>** 。如果待排序的列有多个，那么可以在这些列上建立**<font color=red>组合索引</font>** 。
+
+示例：对GROUP BY的字段加索引后查询速度显著加快
+
+```mysql
+#1. 没对student_id加索引，查询耗时0.802s
+SELECT student_id,COUNT(*) AS num from student_info GROUP BY student_id LIMIT 100;  
+#2. 对student_id加索引后，查询耗时0.029s
+ALTER TABLE student_info ADD INDEX stu_idx(student_id);
+SELECT student_id,COUNT(*) AS num from student_info GROUP BY student_id LIMIT 100;  
+```
+
+
+
+添加联合索引：
+
+```mysql
+# 对student_id和create_time降序加联合索引
+ALTER TABLE student_info ADD INDEX idx_sid_cre_time(student_id,create_time DESC); 
+SELECT student_id,COUNT(*) AS num FROM student_info
+GROUP BY student_id ORDER BY create_time DESC LIMIT 100;
+#查询报错修改sql_mode 
+# 错误信息
+1055 - Expression #1 of ORDER BY clause is not in GROUP BY clause and contains nonaggregated column 'atguigudb1.student_info.create_time' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by
+#修改sql_mode,先查看
+SELECT @@sql_mode;
+# ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+# 修改，去掉其中的only_full_group_by
+SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+# 重新执行查询
+```
+
+注意：**<font color=orange>GROUP BY 和ORDER BY在一起执行顺序是先GROUP BY 后ORDER BY</font>** ，因此若再创建一个idx_cre_time_sid(create_time DESC,student_id)的联合索引，也是使用idx_sid_cre_time，idx_cre_time_sid用不到。规范：**<font color=orange>GROUP BY 和ORDER BY一起使用创建联合索引必须按照先GROUP BY 后ORDER BY的顺序</font>**。
 
 #### 4. UPDATE、DELETE 的 WHERE 条件列
 
-对数据按照某个条件进行查询后再进行 UPDATE 或 DELETE 的操作，如果对 WHERE 字段创建了索引，就能大幅提升效率。原理是因为我们需要先根据 WHERE 条件列检索出来这条记录，然后再对它进行更新或删除。**如果进行更新的时候，更新的字段是非索引字段，提升的效率会更明显，这是因为非索引字段更新不需要对索引进行维护。**
+对数据按照某个条件进行查询后再进行 UPDATE 或 DELETE 的操作，如果对 WHERE 字段创建了索引，就能大幅提升效率。原理是因为我们需要先根据 WHERE 条件列检索出来这条记录，然后再对它进行更新或删除。**<font color=orange>如果进行更新的时候，更新的字段是非索引字段，提升的效率会更明显，这是因为非索引字段更新不需要对索引进行维护</font>。**
+
+示例：
+
+没对name建索引，执行SQL：
+
+```mysql
+UPDATE student_info SET student_id=10002 WHERE `name`='EFmvqr';
+```
+
+运行结果： Affected rows: 3,    耗时**<font color=orange>0.599s</font>**。
+
+对name创建索引后重新执行类似更新语句：
+
+```mysql
+ALTER TABLE student_info ADD INDEX idx_name(name);
+UPDATE student_info SET student_id=10003 WHERE `name`='EFmvqr';
+```
+
+运行结果： Affected rows: 3,    耗时**<font color=orange>0.002s</font>**
+
+可以看出，对WHERE字段加了索引后更新效率大幅提升。
 
 #### 5.DISTINCT 字段需要创建索引
 
@@ -1594,6 +1765,7 @@ SELECT DISTINCT(student_id) FROM `student_info`;
 如果我们对 student_id 创建索引，再执行 SQL 语句：
 
 ```mysql
+create index stu_idx on student_info(student_id);
 SELECT DISTINCT(student_id) FROM `student_info`;
 ```
 
@@ -1603,11 +1775,11 @@ SELECT DISTINCT(student_id) FROM `student_info`;
 
 #### 6. 多表 JOIN 连接操作时，创建索引注意事项
 
-首先， `连接表的数量尽量不要超过 3 张` ，因为每增加一张表就相当于增加了一次嵌套的循环，数量级增 长会非常快，严重影响查询的效率。 
+首先， **<font color=orange>连接表的数量尽量不要超过 3 张</font>** ，因为每增加一张表就相当于增加了一次嵌套的循环，数量级增 长会非常快，严重影响查询的效率。 
 
-其次， `对 WHERE 条件创建索引` ，因为 WHERE 才是对数据条件的过滤。如果在数据量非常大的情况下， 没有 WHERE 条件过滤是非常可怕的。 
+其次， <font color=orange>**对 WHERE 条件创建索引**</font> ，因为 WHERE 才是对数据条件的过滤。如果在数据量非常大的情况下， 没有 WHERE 条件过滤是非常可怕的。 
 
-最后， `对用于连接的字段创建索引` ，并且该字段在多张表中的 类型必须一致 。比如 course_id 在 student_info 表和 course 表中都为 int(11) 类型，而不能一个为 int 另一个为 varchar 类型。
+最后， <font color=orange>**对用于连接的字段创建索引**</font> ，并且该字段在多张表中的 类型必须一致 。比如 course_id 在 student_info 表和 course 表中都为 int(11) 类型，而不能一个为 int 另一个为 varchar 类型。
 
 举个例子，如果我们只对 student_id 创建索引，执行 SQL 语句：
 
@@ -1624,20 +1796,34 @@ WHERE name = '462eed7ac6e791292a79';
 
 #### 7. 使用列的类型小的创建索引
 
-<img src="MySQL索引及调优篇.assets/image-20220623175306282.png" alt="image-20220623175306282" style="float:left;" />
+这里说的类型大小指的是**<font color=orange>该类型表示的数据范围大小</font>**。
+
+在定义表结构时要显式指定列的类型，以整数类型为例，有TINYINT、MEDIUMINT、INT、BIGINT等，它们占用的存储空间依次递增，能表示的整数范围也依次递增。如果想要对某个整数列建立索引，在表示的整数范围允许的情况下，**<font color=orange>尽量让索引列使用较小的类型</font>**，比如能使用INT就不使用BIGINT，因为数据类型越小：
+
+- **<font color=orange>查询时进行比较操作越快</font>**
+- **<font color=orange>索引占用的存储空间越小，一个数据页内就能放下更多记录，从而减少磁盘IO次数，加快读取效率</font>**
+
+这个建议对于表的**<font color=orange>主键来说更加适用</font>**，因为不仅是聚簇索引中会存储主键值，其他所有二级索引的节点处都会存储一份记录的主键值，如果主键使用更小的数据类型，也就意味着节省更多的存储空间和更高效的IO。
 
 #### 8. 使用字符串前缀创建索引
 
-<img src="MySQL索引及调优篇.assets/image-20220623175513439.png" alt="image-20220623175513439" style="float:left;" />
+假设我们的字符串很长，那么存储一个字符串就需要占用很大的存储空间。在我们需要为这个字符串列建立索引 时，就意味着在对应的B+树中有两个问题：
+
+-   B+树索引中的记录需要把该列的完整字符串存储起来，更费时。而且字符串越长，**<font color=orange>在索引中占用的存储空间大</font>**。
+- 如果B+树索引中索引列存储的字符串很长，那**<font color=orange>做字符串比较时会占用更多时间</font>**。
+
+我们可以通过**<font color=orange>截取字段的前面一部分内容建立索引</font>**，这个就叫**<font color=orange>前缀索引</font>**。这样在查找记录时虽然不能精确定位 到记录的位置，但能定位到相应前缀所在的位置，然后根据前缓相同的记录的主健值回表查询完整的字符串值。既**<font color=orange>节约空间</font>**，又**<font color=orange>减少了字符串的比较时间</font>**，还大体能解决排序问题。
+
+ 例如，TEXT和BLOG类型的字段，进行全文检索很浪费时间，如果只检索字段前面的若干字符，这样可以提索速度。
 
 创建一张商户表，因为地址字段比较长，在地址字段上建立前缀索引
 
 ```mysql
-create table shop(address varchar(120) not null);
-alter table shop add index(address(12));
+create table shop(address varchar(120) not null); 
+alter table shop add index(address(12)); #截取字段address前12个字符建立索引
 ```
 
-问题是，截取多少呢？截取得多了，达不到节省索引存储空间的目的；截取得少了，重复内容太多，字 段的散列度(选择性)会降低。怎么计算不同的长度的选择性呢？
+问题是，截取多少呢？截取得多了，达不到节省索引存储空间的目的；截取得少了，重复内容太多，字 段的散列度(选择性)会降低。**<font color=orange>怎么计算不同的长度的选择性呢</font>**？
 
 先看一下字段在全部数据中的选择度：
 
@@ -1647,10 +1833,10 @@ select count(distinct address) / count(*) from shop
 
 通过不同长度去计算，与全表的选择性对比：
 
-公式：
+**<font color=red>截取长度计算公式</font>**：
 
 ```mysql
-count(distinct left(列名, 索引长度))/count(*)
+count(distinct left(列名, 索引长度))/count(*);  #left函数：截取字符串
 ```
 
 例如：
@@ -1663,7 +1849,7 @@ count(distinct left(address,25)) / count(*) as sub13 -- 截取前25个字符的�
 from shop;
 ```
 
-> 越接近于1越好，说明越有区分度
+> 越接近于1越好，越有区分度
 
 **引申另一个问题：索引列前缀对排序的影响**
 
@@ -1675,19 +1861,19 @@ ORDER BY address
 LIMIT 12;
 ```
 
-因为二级索引中不包含完整的address列信息，所以无法对前12个字符相同，后边的字符不同的记录进行排序，也就是使用索引列前缀的方式 `无法支持使用索引排序` ，只能使用文件排序。
+因为二级索引中不包含完整的address列信息，所以无法对前12个字符相同，后边的字符不同的记录进行排序，也就是使用索引列前缀的方式 <font color=orange>**无法支持使用索引排序**</font> ，只能使用文件排序。
 
 **拓展：Alibaba《Java开发手册》**
 
-【 强制 】在 varchar 字段上建立索引时，必须指定索引长度，没必要对全字段建立索引，根据实际文本 区分度决定索引长度。 
+【 **<font color=orange>强制</font>** 】在 varchar 字段上建立索引时，必须指定索引长度，没必要对全字段建立索引，根据实际文本 区分度决定索引长度。 
 
-说明：索引的长度与区分度是一对矛盾体，一般对字符串类型数据，长度为 20 的索引，区分度会高达 90% 以上 ，可以使用 count(distinct left(列名, 索引长度))/count(*)的区分度来确定。
+说明：索引的长度与区分度是一对矛盾体，一般对字符串类型数据，长度为 20 的索引，区分度会高达 90% 以上 ，可以使用 **<font color=orange>count(distinct left(列名, 索引长度))/count(*)的区分度</font>**来确定。
 
 #### 9. 区分度高(散列性高)的列适合作为索引
 
-`列的基数` 指的是某一列中不重复数据的个数，比方说某个列包含值 `2, 5, 8, 2, 5, 8, 2, 5, 8`，虽然有`9`条记录，但该列的基数却是3。也就是说**在记录行数一定的情况下，列的基数越大，该列中的值越分散；列的基数越小，该列中的值越集中。**这个列的基数指标非常重要，直接影响我们是否能有效的利用索引。最好为列的基数大的列简历索引，为基数太小的列的简历索引效果可能不好。
+<font color=orange>**列的基数**</font>指的是某一列中不重复数据的个数，比方说某个列包含值 `2, 5, 8, 2, 5, 8, 2, 5, 8`，虽然有`9`条记录，但该列的基数却是3。也就是说**<font color=orange>在记录行数一定的情况下，列的基数越大，该列中的值越分散；列的基数越小，该列中的值越集中</font>。**这个列的基数指标非常重要，直接影响我们是否能有效的利用索引。最好为列的基数大的列简历索引，为基数太小的列的简历索引效果可能不好。
 
-可以使用公式`select count(distinct a) / count(*) from t1` 计算区分度，越接近1越好，一般超过33%就算比较高效的索引了。
+可以使用公式`select count(distinct a) / count(*) from t1` 计算区分度，越接近1越好，一般超过**<font color=orange>33%</font>**就算比较高效的索引了。
 
 扩展：联合索引把区分度搞(散列性高)的列放在前面。
 
@@ -1699,7 +1885,11 @@ LIMIT 12;
 
 ### 3.3 限制索引的数目
 
-<img src="MySQL索引及调优篇.assets/image-20220627151947786.png" alt="image-20220627151947786" style="float:left;" />
+索引的数目不是越多越好，建议单张表索引数量**<font color=orange>不超过6个</font>**，原因： 
+
+- 每个索引都需要占用<font color=orange>**磁盘空间**</font>，索引越多，需要的磁盘空间就越大；
+- 索引会影响<font color=orange>**INSERT、DELETE、UPDATE等语句的性能**</font>，因为表中数据更改时，索引也会进行调整和更新，会造成负担；
+- 优化器在选择如何优化查询时，会根据统一信息，对每个可以用到的**<font color=orange>索引来进行评估</font>**，以生成一个最好的执行计划，如果同时有多个索引都可以用于查询，会增加MySQL优化器生执行计划的时间，降低直询性能.
 
 ### 3.4 哪些情况不适合创建索引
 
@@ -1717,7 +1907,7 @@ WHERE student_id = 41251;
 
 #### 2. 数据量小的表最好不要使用索引
 
-如果表记录太少，比如少于1000个，那么是不需要创建索引的。表记录太少，是否创建索引 `对查询效率的影响并不大`。甚至说，查询花费的时间可能比遍历索引的时间还要短，索引可能不会产生优化效果。
+如果表记录太少，比如少于1000个，那么是不需要创建索引的。表记录太少，是否创建索引 **<font color=orange>对查询效率的影响并不大</font>**。甚至说，查询花费的时间可能比遍历索引的时间还要短，索引可能不会产生优化效果。
 
 举例：创建表1：
 
@@ -1802,11 +1992,11 @@ mysql> select * from t_with_index where b = 9879;
 
 你能看到运行结果相同，但是在数据量不大的情况下，索引就发挥不出作用了。
 
-> 结论：在数据表中的数据行数比较少的情况下，比如不到 1000 行，是不需要创建索引的。
+> 结论：**<font color=red>数据表中的数据行数低于1000 行不需要创建索引</font>**。
 
 #### 3. 有大量重复数据的列上不要建立索引
 
-在条件表达式中经常用到的不同值较多的列上建立索引，但字段中如果有大量重复数据，也不用创建索引。比如在学生表的"性别"字段上只有“男”与“女”两个不同值，因此无须建立索引。如果建立索引，不但不会提高查询效率，反而会`严重降低数据更新速度`。
+在条件表达式中经常用到的不同值较多的列上建立索引，但字段中如果有大量重复数据，也不用创建索引。比如在学生表的"性别"字段上只有“男”与“女”两个不同值，因此无须建立索引。如果建立索引，不但不会提高查询效率，反而会<font color=orange>**严重降低数据更新速度**</font>。
 
 举例1：要在 100 万行数据中查找其中的 50 万行（比如性别为男的数据），一旦创建了索引，你需要先 访问 50 万次索引，然后再访问 50 万次数据表，这样加起来的开销比不使用索引可能还要大。
 
@@ -1829,7 +2019,7 @@ CREATE TABLE student_gender(
 SELECT * FROM student_gender WHERE student_gender = 1;
 ```
 
-> 结论：当数据重复度大，比如 高于 10% 的时候，也不需要对这个字段使用索引。
+> 结论：当数据重复度大，比如<font color=orange> **高于 10%** </font>时，**<font color=orange>无需对该字段加索引</font>**。
 
 #### 4.  避免对经常更新的表创建过多的索引
 
@@ -1860,7 +2050,7 @@ CREATE TABLE person_info(
     country varchar(100) NOT NULL,
     PRIMARY KEY (id),
     KEY idx_name_birthday_phone_number (name(10), birthday, phone_number),
-    KEY idx_name (name(10))
+    KEY idx_name (name(10))  #冗余索引，和上面重复了
 );
 ```
 
@@ -1880,6 +2070,10 @@ INDEX idx_c1 (col1)
 ```
 
 我们看到，col1 既是主键、又给它定义为一个唯一索引，还给它定义了一个普通索引，可是主键本身就 会生成聚簇索引，所以定义的唯一索引和普通索引是重复的，这种情况要避免。
+
+### 3.5 小结
+
+**<font color=oran>索引是把双刃剑，可以提高查询效率，但也会降低插入和更新的速度，并占用磁盘空间</font>**。
 
 # 第09章_性能分析工具的使用
 
@@ -2046,7 +2240,13 @@ mysql> SHOW STATUS LIKE 'last_query_cost';
 
 ## 4. 定位执行慢的 SQL：慢查询日志
 
-![image-20240704202430525](assets/image-20240704202430525.png)
+MySQL慢查询日志用来记录在MySQL中**<font color=orange>响应时间超过阀值</font>**的语句，具体指运行时间超过**<font color=orange>long_query_time</font>**的SQL会被记录到慢查询日志中。Iong_query_time的默认值为<font color=orange>**10s**</font>，意思是运行10s以上（不含10）的语句，认为是超出了我们的最大忍耐时间值。
+
+它的主要作用是，帮助我们发现那些执行时间特别长的SQL查询，并且有针对性地进行优化，从而提高系统的整体效率。当数据库服务器发生阻塞、运行变慢时，检查慢查询日志从中找到慢查询SQL，对解决问题很有帮助。比如一条SQL执行超过5秒，我们就算慢SQL，希望能收集超过5秒的SQL，结合explain进行全面分析。
+
+ 默认情况下，MySQL数据库<font color=orange>**未开启慢查询日志**</font>，需要手动设置这个参数。<font color=orange>**如果不是调优需要的话，不建议开启**</font>，因为开启慢查询日志会带来一定的性能影响。
+
+ 慢查询日志支持将日志记录写入文件。
 
 ### 4.1 开启慢查询日志参数
 
@@ -2058,7 +2258,7 @@ mysql> SHOW STATUS LIKE 'last_query_cost';
 mysql > show variables like '%slow_query_log';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628173525966.png" alt="image-20220628173525966" style="float:left;" />
+![image-20240711092712376](assets/image-20240711092712376.png)
 
 我们可以看到 `slow_query_log=OFF`，我们可以把慢查询日志打开，注意设置变量值的时候需要使用 global，否则会报错：
 
@@ -2068,9 +2268,9 @@ mysql > set global slow_query_log='ON';
 
 然后我们再来查看下慢查询日志是否开启，以及慢查询日志文件的位置：
 
-<img src="MySQL索引及调优篇.assets/image-20220628175226812.png" alt="image-20220628175226812" style="float:left;" />
+![image-20240711092758375](assets/image-20240711092758375.png)
 
-你能看到这时慢查询分析已经开启，同时文件保存在 `/var/lib/mysql/atguigu02-slow.log` 文件 中。
+你能看到这时慢查询分析已经开启，同时文件保存在 `/var/lib/mysql/d4d052bc412a-slow.log` 文件 中。
 
 **2. 修改 long_query_time 阈值**
 
@@ -2080,7 +2280,7 @@ mysql > set global slow_query_log='ON';
 mysql > show variables like '%long_query_time%';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628175353233.png" alt="image-20220628175353233" style="float:left;" />
+![image-20240711093019530](assets/image-20240711093019530.png)
 
 这里如果我们想把时间缩短，比如设置为 1 秒，可以这样设置：
 
@@ -2094,7 +2294,7 @@ mysql> set long_query_time=1;
 mysql> show variables like '%long_query_time%';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628175425922.png" alt="image-20220628175425922" style="zoom:80%; float:left;" />
+![image-20240711093158873](assets/image-20240711093158873.png)
 
 **补充：配置文件中一并设置参数**
 
@@ -2252,7 +2452,15 @@ mysql> SELECT * FROM student WHERE name = 'oQmLUr';
 show status like 'slow_queries';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628195650079.png" alt="image-20220628195650079" style="float:left;" />
+> [!NOTE]
+>
+> 补充说明： 
+>
+> 除了上述变量，控制慢直询日志的还有一个系统变量：min_examined_row_limit。这个变量的意思是，查询**<font color=orange>扫描过的最少记录数</font>**。这个变量和查询执行时间，共同组成了判别一个查询是否是慢查询的条件。如果查扫描过的记录数大于等于这个变量的值，并且查询执行时间超过long_query_time的值，那么这个查询就被记录到慢查询日志中；反之则不被记录到慢查询日志中。
+>
+> ![image-20240711093740596](assets/image-20240711093740596.png)
+>
+>  这个值默认是0，与long_query_time=10合在一起，表示只要查询的执行时间超过10秒，哪怕一个记录也没扫描过，都要被记录到慢查询日志中。也可以根据需要，通过修改"my.ini"文件，来修改查询时长，或者通过SET指令，用SQL语句修改"min_examined_row_limit"的值。
 
 ### 4.5 慢查询日志分析工具：mysqldumpslow
 
@@ -2262,14 +2470,17 @@ show status like 'slow_queries';
 
 ```properties
 mysqldumpslow --help
+# docker容器内没装可以在宿主机装
+apt-get install -y mysql-client 
+#然后docker cp 容器id:日志路径 宿主机路径  拷贝到宿主机上分析
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628195821440.png" alt="image-20220628195821440" style="float:left;" />
+![image-20240711100104166](assets/image-20240711100104166.png)
 
 mysqldumpslow 命令的具体参数如下：
 
 * -a: 不将数字抽象成N，字符串抽象成S
-* -s: 是表示按照何种方式排序：
+* -s: 是表示按照何种方式排序（降序）：
   * c: 访问次数 
   * l: 锁定时间 
   * r: 返回记录 
@@ -2281,7 +2492,7 @@ mysqldumpslow 命令的具体参数如下：
 * -t: 即为返回前面多少条的数据；
 * -g: 后边搭配一个正则匹配模式，大小写不敏感的；
 
-举例：我们想要按照查询时间排序，查看前五条 SQL 语句，这样写即可：
+举例：按照查询耗时降序排序，**<font color=orange>查看前五条最耗时的 SQL 语句</font>**：
 
 ```properties
 mysqldumpslow -s t -t 5 /var/lib/mysql/atguigu01-slow.log
@@ -2299,6 +2510,10 @@ SELECT * FROM student WHERE stuno = N
 
 Died at /usr/bin/mysqldumpslow line 162, <> chunk 2.
 ```
+
+下面long_query_time设为0.1s ，并将慢查询日志从容器拷到宿主机分析:
+
+![image-20240711103200202](assets/image-20240711103200202.png)
 
 **工作常用参考：**
 
@@ -2369,7 +2584,7 @@ SHOW VARIABLES LIKE `slow_query_log%`;
 
 <img src="MySQL索引及调优篇.assets/image-20220628203545536.png" alt="image-20220628203545536" style="float:left;" />
 
-从执行结果可以看出，慢查询日志的目录默认为MySQL的数据目录，在该目录下 `手动删除慢查询日志文件` 即可。
+从执行结果可以看出，慢查询日志的目录默认为MySQL的数据目录，在该目录下 **<font color=orange>手动删除慢查询日志文件</font>** 即可。
 
 使用命令 `mysqladmin flush-logs` 来重新生成查询日志文件，具体命令如下，执行完毕会在数据目录下重新生成慢查询日志文件。
 
@@ -2393,7 +2608,7 @@ show profile 是 MySQL 提供的可以用来分析当前会话中 SQL 都做了�
 mysql > show variables like 'profiling';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628204922556.png" alt="image-20220628204922556" style="float:left;" />
+![image-20240711104041652](assets/image-20240711104041652.png)
 
 通过设置 profiling='ON' 来开启 show profile:
 
@@ -2401,7 +2616,7 @@ mysql > show variables like 'profiling';
 mysql > set profiling = 'ON';
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628205029208.png" alt="image-20220628205029208" style="zoom:80%;float:left" />
+![image-20240711104147900](assets/image-20240711104147900.png)
 
 然后执行相关的查询语句。接着看下当前会话都有哪些 profiles，使用下面这条命令：
 
@@ -2409,7 +2624,7 @@ mysql > set profiling = 'ON';
 mysql > show profiles;
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628205243769.png" alt="image-20220628205243769" style="zoom:80%;float:left" />
+![image-20240711104320148](assets/image-20240711104320148.png)
 
 你能看到当前会话一共有 2 个查询。如果我们想要查看最近一次查询的开销，可以使用：
 
@@ -2417,13 +2632,13 @@ mysql > show profiles;
 mysql > show profile;
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628205317257.png" alt="image-20220628205317257" style="float:left;" />
+![image-20240711104412539](assets/image-20240711104412539.png)
 
 ```mysql
 mysql> show profile cpu,block io for query 2
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628205354230.png" alt="image-20220628205354230" style="float:left;" />
+![image-20240711104440017](assets/image-20240711104440017.png)
 
 **show profile的常用查询参数： **
 
@@ -2445,7 +2660,7 @@ mysql> show profile cpu,block io for query 2
 
 ⑨ SWAPS：显示交换次数开销信息。
 
-**日常开发需注意的结论：**
+**<font color=red>日常开发需注意的结论</font>：**
 
 ① `converting HEAP to MyISAM`: 查询结果太大，内存不够，数据往磁盘上搬了。 
 
@@ -2465,7 +2680,7 @@ mysql> show profile cpu,block io for query 2
 
 ### 6.1 概述
 
-<img src="MySQL索引及调优篇.assets/image-20220628210837301.png" alt="image-20220628210837301" style="float:left;" />
+**<font color=orange>定位了查询慢的SQL之后，就可以使用EXPLAIN或DESCRIBE工具做针对性的分析</font>**，二者的使用方法和分析结果是一样的。MySQL中有专门负责优化SELECT语句的优化器模块，其主要功能是通过计算分析系统中收集到的统计信息，为端请求的Query提供它认为最优的**<font color=orange>执行计划</font>**（但未必是DBA认为是最优的，这部分最耗费时间）。这个执行计划展示了接下来具体执行查询的方式，比如多表连接的顺序是什么，对于每个表采用什么访问方法来执行查询等等。MySQL提供了 **<font color=orange>EXPLAIN</font>**语句来帮助查看某个查询语句的具体执行计划，看懂EXPLAIN语句的各个输出项，可以有针对性地提升直询语句的性能。
 
 **1. 能做什么？**
 
@@ -2482,14 +2697,14 @@ https://dev.mysql.com/doc/refman/5.7/en/explain-output.html
 
 https://dev.mysql.com/doc/refman/8.0/en/explain-output.html
 
-![image-20220628211207436](MySQL索引及调优篇.assets/image-20220628211207436.png)
+![image-20240711132453463](assets/image-20240711132453463.png)
 
 **3. 版本情况**
 
-* MySQL 5.6.3以前只能 EXPLAIN SELECT ；MYSQL 5.6.3以后就可以 EXPLAIN SELECT，UPDATE， DELETE 
+* MySQL 5.6.3以前只能 **<font color=orange>EXPLAIN SELECT</font>** ；MYSQL 5.6.3以后就可以 **<font color=orange>EXPLAIN SELECT，UPDATE， DELETE</font>** 
 * 在5.7以前的版本中，想要显示 partitions 需要使用 explain partitions 命令；想要显示 filtered 需要使用 explain extended 命令。在5.7版本后，默认explain直接显示partitions和 filtered中的信息。
 
-<img src="MySQL索引及调优篇.assets/image-20220628211351678.png" alt="image-20220628211351678" style="float:left;" />
+![image-20240711132905306](assets/image-20240711132905306.png)
 
 ### 6.2 基本语法
 
@@ -2501,19 +2716,30 @@ EXPLAIN SELECT select_options
 DESCRIBE SELECT select_options
 ```
 
-如果我们想看看某个查询的执行计划的话，可以在具体的查询语句前边加一个 EXPLAIN ，就像这样：
+查看某个查询的执行计划，可以在具体查询语句前加 EXPLAIN ：
 
 ```mysql
 mysql> EXPLAIN SELECT 1;
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220628212029574.png" alt="image-20220628212029574" style="float:left;" />
+![image-20240711133138936](assets/image-20240711133138936.png)
 
-EXPLAIN 语句输出的各个列的作用如下：
+EXPLAIN 语句输出列：
 
-![image-20220628212049096](MySQL索引及调优篇.assets/image-20220628212049096.png)
-
-在这里把它们都列出来知识为了描述一个轮廓，让大家有一个大致的印象。
+|                    列名                     |                             描述                             |
+| :-----------------------------------------: | :----------------------------------------------------------: |
+|      **<font color=orange>id</font>**       | 在一个大的查询语句中每个SELECT关键字都对应一个**<font color=orange>唯一id</font>** |
+|  **<font color=orange>select_type</font>**  |                  SELECT关键字对应的查询类型                  |
+|     **<font color=orange>table</font>**     |                             表名                             |
+|  **<font color=orange>partitions</font>**   |                        匹配的分区信息                        |
+|     **<font color=orange>type</font>**      |                      针对表单的访问方法                      |
+| **<font color=orange>possible_keys</font>** |                        可能用到的索引                        |
+|      **<font color=orange>key</font>**      |                       实际上使用的索引                       |
+|    **<font color=orange>key_len</font>**    |                     实际上使用的索引长度                     |
+|      **<font color=orange>ref</font>**      |     当使用索引列等值查询时，与索引列进行值匹配的对象信息     |
+|     **<font color=orange>rows</font>**      |                    预估需要读取的记录条数                    |
+|   **<font color=orange>filtered</font>**    |         某个表经过搜索条件过滤后剩余记录条数的百分比         |
+|     **<font color=orange>Extra</font>**     |                           额外信息                           |
 
 ### 6.3 数据准备
 
@@ -2563,7 +2789,7 @@ CREATE TABLE s2 (
 set global log_bin_trust_function_creators=1; # 不加global只是当前窗口有效。
 ```
 
-**3. 创建函数**
+**3. 创建存储函数**
 
 ```mysql
 DELIMITER //
@@ -2651,29 +2877,31 @@ s2表数据的添加：加入1万条记录：
 CALL insert_s2(10001,10000);
 ```
 
+![image-20240711135543299](assets/image-20240711135543299.png)
+
 ### 6.4 EXPLAIN各列作用
 
 为了让大家有比较好的体验，我们调整了下 `EXPLAIN` 输出列的顺序。
 
 #### 1. table
 
-不论我们的查询语句有多复杂，里边儿 包含了多少个表 ，到最后也是需要对每个表进行 单表访问 的，所 以MySQL规定EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表着该 表的表名（有时不是真实的表名字，可能是简称）。
+不论我们的查询语句有多复杂，里面包含了多少张表 ，到最后也是需要对每个表进行单表访问的，所以MySQL规定EXPLAIN语句输出的每条记录都对应着某个单表的访问方法，该条记录的table列代表着该表的表名（有时不是真实的表名字，可能是简称）。
 
 ```mysql
 mysql > EXPLAIN SELECT * FROM s1;
 ```
 
-![image-20220628221143339](MySQL索引及调优篇.assets/image-20220628221143339.png)
+![image-20240711135807054](assets/image-20240711135807054.png)
 
 这个查询语句只涉及对s1表的单表查询，所以 `EXPLAIN` 输出中只有一条记录，其中的table列的值为s1，表明这条记录是用来说明对s1表的单表访问方法的。
 
 下边我们看一个连接查询的执行计划
 
 ```mysql
-mysql > EXPLAIN SELECT * FROM s1 INNER JOIN s2;
+mysql > EXPLAIN SELECT * FROM s1 INNER JOIN s2; # s1：驱动表   s2:被驱动表
 ```
 
-![image-20220628221414097](MySQL索引及调优篇.assets/image-20220628221414097.png)
+![image-20240711135922458](assets/image-20240711135922458.png)
 
 可以看出这个连接查询的执行计划中有两条记录，这两条记录的table列分别是s1和s2，这两条记录用来分别说明对s1表和s2表的访问方法是什么。
 
@@ -2695,13 +2923,26 @@ WHERE s1.common_field = 'a';
 
 但是下边两种情况下在一条查询语句中会出现多个SELECT关键字：
 
-<img src="MySQL索引及调优篇.assets/image-20220628221948512.png" alt="image-20220628221948512" style="float:left;" />
+- 包含子查询的情况
 
 ```mysql
-mysql > EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
+SELECT * FROM s1
+WHERE key1 IN (SELECT key3 FROM s2);
 ```
 
-![image-20220628222055716](MySQL索引及调优篇.assets/image-20220628222055716.png)
+- 包UNION语句的情况
+
+```mysql
+SELECT * FROM s1 UNION SELECT * FROM s2;
+```
+
+查询语句中每个SELECT关键字对应一个唯一id，该id值就是EXPLAIN语句的第一个列，比如下面这个查询中只有一个SELECT关键字，所以EXPLAIN结果中也只有一条id列为1的记录：
+
+```mysql
+EXPLAIN SELECT * FROM s1 WHERE key1='a';
+```
+
+![image-20240711143417910](assets/image-20240711143417910.png)
 
 对于连接查询来说，一个SELECT关键字后边的FROM字句中可以跟随多个表，所以在连接查询的执行计划中，每个表都会对应一条记录，但是这些记录的id值都是相同的，比如：
 
@@ -2709,55 +2950,61 @@ mysql > EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 ```
 
-![image-20220628222251309](MySQL索引及调优篇.assets/image-20220628222251309.png)
+![image-20240711143612715](assets/image-20240711143612715.png)
 
-可以看到，上述连接查询中参与连接的s1和s2表分别对应一条记录，但是这两条记录对应的`id`都是1。这里需要大家记住的是，**在连接查询的执行计划中，每个表都会对应一条记录，这些记录的id列的值是相同的**，出现在前边的表表示`驱动表`，出现在后面的表表示`被驱动表`。所以从上边的EXPLAIN输出中我们可以看到，查询优化器准备让s1表作为驱动表，让s2表作为被驱动表来执行查询。
+可以看到，上述连接查询中参与连接的s1和s2表分别对应一条记录，但是这两条记录对应的`id`都是1。这里需要大家记住的是，**<font color=orange>在连接查询的执行计划中，每个表都会对应一条记录，这些记录的id列的值是相同的，出现在前边的表表示驱动表，出现在后面的表表示被驱动表</font>**。所以从上边的EXPLAIN输出中我们可以看到，查询优化器准备让s1表作为驱动表，让s2表作为被驱动表来执行查询。
 
-对于包含子查询的查询语句来说，就可能涉及多个`SELECT`关键字，所以在**包含子查询的查询语句的执行计划中，每个`SELECT`关键字都会对应一个唯一的id值，比如这样：
+对于包含子查询的查询语句来说，就可能涉及多个`SELECT`关键字，所以在包含子查询的查询语句的执行计划中，每个`SELECT`关键字都会对应一个唯一的id值，比如这样：
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2) OR key3 = 'a';
 ```
 
-![image-20220629165122837](MySQL索引及调优篇.assets/image-20220629165122837.png)
+![image-20240711143844360](assets/image-20240711143844360.png)
 
-<img src="MySQL索引及调优篇.assets/image-20220629170848349.png" alt="image-20220629170848349" style="float:left;" />
+从输出结果中可以看到，s1表在外层查询中，外层查询有一个独立的**<font color=orange>SELECT</font>**关键字，所以第一条记录的id 值就是1，s2表在子查询中，子查询有一个独立的SELECT关键字，所以第二条记录的id值就是2。
+
+ 需要特别注意，**<font color=orange>查询优化器可能对涉及子查询的查询语句进行重写，从而转换为连接查询</font>**。所以若想知道查询优化器对某个包含子查询的语句是否进行了重写，直接查看执行计划即可，例如：
 
 ```mysql
 # 查询优化器可能对涉及子查询的查询语句进行重写，转变为多表查询的操作。  
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key2 FROM s2 WHERE common_field = 'a');
 ```
 
-![image-20220629165603072](MySQL索引及调优篇.assets/image-20220629165603072.png)
+![image-20240711144729881](assets/image-20240711144729881.png)
 
 可以看到，虽然我们的查询语句是一个子查询，但是执行计划中s1和s2表对应的记录的`id`值全部是1，这就表明`查询优化器将子查询转换为了连接查询`。
 
-对于包含`UNION`子句的查询语句来说，每个`SELECT`关键字对应一个`id`值也是没错的，不过还是有点儿特别的东西，比方说下边的查询：
+对于包含`UNION`子句的查询语句来说，每个`SELECT`关键字对应一个`id`值也是没错的，不过需要注意：
 
 ```mysql
 # Union去重
 mysql> EXPLAIN SELECT * FROM s1 UNION SELECT * FROM s2;
 ```
 
-![image-20220629165909340](MySQL索引及调优篇.assets/image-20220629165909340.png)
+![image-20240711145003110](assets/image-20240711145003110.png)
 
-<img src="MySQL索引及调优篇.assets/image-20220629171104375.png" alt="image-20220629171104375" style="float:left;" />
+这个语句执行计划的第三条记录是什么？为何id值是NULL，而且table列也很奇怪？ **<font color=orange>UNION</font>** ! 它会把多个查询 的结果集合并起来并对结果集中的记录**<font color=orange>进行去重</font>**，怎么去重呢？ MySQL使用的是内部的临时表。正如上边查询计划中所示，UNION子句是为了把id为1的查询和id为2的查询的结果集合并起来并去重，所以在内部创建了一个 名为**<font color=orange><union, 2＞</font>** 的临时表（就是执行计划第三条记录的table列的名称），id为NULL表明这个临时表是为了合并两个查询的结果集而创建的。 
+
+跟UNION对比起来，**<font color=orange>UNION ALL</font>**就不需要为最终的结果集进行去重，只是单纯把多个查询的结果集中的记录合并成一个并返回给用户，所以也就不需要使用临时表。在包含UNION ALL子句的查询的执行计划中，没有那个id为NULL的记录，如下所示：
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 UNION ALL SELECT * FROM s2;
 ```
 
-![image-20220629171138065](MySQL索引及调优篇.assets/image-20220629171138065.png)
+![image-20240711153238322](assets/image-20240711153238322.png)
 
 **小结:**
 
-* id如果相同，可以认为是一组，从上往下顺序执行 
-* 在所有组中，id值越大，优先级越高，越先执行 
-* 关注点：id号每个号码，表示一趟独立的查询, 一个sql的查询趟数越少越好
+* **<font color=orange>id如果相同，可以认为是一组，从上往下顺序执行</font>** 
+* **<font color=orange>在所有组中，id值越大，优先级越高，越先执行</font>** 
+* **<font color=orange>关注点：id号每个号码，表示一趟独立的查询, 一个sql的查询趟数越少越好</font>**
 
 #### 3. select_type
 
-<img src="MySQL索引及调优篇.assets/image-20220629171611716.png" alt="image-20220629171611716" style="float:left;" />
+一条大的查询语句中可以包含若干个SELECT关键字，**<font color=orange>每个SELECT关键字代表一个小的查询语句</font>**，而每个 SELECT关键字的FROM子句中都可以包含若干张表（这些表用来做连接查询），<font color=orange>**每一张表都对应执行计划输出中的一条记录**</font>，对于在同一个SELECT关键字中的表来说，它们的id值是相同的。
+
+ MySQL为每一个SELECT关键字代表的小查询都定义了一个称之为select_type的属性，意思是我们只要知道了某个小查询的select_type属性，就知道了这个<font color=orange>**小查询在整个大查询中扮演什么角色**</font>，官方规定的select_type取值如下：
 
 ![image-20220629171442624](MySQL索引及调优篇.assets/image-20220629171442624.png)
 
@@ -2771,7 +3018,7 @@ mysql> EXPLAIN SELECT * FROM s1 UNION ALL SELECT * FROM s2;
   mysql> EXPLAIN SELECT * FROM s1;
   ```
 
-![image-20220629171840300](MySQL索引及调优篇.assets/image-20220629171840300.png)
+![image-20240711154917136](assets/image-20240711154917136.png)
 
 ​        当然，连接查询也算是 SIMPLE 类型，比如：
 
@@ -2779,7 +3026,7 @@ mysql> EXPLAIN SELECT * FROM s1 UNION ALL SELECT * FROM s2;
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 ```
 
-![image-20220629171904912](MySQL索引及调优篇.assets/image-20220629171904912.png)
+![image-20240711155008503](assets/image-20240711155008503.png)
 
 * PRIMARY
 
@@ -2789,7 +3036,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2;
   mysql> EXPLAIN SELECT * FROM s1 UNION SELECT * FROM s2;
   ```
 
-  ![image-20220629171929924](MySQL索引及调优篇.assets/image-20220629171929924.png)
+  ![image-20240711155137329](assets/image-20240711155137329.png)
 
   从结果中可以看到，最左边的小查询`SELECT * FROM s1`对应的是执行计划中的第一条记录，它的`select_type`的值就是`PRIMARY`。
 
@@ -2803,57 +3050,63 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2;
 
 * SUBQUERY
 
-  如果包含子查询的查询语句不能够转为对应的`semi-join`的形式，并且该子查询是不相关子查询，并且查询优化器决定采用将该子查询物化的方案来执行该子查询时，该子查询的第一个`SELECT`关键字代表的那个查询的`select_type`就是`SUBQUERY`，比如下边这个查询：
+  如果包含子查询的查询语句不能够转为对应的`semi-join`的形式，并且该子查询是**不相关子查询**，并且查询优化器决定采用将该子查询物化的方案来执行该子查询时，该子查询的第一个`SELECT`关键字代表的那个查询的`select_type`就是`SUBQUERY`，比如下边这个查询：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2) OR key3 = 'a';
   ```
 
-  ![image-20220629172449267](MySQL索引及调优篇.assets/image-20220629172449267.png)
+  ![image-20240711155242369](assets/image-20240711155242369.png)
 
 * DEPENDENT SUBQUERY
+
+  如果包含子查询的查询语句不能够转为对应的`semi-join`的形式，并且该子查询是**相关子查询**，则该子查询的第一个`SELECT`关键字代表的那个查询的`select_type`就是`DEPENDENT SUBQUERY`，示例：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2 WHERE s1.key2 = s2.key2) OR key3 = 'a';
   ```
 
-  ![image-20220629172525236](MySQL索引及调优篇.assets/image-20220629172525236.png)
+  ![image-20240711155339829](assets/image-20240711155339829.png)
 
 * DEPENDENT UNION
+
+  在包含UNION或UNION ALL的大查询中，若各个小查询都依赖外层查询，那除了最左边的那个小查询外，其余小查询的`select_type`就是`DEPENDENT UNION`
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2 WHERE key1 = 'a' UNION SELECT key1 FROM s1 WHERE key1 = 'b');
   ```
 
-  ![image-20220629172555603](MySQL索引及调优篇.assets/image-20220629172555603.png)
+  ![image-20240711160609115](assets/image-20240711160609115.png)
 
 * DERIVED
+
+  对于包含派生表的查询，该派生表的子查询的`select_type`就是`DERIVED`
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM (SELECT key1, count(*) as c FROM s1 GROUP BY key1) AS derived_s1 where c > 1;
   ```
 
-  ![image-20220629172622893](MySQL索引及调优篇.assets/image-20220629172622893.png)
+  ![image-20240711160737223](assets/image-20240711160737223.png)
 
   从执行计划中可以看出，id为2的记录就代表子查询的执行方式，它的select_type是DERIVED, 说明该子查询是以物化的方式执行的。id为1的记录代表外层查询，大家注意看它的table列显示的是derived2，表示该查询时针对将派生表物化之后的表进行查询的。
 
 * MATERIALIZED
 
-  当查询优化器在执行包含子查询的语句时，选择将子查询物化之后的外层查询进行连接查询时，该子查询对应的`select_type`属性就是DERIVED，比如下边这个查询：
+  当查询优化器在执行包含子查询的语句时，选择将子查询物化之后的外层查询进行连接查询时，该子查询对应的`select_type`属性就是`MATERIALIZED`，比如下边这个查询：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN (SELECT key1 FROM s2);
   ```
 
-  ![image-20220629172646367](MySQL索引及调优篇.assets/image-20220629172646367.png)
+  ![image-20240711160915873](assets/image-20240711160915873.png)
 
 * UNCACHEABLE SUBQUERY
 
-  不常用，就不多说了。
+  不常用。
 
 * UNCACHEABLE UNION
 
-  不常用，就不多说了。
+  不常用。
 
 ####  4. partitions (可略)
 
@@ -2872,27 +3125,23 @@ PARTITION p1 VALUES less than MAXVALUE
 );
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220629190304966.png" alt="image-20220629190304966" style="float:left;" />
-
 ```mysql
 DESC SELECT * FROM user_partitions WHERE id>200;
 ```
 
 查询id大于200（200>100，p1分区）的记录，查看执行计划，partitions是p1，符合我们的分区规则
 
-<img src="MySQL索引及调优篇.assets/image-20220629190335371.png" alt="image-20220629190335371" style="float:left;" />
+![image-20240711161139524](assets/image-20240711161139524.png)
 
-#### 5. type ☆
+#### 5. type （重要）
 
-执行计划的一条记录就代表着MySQL对某个表的 `执行查询时的访问方法` , 又称“访问类型”，其中的 `type` 列就表明了这个访问方法是啥，是较为重要的一个指标。比如，看到`type`列的值是`ref`，表明`MySQL`即将使用`ref`访问方法来执行对`s1`表的查询。
+执行计划的一条记录就代表着MySQL对某个表的 <font color=orange>**执行查询时的访问方法**</font> , 又称“访问类型”，其中的 `type` 列就表明了这个访问方法是啥，是较为重要的一个指标。比如，看到`type`列的值是`ref`，表明`MySQL`即将使用`ref`访问方法来执行对`s1`表的查询。
 
-完整的访问方法如下： `system ， const ， eq_ref ， ref ， fulltext ， ref_or_null ， index_merge ， unique_subquery ， index_subquery ， range ， index ， ALL` 。
+完整的访问方法如下： <font color=orange>**system ， const ， eq_ref ， ref ， fulltext ， ref_or_null ， index_merge ， unique_subquery ， index_subquery ， range ， index ， ALL**</font> 。
 
-我们详细解释一下：
+* <font color=orange>**system**</font>
 
-* `system`
-
-  当表中`只有一条记录`并且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory，那么对该表的访问方法就是`system`。比方说我们新建一个`MyISAM`表，并为其插入一条记录：
+  当表中<font color=orange>**只有一条记录**</font>并且该表使用的存储引擎的统计数据是精确的，比如MyISAM、Memory，那么对该表的访问方法就是`system`，它是**<font color=orange>性能最高的级别</font>**。比方说我们新建一个`MyISAM`表，并为其插入一条记录：
 
   ```mysql
   mysql> CREATE TABLE t(i int) Engine=MyISAM;
@@ -2905,24 +3154,24 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   然后我们看一下查询这个表的执行计划：
 
   ```mysql
-  mysql> EXPLAIN SELECT * FROM t;
+  mysql> EXPLAIN SELECT * FROM t;  
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630164434315.png" alt="image-20220630164434315" style="float:left;" />
+  ![image-20240711161903860](assets/image-20240711161903860.png)
 
   可以看到`type`列的值就是`system`了，
 
   > 测试，可以把表改成使用InnoDB存储引擎，试试看执行计划的`type`列是什么。ALL
 
-* `const`
+* <font color=orange>**const**</font>
 
-  当我们根据主键或者唯一二级索引列与常数进行等值匹配时，对单表的访问方法就是`const`, 比如：
+  根据主键或者唯一二级索引列与常数进行等值匹配时，对单表的访问方法就是`const`, 比如：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE id = 10005;
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630164724548.png" alt="image-20220630164724548" style="float:left;" />
+  ![image-20240711162157503](assets/image-20240711162157503.png)
 
 * `eq_ref`
 
@@ -2932,7 +3181,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630164802559.png" alt="image-20220630164802559" style="float:left;" />
+  ![image-20240711162335047](assets/image-20240711162335047.png)
 
   从执行计划的结果中可以看出，MySQL打算将s2作为驱动表，s1作为被驱动表，重点关注s1的访问 方法是 `eq_ref` ，表明在访问s1表的时候可以 `通过主键的等值匹配` 来进行访问。
 
@@ -2944,7 +3193,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630164930020.png" alt="image-20220630164930020" style="float:left;" />
+  ![image-20240711163108894](assets/image-20240711163108894.png)
 
 * `fulltext`
 
@@ -2958,7 +3207,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a' OR key1 IS NULL;
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630175133920.png" alt="image-20220630175133920" style="float:left;" />
+  ![image-20240711163146349](assets/image-20240711163146349.png)
 
 * `index_merge`
 
@@ -2968,7 +3217,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a' OR key3 = 'a';
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630175511644.png" alt="image-20220630175511644" style="float:left;" />
+  ![image-20240711163230406](assets/image-20240711163230406.png)
 
   从执行计划的 `type` 列的值是 `index_merge` 就可以看出，MySQL 打算使用索引合并的方式来执行 对 s1 表的查询。
 
@@ -2980,7 +3229,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 WHERE key2 IN (SELECT id FROM s2 where s1.key1 = s2.key1) OR key3 = 'a';
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220630180123913.png" alt="image-20220630180123913" style="float:left;" />
+  ![image-20240711163259060](assets/image-20240711163259060.png)
 
 + `index_subquery`
 
@@ -2998,7 +3247,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 IN ('a', 'b', 'c');
   ```
 
-  ![image-20220703214633338](MySQL索引及调优篇.assets/image-20220703214633338.png)
+  ![image-20240711163402219](assets/image-20240711163402219.png)
 
   或者：
 
@@ -3016,7 +3265,7 @@ DESC SELECT * FROM user_partitions WHERE id>200;
   mysql> EXPLAIN SELECT key_part2 FROM s1 WHERE key_part3 = 'a';
   ```
 
-  ![image-20220703214844885](MySQL索引及调优篇.assets/image-20220703214844885.png)
+  ![image-20240711163433043](assets/image-20240711163433043.png)
 
   上述查询中的所有列表中只有key_part2 一个列，而且搜索条件中也只有 key_part3 一个列，这两个列又恰好包含在idx_key_part这个索引中，可是搜索条件key_part3不能直接使用该索引进行`ref`和`range`方式的访问，只能扫描整个`idx_key_part`索引的记录，所以查询计划的`type`列的值就是`index`。
 
@@ -3024,45 +3273,45 @@ DESC SELECT * FROM user_partitions WHERE id>200;
 
 * `ALL`
 
-  最熟悉的全表扫描，就不多说了，直接看例子：
+  最熟悉的全表扫描，效率最差，直接看例子：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1;
   ```
 
-  ![image-20220703215958374](MySQL索引及调优篇.assets/image-20220703215958374.png)
+  ![image-20240711163505442](assets/image-20240711163505442.png)
 
 **小结: **
 
-**结果值从最好到最坏依次是： **
+**<font color=red>结果值从最好到最坏依次是：</font> **
 
-**system > const > eq_ref > ref** > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL 
+**<font color=red>system > const > eq_ref > ref</font>** > fulltext > ref_or_null > index_merge > unique_subquery > index_subquery > range > index > ALL 
 
-**其中比较重要的几个提取出来（见上图中的粗体）。SQL 性能优化的目标：至少要达到 range 级别，要求是 ref 级别，最好是 consts级别。（阿里巴巴 开发手册要求）**
+**其中比较重要的几个提取出来（见上图中的粗体）。SQL 性能优化的目标：<font color=red>至少要达到 range 级别，要求是 ref 级别，最好是 const级别</font>。（阿里巴巴 开发手册要求）**
 
 ####  6. possible_keys和key
 
-在EXPLAIN语句输出的执行计划中，`possible_keys`列表示在某个查询语句中，对某个列执行`单表查询时可能用到的索引`有哪些。一般查询涉及到的字段上若存在索引，则该索引将被列出，但不一定被查询使用。`key`列表示`实际用到的索引`有哪些，如果为NULL，则没有使用索引。比方说下面这个查询：
+在EXPLAIN语句输出的执行计划中，<font color=orange>possible_keys</font>列表示在某个查询语句中，对某个列执行单表查询时<font color=orange>**可能用到的索引有哪些**</font>。一般查询涉及到的字段上若存在索引，则该索引将被列出，但不一定被查询使用。<font color=orange>key</font>列表示<font color=orange>**实际用到的索引有哪些**</font>，如果为NULL，则没有使用索引。比方说下面这个查询：
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z' AND key3 = 'a';
 ```
 
-![image-20220703220724964](MySQL索引及调优篇.assets/image-20220703220724964.png)
+![image-20240711163829310](assets/image-20240711163829310.png)
 
 上述执行计划的`possible_keys`列的值是`idx_key1, idx_key3`，表示该查询可能使用到`idx_key1, idx_key3`两个索引，然后`key`列的值是`idx_key3`，表示经过查询优化器计算使用不同索引的成本后，最后决定采用`idx_key3`。
 
-#### 7. key_len ☆
+#### 7. key_len （重要）
 
-实际使用到的索引长度 (即：字节数)
+实际使用到的索引长度 (字节数)
 
-帮你检查`是否充分的利用了索引`，`值越大越好`，主要针对于联合索引，有一定的参考意义。
+帮你检查<font color=orange>**是否充分的利用了索引，值越大越好，主要针对于联合索引**</font>，有一定的参考意义。
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE id = 10005;
 ```
 
-![image-20220704130030692](MySQL索引及调优篇.assets/image-20220704130030692.png)
+![image-20240711195853109](assets/image-20240711195853109.png)
 
 > int 占用 4 个字节
 
@@ -3070,7 +3319,7 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE id = 10005;
 mysql> EXPLAIN SELECT * FROM s1 WHERE key2 = 10126;
 ```
 
-![image-20220704130138204](MySQL索引及调优篇.assets/image-20220704130138204.png)
+![image-20240711195931957](assets/image-20240711195931957.png)
 
 > key2上有一个唯一性约束，是否为NULL占用一个字节，那么就是5个字节
 
@@ -3078,21 +3327,15 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key2 = 10126;
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
 ```
 
-![image-20220704130214482](MySQL索引及调优篇.assets/image-20220704130214482.png)
+![image-20240711200014830](assets/image-20240711200014830.png)
 
 > key1 VARCHAR(100) 一个字符占3个字节，100*3，是否为NULL占用一个字节，varchar的长度信息占两个字节。
-
-```mysql
-mysql> EXPLAIN SELECT * FROM s1 WHERE key_part1 = 'a';
-```
-
-![image-20220704130442095](MySQL索引及调优篇.assets/image-20220704130442095.png)
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key_part1 = 'a' AND key_part2 = 'b';
 ```
 
-![image-20220704130515031](MySQL索引及调优篇.assets/image-20220704130515031.png)
+![image-20240711200131635](assets/image-20240711200131635.png)
 
 > 联合索引中可以比较，key_len=606的好于key_len=303
 
@@ -3112,37 +3355,37 @@ char(10)固定字段且不允许NULL = 10 * ( character set：utf8=3,gbk=2,latin
 
 #### 8. ref
 
-<img src="MySQL索引及调优篇.assets/image-20220704131759630.png" alt="image-20220704131759630" style="float:left;" />
+当使用索引列等值查询时，与索引列进行等值匹配的对象信息。
 
 ```mysql
-mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a';
+mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a'; 
 ```
 
-![image-20220704130837498](MySQL索引及调优篇.assets/image-20220704130837498.png)
+![image-20240711200713653](assets/image-20240711200713653.png)
 
-可以看到`ref`列的值是`const`，表明在使用`idx_key1`索引执行查询时，与`key1`列作等值匹配的对象是一个常数，当然有时候更复杂一点:
+可以看到`ref`列的值是`const`，表明在使用`idx_key1`索引执行查询时，与`key1`列作等值匹配的对象是一个常数（'a'），当然有时候更复杂一点:
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.id = s2.id;
 ```
 
-![image-20220704130925426](MySQL索引及调优篇.assets/image-20220704130925426.png)
+![image-20240711200805487](assets/image-20240711200805487.png)
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s2.key1 = UPPER(s1.key1);
 ```
 
-![image-20220704130957359](MySQL索引及调优篇.assets/image-20220704130957359.png)
+![image-20240711200924993](assets/image-20240711200924993.png)
 
-#### 9. rows ☆
+#### 9. rows (重要)
 
-预估的需要读取的记录条数，`值越小越好`。
+预估的需要读取的记录条数，`值越小越好`（IO次数越少）。
 
 ```mysql
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z';
 ```
 
-![image-20220704131050496](MySQL索引及调优篇.assets/image-20220704131050496.png)
+![image-20240711201052564](assets/image-20240711201052564.png)
 
 #### 10. filtered
 
@@ -3154,7 +3397,7 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z';
 mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z' AND common_field = 'a';
 ```
 
-![image-20220704131323242](MySQL索引及调优篇.assets/image-20220704131323242.png)
+![image-20240712005644946](assets/image-20240712005644946.png)
 
 对于单表查询来说，这个filtered的值没有什么意义，我们`更关注在连接查询中驱动表对应的执行计划记录的filtered值`，它决定了被驱动表要执行的次数 (即: rows * filtered)
 
@@ -3162,13 +3405,13 @@ mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z' AND common_field = 'a';
 mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.common_field = 'a';
 ```
 
-![image-20220704131644615](MySQL索引及调优篇.assets/image-20220704131644615.png)
+![image-20240712005453659](assets/image-20240712005453659.png)
 
-从执行计划中可以看出来，查询优化器打算把`s1`作为驱动表，`s2`当做被驱动表。我们可以看到驱动表`s1`表的执行计划的`rows`列为`9688`，filtered列为`10.00`，这意味着驱动表`s1`的扇出值就是`9688 x 10.00% = 968.8`，这说明还要对被驱动表执行大约`968`次查询。
+从执行计划中可以看出来，查询优化器打算把`s1`作为驱动表，`s2`当做被驱动表。我们可以看到驱动表`s1`表的执行计划的`rows`列为`9852`，filtered列为`10.00`，这意味着驱动表`s1`的扇出值就是`9852 x 10.00% = 985.2`，这说明还要对被驱动表执行大约`985`次查询。
 
-#### 11. Extra ☆
+#### 11. Extra （重要）
 
-顾名思义，`Extra`列是用来说明一些额外信息的，包含不适合在其他列中显示但十分重要的额外信息。我们可以通过这些额外信息来`更准确的理解MySQL到底将如何执行给定的查询语句`。MySQL提供的额外信息有好几十个，我们就不一个一个介绍了，所以我们只挑选比较重要的额外信息介绍给大家。
+顾名思义，`Extra`列是用来说明一些额外信息的，包含不适合在其他列中显示但十分重要的额外信息。可以通过它们来<font color=orange>**更准确的理解MySQL如何执行给定的查询语句**</font>。MySQL提供的额外信息有好几十个，下面挑选比较重要的进行介绍。
 
 * `No tables used`
 
@@ -3178,7 +3421,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT 1;
   ```
 
-  ![image-20220704132345383](MySQL索引及调优篇.assets/image-20220704132345383.png)
+  ![image-20240712010104490](assets/image-20240712010104490.png)
 
 * `Impossible WHERE`
 
@@ -3188,25 +3431,27 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT * FROM s1 WHERE 1 != 1;
   ```
 
-  ![image-20220704132458978](MySQL索引及调优篇.assets/image-20220704132458978.png)
+  ![image-20240712010131914](assets/image-20240712010131914.png)
 
 * `Using where`
 
-  <img src="MySQL索引及调优篇.assets/image-20220704140148163.png" alt="image-20220704140148163" style="float:left;" />
+  不用读取表中的信息，仅通过索引就可获得所需数据，这发生在对表的全部请求列都是同一索引的部分时，表示mysql服务器将在存储引擎检索行后再进行过滤，表明使用了WHERE过滤。
+
+  当使用全表扫面来执行对某个表的查询，且该语句的WHERE子句中有针对该表的搜索条件时，在Extra列中会提示上述额外信息，如下边这个查询：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE common_field = 'a';
   ```
 
-  ![image-20220704132655342](MySQL索引及调优篇.assets/image-20220704132655342.png)
+  ![image-20240712010703973](assets/image-20240712010703973.png)
 
-  <img src="MySQL索引及调优篇.assets/image-20220704140212813.png" alt="image-20220704140212813" style="float:left;" />
+  当使用索引访问来执行对某个表的查询，并且该语句的WHERE子句中有除了该索引包含的列之外的其他搜索 条件时，在Extra列中也会提示上述额外信息。比如下边这个查询虽然使用idx_key1索引执行查询，但搜索条件中除了包含key1的搜索条件key1= 'a'，还包含common.field的搜索条件，所以Extra列会显 示Using where 的提示：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 = 'a' AND common_field = 'a';
   ```
 
-  ![image-20220704133130515](MySQL索引及调优篇.assets/image-20220704133130515.png)
+  ![image-20240712011105927](assets/image-20240712011105927.png)
 
 * `No matching min/max row`
 
@@ -3216,7 +3461,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT MIN(key1) FROM s1 WHERE key1 = 'abcdefg';
   ```
 
-  ![image-20220704134324354](MySQL索引及调优篇.assets/image-20220704134324354.png)
+  ![image-20240712011153737](assets/image-20240712011153737.png)
 
 * `Using index`
 
@@ -3226,7 +3471,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT key1 FROM s1 WHERE key1 = 'a';
   ```
 
-  ![image-20220704134931220](MySQL索引及调优篇.assets/image-20220704134931220.png)
+  ![image-20240712011226142](assets/image-20240712011226142.png)
 
 * `Using index condition`
 
@@ -3236,15 +3481,25 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   SELECT * FROM s1 WHERE key1 > 'z' AND key1 LIKE '%a';
   ```
 
-  <img src="MySQL索引及调优篇.assets/image-20220704140344015.png" alt="image-20220704140344015" style="float:left;" />
+  其中的key1 > 'z'，可以使用到索引，但是key1 LIKE '%a' 却无法使用到索引，在以前版本的MySQL中， 是按照下边步骤来执行这个查询的： 
 
-  <img src="MySQL索引及调优篇.assets/image-20220704140411033.png" alt="image-20220704140411033" style="float:left;" />
+  - 先根据key1 > 'z' 这个条件，从二级索引idx_key1中获取到对应的二级索引记录。 
+  - 根据上一步骤得到的二级索引记录中的主键值进行回表，找到完整的用户记录再检测该记录是否符合key1 LIKE '%a' 这个条件，将符合条件的记录加入到最后的结果集.。
+
+  虽然key1 LIKE '%a'  不能组成范围区间参与range访问方法的执行，但这个条件毕竟只涉及到了 key1列，所以MySQL把上边的步骤改进了一下： 
+
+  - 先根据key1 > 'z' 这个条件，定位到二级索引idx_key1中对应的二级索引记录 。
+  - 对于指定的二级索引记录，先不着急回表，而是先检测一下该记录是否满足key1 LIKE '%a' 这个条件， 如果不满足，则该二级索引记录没必要回表；若满足则执行回表操作。
+
+  我们说回表操作其实是一个随机IO，比较耗时，所以上述修改虽然只改进了一点点，但是可以省去好多回表 操作的成本。MySQL把这个改进称为**<font color=orange>索引条件下推</font>**（Index Condition Pushdown）。
+
+  如果在查询语句的执行过程中将要使用索引条件下推这个特性，在Extra列中将会显示Using index condition ,比如这样：
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 WHERE key1 > 'z' AND key1 LIKE '%b';
   ```
 
-  ![image-20220704140441702](MySQL索引及调优篇.assets/image-20220704140441702.png)
+  ![image-20240712012201712](assets/image-20240712012201712.png)
 
 * `Using join buffer (Block Nested Loop)`
 
@@ -3254,7 +3509,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.common_field = s2.common_field;
   ```
 
-  ![image-20220704140815955](MySQL索引及调优篇.assets/image-20220704140815955.png)
+  ![image-20240712012347887](assets/image-20240712012347887.png)
 
 * `Not exists`
 
@@ -3264,7 +3519,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
   mysql> EXPLAIN SELECT * FROM s1 LEFT JOIN s2 ON s1.key1 = s2.key1 WHERE s2.id IS NULL;
   ```
 
-  ![image-20220704142059555](MySQL索引及调优篇.assets/image-20220704142059555.png)
+  ![image-20240712012607372](assets/image-20240712012607372.png)
 
 * `Using intersect(...) 、 Using union(...) 和 Using sort_union(...)`
 
@@ -3282,7 +3537,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 
 * `Zero limit`
 
-  当我们的`LIMIT`子句的参数为`0`时，表示压根儿不打算从表中读取任何记录，将会提示该额外信息
+  当我们的`LIMIT`子句的参数为`0`时，表示压根不打算从表中读取任何记录，将会提示该额外信息
 
   ```mysql
   mysql> EXPLAIN SELECT * FROM s1 LIMIT 0;
@@ -3363,7 +3618,7 @@ mysql> EXPLAIN SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key1 WHERE s1.comm
 mysql> EXPLAIN SELECT s1.key1, s2.key1 FROM s1 LEFT JOIN s2 ON s1.key1 = s2.key1 WHERE s2.common_field IS NOT NULL;
 ```
 
-![image-20220704161702384](MySQL索引及调优篇.assets/image-20220704161702384.png)
+![image-20240712012751967](assets/image-20240712012751967.png)
 
 #### 2. JSON格式
 
@@ -3385,15 +3640,88 @@ EXPLAIN FORMAT=JSON SELECT ....
 mysql> EXPLAIN FORMAT=JSON SELECT * FROM s1 INNER JOIN s2 ON s1.key1 = s2.key2 WHERE s1.common_field = 'a'\G
 ```
 
-![image-20220704172833362](MySQL索引及调优篇.assets/image-20220704172833362.png)
+```mysql
+EXPLAIN: {
+  "query_block": {
+    "select_id": 1, # 整个查询语句只有一个SELECT关键字，该关键字对应的id为1
+    "cost_info": {
+      "query_cost": "1354.27" #整个查询的执行成本预计1354.27
+    },
+    "nested_loop": [
+        #以下是参与嵌套循环连接算法的各个表信息
+      {
+        "table": {
+          "table_name": "s1", # s1驱动表
+          "access_type": "ALL", #访问方法为ALL，即全表扫描
+          "possible_keys": [  #可能使用的索引
+            "idx_key1"
+          ],
+          "rows_examined_per_scan": 9852, #查询一次s1表大概要扫描9852条记录
+          "rows_produced_per_join": 985, #驱动表s1的扇出为985
+          "filtered": "10.00",  # condition filtering代表的百分比
+          "cost_info": {
+            "read_cost": "910.93",
+            "eval_cost": "98.52",
+            "prefix_cost": "1009.45", #单次读取s1表总成本
+            "data_read_per_join": "1M" #读取的数据量
+          }, 
+          "used_columns": [  #执行查询中涉及到的列
+            "id",
+            "key1",
+            "key2",
+            "key3",
+            "key_part1",
+            "key_part2",
+            "key_part3",
+            "common_field"
+          ],
+        #对s1表访问时针对单表查询的条件
+          "attached_condition": "((`atguigudb1`.`s1`.`common_field` = 'a') and (`atguigudb1`.`s1`.`key1` is not null))"
+        }
+      },
+      {
+        "table": {
+          "table_name": "s2", # s2被驱动表
+          "access_type": "eq_ref", # 访问方法为eq_ref
+          "possible_keys": [  #可能使用的索引
+            "idx_key2"
+          ],
+          "key": "idx_key2",  #实际使用的索引
+          "used_key_parts": [ #使用到的索引
+            "key2"
+          ],
+          "key_length": "5", # key_len
+          "ref": [       # 与key2列进行等值匹配的对象
+            "atguigudb1.s1.key1"
+          ],
+          "rows_examined_per_scan": 1, # 查询一次s2表大致需要扫描1条记录
+          "rows_produced_per_join": 985, #被驱动表s2的扇出为985
+          "filtered": "100.00", # condition filtering代表的百分比
+           #s2表使用索引进行查询的搜索条件
+          "index_condition": "(cast(`atguigudb1`.`s1`.`key1` as double) = cast(`atguigudb1`.`s2`.`key2` as double))",
+          "cost_info": {
+            "read_cost": "246.30",
+            "eval_cost": "98.52",
+            "prefix_cost": "1354.27",  # 单次查询s1多次查询s2的总成本
+            "data_read_per_join": "1M"
+          },
+          "used_columns": [ #执行查询中涉及到的列
+            "id",
+            "key1",
+            "key2",
+            "key3",
+            "key_part1",
+            "key_part2",
+            "key_part3",
+            "common_field"
+          ]
+        }
+      }
+    ]
+  }
+}
 
-![image-20220704172920158](MySQL索引及调优篇.assets/image-20220704172920158.png)
-
-![image-20220704173012413](MySQL索引及调优篇.assets/image-20220704173012413.png)
-
-![image-20220704173045190](MySQL索引及调优篇.assets/image-20220704173045190.png)
-
-![image-20220704173108888](MySQL索引及调优篇.assets/image-20220704173108888.png)
+```
 
 我们使用 # 后边跟随注释的形式为大家解释了 `EXPLAIN FORMAT=JSON` 语句的输出内容，但是大家可能 有疑问 "`cost_info`" 里边的成本看着怪怪的，它们是怎么计算出来的？先看 s1 表的 "`cost_info`" 部 分：
 
@@ -3492,7 +3820,9 @@ AS `key1` from `atguigu`.`s1` join `atguigu`.`s2` where ((`atguigu`.`s1`.`key1` 
 
 ## 8. 分析优化器执行计划：trace
 
-<img src="MySQL索引及调优篇.assets/image-20220704175711800.png" alt="image-20220704175711800" style="float:left;" />
+**<font color=orange>OPTIMIZER_TRACE</font>**是MySQL 5.6引入的一项跟踪功能，它可以跟踪优化器做出的各种决策（比如访问表的方法、 各种开销计算、各种转换等），并将跟踪结果记录到 INFORMATION_SCHEMA. OPTIMIZER_TRACE表中。 
+
+此功能默认关闭。开启trace, 并设置格式为 JSON，同时设置trace最大能够使用的内存大小，避免解析过程中因 为默认内存过小而不能够完整展示:
 
 ```mysql
 SET optimizer_trace="enabled=on",end_markers_in_json=on;
@@ -3737,7 +4067,7 @@ INSUFFICIENT_PRIVILEGES: 0 //缺失权限
 
 ## 9. MySQL监控分析视图-sys schema
 
-<img src="MySQL索引及调优篇.assets/image-20220704190726180.png" alt="image-20220704190726180" style="float:left;" />
+关于MySQL的性能监控和问题诊断，我们一般都从performance_schema中去获取想要的数据，在MySQL5.7.7版本 中新增sys schema,它将performance_schema和information_schema中的数据以更容易理解的方式总结归纳为"视图”，其目的就是为了**<font color=orange>降低查询performance_schema的复杂度</font>**，让DBA能够快速的定位问题。下面看看这些库中都有哪些监控表和视图，掌握了这些，在我们开发和运维的过程中就起到了事半功倍的效果。
 
 ### 9.1 Sys schema视图摘要
 
@@ -3826,10 +4156,10 @@ select * from sys.innodb_lock_waits;
 
 关于数据库调优的知识非常分散。不同的DBMS，不同的公司，不同的职位，不同的项目遇到的问题都不尽相同。这里我们分为三个章节进行细致讲解。
 
-虽然SQL查询优化的技术有很多，但是大方向上完全可以分成`物理查询优化`和`逻辑查询优化`两大块。
+虽然SQL查询优化的技术有很多，但是大方向上完全可以分成<font color=orange>物理查询优化</font>和<font color=orange>逻辑查询优化</font>两大块。
 
-* 物理查询优化是通过`索引`和`表连接方式`等技术来进行优化，这里重点需要掌握索引的使用。
-* 逻辑查询优化就是通过SQL`等价变换`提升查询效率，直白一点就是说，换一种查询写法效率可能更高。
+* 物理查询优化是通过<font color=orange>索引</font>和<font color=orange>表连接方式</font>等技术来进行优化，这里重点需要掌握索引的使用。
+* 逻辑查询优化就是通过SQL<font color=orange>等价变换</font>提升查询效率，直白一点就是说，换一种查询写法效率可能更高。
 
 ## 1. 数据准备
 
@@ -4010,7 +4340,14 @@ CALL proc_drop_index("dbname","tablename");
 
 ## 2. 索引失效案例
 
-<img src="MySQL索引及调优篇.assets/image-20220704202453482.png" alt="image-20220704202453482" style="float:left;" />
+MySQL中**<font color=orange>提高性能</font>**的一个最有效的方式是对数据表<font color=orange>设计合理的索引</font>。索引提供了高效访问数据的方法，并且加快 查询的速度，因此索引对查询的速度有着至关重要的影响。
+
+-  使用索引可以<font color=orange>快速定位</font>表中的某条记录，从而提高数据库查询的速度，提高数据库的性能。 
+- 如果查询时没有使用索引，查询语句就会<font color=orange>扫描表中的所有记录</font>。在数据量大的情况下，这样查询的速度会很 慢。 
+
+大多数情况下都 (默认) 采用B+树来构建索引。只是空间列类型的索引使用R-树，并且MEMORY表还支持hash 索引。
+
+其实，<font color=red>**用不用索引，最终由优化器决定**</font>。优化器以<font color=orange>最小化cost开销为目标</font>，而非基于规则或语义。另外，<font color=orange>SQL语句是否使用索引，跟数据库版本、数据量、数据选择度都有关系</font>。
 
 ### 2.1 全值匹配我最爱
 
@@ -4040,11 +4377,14 @@ CREATE INDEX idx_age_classid_name ON student(age,classId,name);
 建立索引后执行：
 
 ```mysql
-mysql> SELECT SQL_NO_CACHE * FROM student WHERE age=30 AND classId=4 AND name = 'abcd';
+mysql> SELECT SQL_NO_CACHE * FROM student WHERE age=30 AND classId=4 AND name = 'abcd';  
+# 优先使用idx_age_classid_name索引
 Empty set, 1 warning (0.01 sec)
 ```
 
-<img src="MySQL索引及调优篇.assets/image-20220704204140589.png" alt="image-20220704204140589" style="float:left;" />
+可以看出，创建索引前的查询时间为0.28s，创建索引后查询时间为0.01s，极大提高了查询效率。
+
+**<font color=red>查询优化器优先选择最长匹配的索引</font>**
 
 ### 2.2 最佳左前缀法则
 

@@ -6521,6 +6521,325 @@ class Solution {
 
 ```
 
+# 二四. 前缀树（字典树）
+
+## 1. [实现 Trie (前缀树)](https://leetcode.cn/problems/implement-trie-prefix-tree/)
+
+**[Trie](https://baike.baidu.com/item/字典树/9825209?fr=aladdin)** **前缀树** 或 **字典树** 是一种树形数据结构，用于高效地存储和检索字符串数据集中的键。这一数据结构有相当多的应用情景，例如自动补完和拼写检查。
+
+请你实现 Trie 类：
+
+- `Trie()` 初始化前缀树对象。
+- `void insert(String word)` 向前缀树中插入字符串 `word` 。
+- `boolean search(String word)` 如果字符串 `word` 在前缀树中，返回 `true`（即，在检索之前已经插入）；否则，返回 `false` 。
+- `boolean startsWith(String prefix)` 如果之前已经插入的字符串 `word` 的前缀之一为 `prefix` ，返回 `true` ；否则，返回 `false` 。
+
+ 
+
+**示例：**
+
+```
+输入
+["Trie", "insert", "search", "search", "startsWith", "insert", "search"]
+[[], ["apple"], ["apple"], ["app"], ["app"], ["app"], ["app"]]
+输出
+[null, null, true, false, true, null, true]
+
+解释
+Trie trie = new Trie();
+trie.insert("apple");
+trie.search("apple");   // 返回 True
+trie.search("app");     // 返回 False
+trie.startsWith("app"); // 返回 True
+trie.insert("app");
+trie.search("app");     // 返回 True
+```
+
+ 
+
+**提示：**
+
+- `1 <= word.length, prefix.length <= 2000`
+- `word` 和 `prefix` 仅由小写英文字母组成
+- `insert`、`search` 和 `startsWith` 调用次数 **总计** 不超过 `3 * 104` 次
+
+
+
+
+
+### 1.1 前缀树的构造
+
+关键：**<font color=blue size=3>前缀树是每个节点都有26个子节点的26叉树，分别对应26个小写字母，通过节点是否为null标志对应的字母是否存在</font>**，从入口节点逐渐往下检索，不匹配直接返回。
+
+
+
+![image-20240302095546093.png](assets/1709344595-HaJKeO-image-20240302095546093.png)
+
+每个节点都有26个子节点，分别代表a-z 26个小写字母，用长度为26的Node数组存储，Node本身不存字符，而是通过对应下标的Node是否为null判断该字符是否存在。上图中，第0层为入口节点（根节点），作为搜索的入口；第1层为所有字符串的第一个字母节点集合，图中仅画出了已有字符串的第一个字母，其实每个节点（第1层为根节点的子节点集合）都有26个子节点，但是不存在的字符对应的节点为null；第二层为已有字符串的第二个字母，后面依此类推.....
+
+
+
+### 1.2 加入一个字符串
+
+从root节点出发，假设当前节点为 node，当前要加入的字符为 ch：如果当前节点 node 的子节点列表中，ch 对应的下标节点为null，则新建一个节点；然后更新 node 为子节点，加入下一个字符；
+
+![image-20240121233200906.png](assets/1705852091-LnbIrQ-image-20240121233200906.png)
+
+
+
+### 1.3 查找一个前缀
+
+从root节点出发，假设当前节点为 node，当前要查找的字符为 ch：如果当前节点 node 的子节点列表中，ch对应的下标位置节点为null，说明该字符不存在，退出查找；否则更新 node 为子节点，查找下一字符；
+
+![image-20240121233831238.png](assets/1705852091-YnaVlW-image-20240121233831238.png)
+
+
+
+### 1.4 标志位标记完整字符串
+
+通过以上方式可以快速找到一个前缀，但如何确定它是一个完整的字符串还是某个字符串的前缀呢？
+
+<img src="assets/1708854943-VdkgQm-image-20240121234320181.png" alt="image-20240121234320181.png" style="zoom:50%;" />
+
+此时可为每个节点引入一个标志 isEnd 标记，插入字符串时将最后一个字符对应的节点的标志位置为 True。
+
+当我们查找一个完整字符串时，最后一个字符对应的节点不为null，且节点标志位为 true，则表明是一个完整的字符串。
+
+<img src="assets/1705852091-TvIojy-image-20240121234502211.png" alt="image-20240121234502211.png" style="zoom:50%;" />
+
+### 1.5 前缀树实现
+
+```java
+class Trie {
+    Node root; //根节点，作为搜索入口
+
+    public Trie() {
+        root=new Node();
+    }
+    
+    public void insert(String word) {
+        // 从根节点开始
+        Node current=root;
+        // 逐个插入每个字符
+        for(int i=0;i<word.length();i++){
+            int index=word.charAt(i)-'a'; // 字符对应的下标
+            if(current.children[index]==null){ // 不重复插入
+                current.children[index]=new Node(); // 将字符对应的节点从null置为非null
+            }
+            current=current.children[index]; // 转向子节点
+        }
+        current.isEnd=true;  // 最后一个节点的isEnd置为true，表示一个完整的字符串
+    }
+    
+    public boolean search(String word) {
+        Node lastNode=searchPrefix(word);
+        return lastNode!=null&&lastNode.isEnd;  // 前缀存在且标志位为true才表示完整的字符串
+    }
+    
+    public boolean startsWith(String prefix) {
+        return searchPrefix(prefix)!=null;
+    }
+
+    public Node searchPrefix(String prefix){
+        // 从根节点开始
+        Node current=root;
+        for(int i=0;i<prefix.length();i++){
+            int index=prefix.charAt(i)-'a';
+            if(current.children[index]==null){ // 字符对应下标节点不存在，直接中断搜索
+                return null;
+            }
+            current=current.children[index];
+        }
+        return current;  //  前缀存在，返回最后一个字符对应的节点
+    }
+}
+
+class Node{ // 字母对应的节点
+    Node[] children; // 子节点 ，26个，对应26个字母
+    boolean isEnd; //是否为字符串的最后一个字母
+
+    public Node(){
+        children=new Node[26]; // 预制26个null节点
+        isEnd=false; // 标志位为false
+    }
+}
+```
+
+
+
+
+
+## 2. [单词搜索 II](https://leetcode.cn/problems/word-search-ii/)
+
+给定一个 `m x n` 二维字符网格 `board` 和一个单词（字符串）列表 `words`， *返回所有二维网格上的单词* 。
+
+单词必须按照字母顺序，通过 **相邻的单元格** 内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母在一个单词中不允许被重复使用。
+
+ 
+
+**示例 1：**
+
+![img](assets/search1.jpg)
+
+```
+输入：board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+输出：["eat","oath"]
+```
+
+**示例 2：**
+
+![img](assets/search2.jpg)
+
+```
+输入：board = [["a","b"],["c","d"]], words = ["abcb"]
+输出：[]
+```
+
+ 
+
+**提示：**
+
+- `m == board.length`
+- `n == board[i].length`
+- `1 <= m, n <= 12`
+- `board[i][j]` 是一个小写英文字母
+- `1 <= words.length <= 3 * 104`
+- `1 <= words[i].length <= 10`
+- `words[i]` 由小写英文字母组成
+- `words` 中的所有字符串互不相同
+
+
+
+按[单词搜索](https://leetcode.cn/problems/word-search/) dfs逐个判断words中每个字符是否在网格中的套路，铁定超时。
+
+![image-20240709094912477](assets/image-20240709094912477.png)
+
+思路：字典树+dfs
+
+为减少重复搜索：先基于words构建字典树，然后遍历网格，若$board[i][j]$​​为words中字符串的第一个字符，则开始dfs搜索，dfs过程中维护一个临时字符串tem，记录从搜索开始到当前位置经历的路径，只有tem在前缀树中才往下搜素（且不要重复判断tem是否在前缀树中，比如搜了ab在树中，再搜abc，就重复遍历了ab，只要判断新增单元格的字母是否是上一个单元格对应前缀树结点的子结点即可）。官解592ms，差不多。
+
+![image-20240709094939526](assets/image-20240709094939526.png)
+
+```java
+class Solution {
+    HashMap<Character,HashSet<String>> map=new HashMap<>(); 
+    Tree tree=new Tree();
+    List<String> res=new ArrayList<>();
+    public List<String> findWords(char[][] board, String[] words) {
+        int m=board.length,n=board[0].length;
+        for(String s:words){
+            if(map.get(s.charAt(0))==null){
+                HashSet<String> tem=new HashSet<>();
+                tem.add(s);
+                map.put(s.charAt(0),tem);
+            }else{
+                map.get(s.charAt(0)).add(s);
+            }
+            tree.insert(s);  // 以words构建字典树
+        }
+
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(map.get(board[i][j])!=null){  // 只搜还在待搜列表中的字符串（比如'a'在board中，但以它开头的字符串都已经判断完了，那么就不再搜）
+                    current=tree.root;
+                    dfs(i,j,board,"");
+                }
+            }
+        }
+        return res;
+    }
+
+    // o a b n
+    // o t a e
+    // a h k r
+    // a f l v
+    Node current=tree.root;
+    public void dfs(int i,int j,char[][] board,String s){
+        int m=board.length,n=board[0].length;
+        if(!valaid(i,j,m,n)||board[i][j]=='1'||map.isEmpty()){
+            return;
+        }
+        char c=board[i][j];  
+        board[i][j]='1'; // 已访问标记
+        String tem=s+c;
+        // tem是words构成字典树中的前缀  && words中还有以tem第一个字母开头的未搜字符串  ->  才往下继续搜
+        if(current.children[c-'a']!=null&&map.get(tem.charAt(0))!=null){  // 不要重复搜索tem是否在前缀树中（会有重复，比如搜了ab在树中，再搜abc，就重复遍历了ab，只要判断新增单元格的字母是否是上一个单元格对应前缀树结点的子结点即可）
+            Node node=current;
+            current=current.children[c-'a'];
+            if(current.isEnd&&map.get(tem.charAt(0)).contains(tem)){ 
+                res.add(tem);
+                // 确定存在就从待搜索列表中移除，避免重复搜索
+                map.get(tem.charAt(0)).remove(tem);  
+                if(map.get(tem.charAt(0)).isEmpty()){  
+                    map.remove(tem.charAt(0));
+                }        
+            }
+            
+            int[][] dir={{-1,0},{1,0},{0,-1},{0,1}};
+            for(int[] d:dir){
+                dfs(i+d[0],j+d[1],board,tem);        
+            }
+            current=node; 
+        }
+        board[i][j]=c;
+    }
+
+    public boolean valaid(int i,int j,int m,int n){
+        return i>=0&&i<m&&j>=0&&j<n;
+    }
+
+}
+
+// 字典树
+class Tree{
+    Node root;  //根节点，作为搜索入口
+    public Tree(){
+        root=new Node();
+    }
+    // 插入字符串
+    public void insert(String s){ 
+        Node current=root;
+        for(int i=0;i<s.length();i++){
+            if(current.children[s.charAt(i)-'a']==null){
+                current.children[s.charAt(i)-'a']=new Node();
+            }
+            current=current.children[s.charAt(i)-'a'];
+        }
+        current.isEnd=true;
+    }
+    
+    // 下面这些都用不上，会造成重复搜
+    public boolean search(String s){
+        Node res=searchPrefix(s);
+        return res!=null&&res.isEnd;
+    }
+
+    public boolean startWith(String prefix){
+        return searchPrefix(prefix)!=null;
+    }
+
+    public Node searchPrefix(String prefix){
+        Node current=root;
+        for(int i=0;i<prefix.length();i++){
+            if(current.children[prefix.charAt(i)-'a']==null){
+                return null;
+            }
+            current=current.children[prefix.charAt(i)-'a'];
+        }
+        return current;
+    } 
+}
+
+
+class Node{
+    Node[] children;  // 对应26个字母
+    boolean isEnd; // 字符串结束标志
+    public Node(){
+        children=new Node[26];
+    }
+}
+```
+
 
 
 
@@ -9277,4 +9596,179 @@ class Solution {
 ```
 
 ![image-20240706200359977](assets/image-20240706200359977.png)
+
+
+
+# 经典面试150
+
+## 1. [单词搜索 II](https://leetcode.cn/problems/word-search-ii/)
+
+给定一个 `m x n` 二维字符网格 `board` 和一个单词（字符串）列表 `words`， *返回所有二维网格上的单词* 。
+
+单词必须按照字母顺序，通过 **相邻的单元格** 内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母在一个单词中不允许被重复使用。
+
+ 
+
+**示例 1：**
+
+![img](assets/search1.jpg)
+
+```
+输入：board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+输出：["eat","oath"]
+```
+
+**示例 2：**
+
+![img](assets/search2.jpg)
+
+```
+输入：board = [["a","b"],["c","d"]], words = ["abcb"]
+输出：[]
+```
+
+ 
+
+**提示：**
+
+- `m == board.length`
+- `n == board[i].length`
+- `1 <= m, n <= 12`
+- `board[i][j]` 是一个小写英文字母
+- `1 <= words.length <= 3 * 104`
+- `1 <= words[i].length <= 10`
+- `words[i]` 由小写英文字母组成
+- `words` 中的所有字符串互不相同
+
+
+
+按[单词搜索](https://leetcode.cn/problems/word-search/) dfs逐个判断words中每个字符是否在网格中，铁定超时。
+
+![image-20240709094912477](assets/image-20240709094912477.png)
+
+思路：字典树+dfs
+
+为减少重复搜索：先基于words构建字典树，然后遍历网格，若$board[i][j]$​​为words中字符串的第一个字符，则开始dfs搜索，dfs过程中维护一个临时字符串tem，记录从搜索开始到当前位置经历的路径，只有tem在前缀树中才往下搜素（且不要重复判断tem是否在前缀树中，比如搜了ab在树中，再搜abc，就重复遍历了ab，只要判断新增单元格的字母是否是上一个单元格对应前缀树结点的子结点即可）。官解592ms，差不多。
+
+![image-20240709094939526](assets/image-20240709094939526.png)
+
+```java
+class Solution {
+    HashMap<Character,HashSet<String>> map=new HashMap<>(); 
+    Tree tree=new Tree();
+    List<String> res=new ArrayList<>();
+    public List<String> findWords(char[][] board, String[] words) {
+        int m=board.length,n=board[0].length;
+        for(String s:words){
+            if(map.get(s.charAt(0))==null){
+                HashSet<String> tem=new HashSet<>();
+                tem.add(s);
+                map.put(s.charAt(0),tem);
+            }else{
+                map.get(s.charAt(0)).add(s);
+            }
+            tree.insert(s);  // 以words构建字典树
+        }
+
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(map.get(board[i][j])!=null){  // 只搜还在待搜列表中的字符串（比如'a'在board中，但以它开头的字符串都已经判断完了，那么就不再搜）
+                    current=tree.root;
+                    dfs(i,j,board,"");
+                }
+            }
+        }
+        return res;
+    }
+
+    // o a b n
+    // o t a e
+    // a h k r
+    // a f l v
+    Node current=tree.root;
+    public void dfs(int i,int j,char[][] board,String s){
+        int m=board.length,n=board[0].length;
+        if(!valaid(i,j,m,n)||board[i][j]=='1'||map.isEmpty()){
+            return;
+        }
+        char c=board[i][j];  
+        board[i][j]='1'; // 已访问标记
+        String tem=s+c;
+        // tem是words构成字典树中的前缀  && words中还有以tem第一个字母开头的未搜字符串  ->  才往下继续搜
+        if(current.children[c-'a']!=null&&map.get(tem.charAt(0))!=null){  // 不要重复搜索tem是否在前缀树中（会有重复，比如搜了ab在树中，再搜abc，就重复遍历了ab，只要判断新增单元格的字母是否是上一个单元格对应前缀树结点的子结点即可）
+            Node node=current;
+            current=current.children[c-'a'];
+            if(current.isEnd&&map.get(tem.charAt(0)).contains(tem)){ 
+                res.add(tem);
+                // 确定存在就从待搜索列表中移除，避免重复搜索
+                map.get(tem.charAt(0)).remove(tem);  
+                if(map.get(tem.charAt(0)).isEmpty()){  
+                    map.remove(tem.charAt(0));
+                }        
+            }
+            
+            int[][] dir={{-1,0},{1,0},{0,-1},{0,1}};
+            for(int[] d:dir){
+                dfs(i+d[0],j+d[1],board,tem);        
+            }
+            current=node; 
+        }
+        board[i][j]=c;
+    }
+
+    public boolean valaid(int i,int j,int m,int n){
+        return i>=0&&i<m&&j>=0&&j<n;
+    }
+
+}
+
+// 字典树
+class Tree{
+    Node root;  //根节点，作为搜索入口
+    public Tree(){
+        root=new Node();
+    }
+    // 插入字符串
+    public void insert(String s){ 
+        Node current=root;
+        for(int i=0;i<s.length();i++){
+            if(current.children[s.charAt(i)-'a']==null){
+                current.children[s.charAt(i)-'a']=new Node();
+            }
+            current=current.children[s.charAt(i)-'a'];
+        }
+        current.isEnd=true;
+    }
+    
+    // 下面这些都用不上，会造成重复搜
+    public boolean search(String s){
+        Node res=searchPrefix(s);
+        return res!=null&&res.isEnd;
+    }
+
+    public boolean startWith(String prefix){
+        return searchPrefix(prefix)!=null;
+    }
+
+    public Node searchPrefix(String prefix){
+        Node current=root;
+        for(int i=0;i<prefix.length();i++){
+            if(current.children[prefix.charAt(i)-'a']==null){
+                return null;
+            }
+            current=current.children[prefix.charAt(i)-'a'];
+        }
+        return current;
+    } 
+}
+
+
+class Node{
+    Node[] children;  // 对应26个字母
+    boolean isEnd; // 字符串结束标志
+    public Node(){
+        children=new Node[26];
+    }
+}
+```
 
