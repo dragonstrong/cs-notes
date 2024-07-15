@@ -187,6 +187,16 @@ https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/
 
 ![image-20240430165032440](assets/image-20240430165032440.png)
 
+## 3.5 修改远程项目提交地址
+
+前提配了git ssh key
+
+![image-20240716005359719](assets/image-20240716005359719.png)
+
+![image-20240716005307951](assets/image-20240716005307951.png)
+
+
+
 # 4.Typora
 
 ## 4.1设置图片相对路径
