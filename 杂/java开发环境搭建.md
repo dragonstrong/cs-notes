@@ -21,11 +21,11 @@
 
 gitlab搜索
 
-![image-20240314155258300](assets/image-20240314155258300.png)
+![image-20240314155258300](../assets/image-20240314155258300.png)
 
 add new key
 
-![image-20240314155234129](assets/image-20240314155234129.png)
+![image-20240314155234129](../assets/image-20240314155234129.png)
 
 生成密钥：
 
@@ -33,19 +33,19 @@ add new key
 ssh-keygen -t rsa -C "Long_Q@outlook.com"   #填注册邮箱，3次回车
 ```
 
-![image-20240314155217369](assets/image-20240314155217369.png)
+![image-20240314155217369](../assets/image-20240314155217369.png)
 
 生成的密钥保存在：
 
-![image-20240314155159902](assets/image-20240314155159902.png)
+![image-20240314155159902](../assets/image-20240314155159902.png)
 
 
 
 打开将其复制到gitlab:
 
-![image-20240314155140003](assets/image-20240314155140003.png)
+![image-20240314155140003](../assets/image-20240314155140003.png)
 
-![image-20240314155121563](assets/image-20240314155121563.png)
+![image-20240314155121563](../assets/image-20240314155121563.png)
 
 # 2.GitLab
 
@@ -59,11 +59,11 @@ https://www.alipan.com/s/JpZdBhbGC4h
 
 ## 3.2 调整VM参数加快启动加载速度
 
-![image-20240314160436003](assets/image-20240314160436003.png)
+![image-20240314160436003](../assets/image-20240314160436003.png)
 
 ## 3.3导入配置
 
-![image-20240314155047113](assets/image-20240314155047113.png)
+![image-20240314155047113](../assets/image-20240314155047113.png)
 
 ## 3.4 配置maven和jdk
 
@@ -107,43 +107,43 @@ maven: 配置阿里云仓库，否则依赖下载很慢
 
 下载jdk ：https://www.oracle.com/java/technologies/downloads/archive/
 
-![image-20240322220755872](assets/image-20240322220755872.png)
+![image-20240322220755872](../assets/image-20240322220755872.png)
 
 选择jdk8-351版本: 有些可能没有集成jvisualvm
 
-![image-20240322220906642](assets/image-20240322220906642.png)
+![image-20240322220906642](../assets/image-20240322220906642.png)
 
 配置环境变量：
 
-![image-20240322220950303](assets/image-20240322220950303.png)
+![image-20240322220950303](../assets/image-20240322220950303.png)
 
 Path添加：
 
-![image-20240322221022761](assets/image-20240322221022761.png)
+![image-20240322221022761](../assets/image-20240322221022761.png)
 
 IDEA设置JDK:
 
 添加本地jdk
 
-![image-20240322221118568](assets/image-20240322221118568.png)
+![image-20240322221118568](../assets/image-20240322221118568.png)
 
 
 
-![image-20240322221145428](assets/image-20240322221145428.png)
+![image-20240322221145428](../assets/image-20240322221145428.png)
 
-![image-20240322221205056](assets/image-20240322221205056.png)
+![image-20240322221205056](../assets/image-20240322221205056.png)
 
 
 
-![image-20240314155027445](assets/image-20240314155027445.png)
+![image-20240314155027445](../assets/image-20240314155027445.png)
 
-![image-20240322221253612](assets/image-20240322221253612.png)
+![image-20240322221253612](../assets/image-20240322221253612.png)
 
 
 
 这个爆红得lifecyclle -> install
 
-![image-20240314155341152](assets/image-20240314155341152.png)
+![image-20240314155341152](../assets/image-20240314155341152.png)
 
 
 
@@ -151,11 +151,11 @@ IDEA设置JDK:
 
 https://blog.csdn.net/Fourier_1024/article/details/129813986
 
-![image-20240430160031082](assets/image-20240430160031082.png)
+![image-20240430160031082](../assets/image-20240430160031082.png)
 
 此时需要将mvn的路径加到环境变量中（mvn调的mvn.cmd，使用idea插件安装的maven在plugins路径下）,且有一个问题-环境变量无法识别空格，为了不重装idea，选择创建软链接：
 
-![image-20240430155815580](assets/image-20240430155815580.png)
+![image-20240430155815580](../assets/image-20240430155815580.png)
 
 IDEA下创建idea-softlink文件夹，在该路径下cmd:
 
@@ -163,11 +163,11 @@ IDEA下创建idea-softlink文件夹，在该路径下cmd:
 mklink /J idea "C:\QiangLong\Software\IDEA\IntelliJ IDEA 2023.1.5\plugins\maven\lib\maven3\bin"
 ```
 
-![image-20240430161001415](assets/image-20240430161001415.png)
+![image-20240430161001415](../assets/image-20240430161001415.png)
 
 
 
-![image-20240430161036183](assets/image-20240430161036183.png)
+![image-20240430161036183](../assets/image-20240430161036183.png)
 
 环境变量加上：
 
@@ -181,19 +181,19 @@ https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/
 
 确定cmd下mvn -v没问题但idea还不行，改下面的（**==很大原因出在这==**）然后重启idea：
 
-![image-20240430164946606](assets/image-20240430164946606.png)
+![image-20240430164946606](../assets/image-20240430164946606.png)
 
 
 
-![image-20240430165032440](assets/image-20240430165032440.png)
+![image-20240430165032440](../assets/image-20240430165032440.png)
 
 ## 3.5 修改远程项目提交地址
 
 前提配了git ssh key
 
-![image-20240716005359719](assets/image-20240716005359719.png)
+![image-20240716005359719](../assets/image-20240716005359719.png)
 
-![image-20240716005307951](assets/image-20240716005307951.png)
+![image-20240716005307951](../assets/image-20240716005307951.png)
 
 
 
@@ -203,15 +203,15 @@ https://archive.apache.org/dist/maven/maven-3/3.8.1/binaries/
 
 文件-> 偏好设置
 
-![image-20240314155457444](assets/image-20240314155457444.png)
+![image-20240314155457444](../assets/image-20240314155457444.png)
 
-![image-20240314155522737](assets/image-20240314155522737.png)
+![image-20240314155522737](../assets/image-20240314155522737.png)
 
 所有图片都存放在assets路径下，这样将md文件和assets文件夹同时移到其他电脑就不会出现图片加载失败的问题。
 
 ## 4.1 自动保存
 
-![image-20240314175816484](assets/image-20240314175816484.png)
+![image-20240314175816484](../assets/image-20240314175816484.png)
 
 # 5.Navicat
 
@@ -223,25 +223,25 @@ Applied Path：选择安装目录
 
 
 
-![image-20240702205146979](assets/image-20240702205146979.png)
+![image-20240702205146979](../assets/image-20240702205146979.png)
 
 generate生成Keygen并将其复制到navicat注册页面，填上许可证
 
 
 
-![image-20240702205601179](assets/image-20240702205601179.png)
+![image-20240702205601179](../assets/image-20240702205601179.png)
 
 **<font color=red>确保是断网状态</font>**（否则不会出现手动激活按钮），点激活，手动激活：
 
-![image-20240702205911457](assets/image-20240702205911457.png)
+![image-20240702205911457](../assets/image-20240702205911457.png)
 
 将请求码复制到NavicatCracker然后点generate Activation code，然后将生成的激活码复制过去点击激活
 
-![image-20240702210304379](assets/image-20240702210304379.png)
+![image-20240702210304379](../assets/image-20240702210304379.png)
 
 
 
-![image-20240702210442580](assets/image-20240702210442580.png)
+![image-20240702210442580](../assets/image-20240702210442580.png)
 
 # 6.服务器
 
@@ -275,7 +275,7 @@ apt install supervisor   # 安装supervisor
 vi /etc/supervisor/supervisord.conf
 ```
 
-![image-20240314174122372](assets/image-20240314174122372.png)
+![image-20240314174122372](../assets/image-20240314174122372.png)
 
 
 
@@ -300,9 +300,9 @@ stdout_logfile=/data/supervisor/java-ccos.out.log
 
 建好对应的文件夹并预置文件：
 
-![image-20240314174545326](assets/image-20240314174545326.png)
+![image-20240314174545326](../assets/image-20240314174545326.png)
 
-![image-20240314174608118](assets/image-20240314174608118.png)
+![image-20240314174608118](../assets/image-20240314174608118.png)
 
 ```
 
@@ -337,7 +337,7 @@ docker run --name redis -p 6379:6379 -v /data/dockerData/redis/data/:/data/ -v /
 docker exec -it redis redis-cli #客户端模式
 ```
 
-![image-20240315203236080](assets/image-20240315203236080.png)
+![image-20240315203236080](../assets/image-20240315203236080.png)
 
 ```bash
 # 做完上面这些还没有持久化， 数据存在内存中，redis重启后就会消失
@@ -350,15 +350,15 @@ appendonly yes
 docker restart redis
 ```
 
-![image-20240315204406483](assets/image-20240315204406483.png)
+![image-20240315204406483](../assets/image-20240315204406483.png)
 
 
 
 配置文件参考：点一个最新版进去就行
 
-![image-20240315205037036](assets/image-20240315205037036.png)
+![image-20240315205037036](../assets/image-20240315205037036.png)
 
-![image-20240315205000108](assets/image-20240315205000108.png)
+![image-20240315205000108](../assets/image-20240315205000108.png)
 
 
 
@@ -374,13 +374,13 @@ https://gitlab.com/java1834509/java-ccos  master分支
 
 ## 8.1 idea插件
 
-![image-20240315220429173](assets/image-20240315220429173.png)
+![image-20240315220429173](../assets/image-20240315220429173.png)
 
 ## 8.2 vsCode
 
 安装插件
 
-![image-20240315220155075](assets/image-20240315220155075.png)
+![image-20240315220155075](../assets/image-20240315220155075.png)
 
 ## 8.3 spring initializr替换阿里源
 
@@ -390,7 +390,7 @@ https://gitlab.com/java1834509/java-ccos  master分支
 https://start.aliyun.com/
 ```
 
-![image-20240316121931939](assets/image-20240316121931939.png)
+![image-20240316121931939](../assets/image-20240316121931939.png)
 
 ## 8.4 模块框架搭建
 
@@ -398,14 +398,14 @@ https://start.aliyun.com/
 
 商品服务：
 
-![image-20240316122053712](assets/image-20240316122053712.png)
+![image-20240316122053712](../assets/image-20240316122053712.png)
 
 勾选如下两个依赖：
 
 - web -> spring web : 表示web服务
 - spring cloud routing -> openFeign : 使用openFeign进行服务间的调用
 
-![image-20240316122247695](assets/image-20240316122247695.png)
+![image-20240316122247695](../assets/image-20240316122247695.png)
 
 按照上面创建其他模块：
 
@@ -415,7 +415,7 @@ https://start.aliyun.com/
 
 3）模块名：product、xxxx
 
-![image-20240316124350834](assets/image-20240316124350834.png)
+![image-20240316124350834](../assets/image-20240316124350834.png)
 
 聚合所有微服务：
 
@@ -445,7 +445,7 @@ https://start.aliyun.com/
 
 maven reload：
 
-![image-20240316131231221](assets/image-20240316131231221.png)
+![image-20240316131231221](../assets/image-20240316131231221.png)
 
 
 
@@ -453,7 +453,7 @@ maven reload：
 
 https://gitee.com/renrenio
 
-![image-20240316170431421](assets/image-20240316170431421.png)
+![image-20240316170431421](../assets/image-20240316170431421.png)
 
 问题1：
 
