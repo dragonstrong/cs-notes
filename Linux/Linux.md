@@ -131,6 +131,7 @@ jstack java进程号  #查看java进程id详情 （包括死锁等情况）
 #win下端口占用查杀
 C:\Users\dragon>netstat -ano | findstr :10000
   TCP    127.0.0.1:10000        0.0.0.0:0              LISTENING       13940
+C:\Users\dragon>tasklist |findstr 13940  #查看具体是什么进程
 C:\Users\dragon>taskkill -f -pid 13940
 成功: 已终止 PID 为 13940 的进程。
 
@@ -291,9 +292,22 @@ docker run -d -p 1000:1000 data-convert:1.0 #-d后台运行 -p端口映射
 
 ![image.png](assets/1713792452557-d8f5e0fa-3824-4bae-a45e-c457532b5850.webp)
 
+## 2.2 docker设置代理
 
+有时候docker.hub会被墙，docker pull下不来镜像，配terminal代理也没用，后面才知道docker有自己的代理：
 
+```json
+#  vi /etc/docker/daemon.json配置代理
+{
+  "proxies": {
+    "http-proxy": "http://192.168.1.4:7890", #填自己代理的ip端口
+    "https-proxy": "http://192.168.1.4:7890"
+ }
+}
 
+# 重启服务重新拉就行了
+systemctl restart docker 
+```
 
 
 
