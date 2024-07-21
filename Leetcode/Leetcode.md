@@ -5404,145 +5404,110 @@ class Solution
 }
 ```
 
-## 2. 有向无环图节点的所有祖先
+## 2. [有向无环图中一个节点的所有祖先](https://leetcode.cn/problems/all-ancestors-of-a-node-in-a-directed-acyclic-graph/)
 
-![Untitled](assets/Untitled 104.png)
+给你一个正整数 `n` ，它表示一个 **有向无环图** 中节点的数目，节点编号为 `0` 到 `n - 1` （包括两者）。
 
-![Untitled](assets/Untitled 105.png)
+给你一个二维整数数组 `edges` ，其中 `edges[i] = [fromi, toi]` 表示图中一条从 `fromi` 到 `toi` 的单向边。
 
-![Untitled](assets/Untitled 106.png)
+请你返回一个数组 `answer`，其中 `answer[i]`是第 `i` 个节点的所有 **祖先** ，这些祖先节点 **升序** 排序。
 
-法1：思路与课程表2类似 
+如果 `u` 通过一系列边，能够到达 `v` ，那么我们称节点 `u` 是节点 `v` 的 **祖先** 节点。
 
-从入度为0的节点开始bfs遍历
+ 
 
-```java
-class Solution 
-{
-    public List<List<Integer>> getAncestors(int n, int[][] edges) 
-    {
-        //建入度数组
-        int[] in_degree=new int[n];
-        List<List<Integer>> edge_list=new ArrayList<>();// 第i个节点指向的节点列表
+**示例 1：**
 
-        for(int i=0;i<n;i++)
-        edge_list.add(new ArrayList<>());
+![img](assets/e1-1721480443346-1.png)
 
-        for(int[] i:edges) //建图
-        {
-            edge_list.get(i[0]).add(i[1]);
-            in_degree[i[1]]++;
-        }
-
-        List<TreeSet<Integer>> res=new ArrayList<>(); //结果
-        for(int i=0;i<n;i++)
-        res.add(new TreeSet<>());
-
-        LinkedList<Integer> list=new LinkedList<>();
-
-        //bfs从入度为0的节点开始遍历
-        for(int i=0;i<n;i++)
-        {
-            if(in_degree[i]==0)
-            list.add(i);
-        }
-        while(!list.isEmpty())
-        {
-            Integer tem=list.remove();
-            for(Integer o:edge_list.get(tem))
-            {
-                //从图中去除tem节点
-                in_degree[o]--;  
-                if(in_degree[o]==0)
-                list.add(o);
-                //更新tem指向节点的祖先节点列表
-                TreeSet<Integer> t=res.get(tem);
-                if(t.size()!=0)
-                {
-                    for(Integer z:t)
-                    res.get(o).add(z);
-                }
-                res.get(o).add(tem);     
-            }
-        }
-
-        List<List<Integer>> res1=new ArrayList<>(); //结果，TreeSet转化为List
-        for(int i=0;i<n;i++)
-        res1.add(new ArrayList<>());
-        int j=0;
-        for(TreeSet<Integer> o:res)
-        {
-            if(o.size()!=0)
-            {
-                for(Integer k:o)
-                res1.get(j).add(k);
-            }
-            j++;
-        }
-
-        return res1;
-    }
-}
+```
+输入：n = 8, edgeList = [[0,3],[0,4],[1,3],[2,4],[2,7],[3,5],[3,6],[3,7],[4,6]]
+输出：[[],[],[],[0,1],[0,2],[0,1,3],[0,1,2,3,4],[0,1,2,3]]
+解释：
+上图为输入所对应的图。
+- 节点 0 ，1 和 2 没有任何祖先。
+- 节点 3 有 2 个祖先 0 和 1 。
+- 节点 4 有 2 个祖先 0 和 2 。
+- 节点 5 有 3 个祖先 0 ，1 和 3 。
+- 节点 6 有 5 个祖先 0 ，1 ，2 ，3 和 4 。
+- 节点 7 有 4 个祖先 0 ，1 ，2 和 3 。
 ```
 
-![Untitled](assets/Untitled 107.png)
+**示例 2：**
 
-法2：
+![img](assets/e2-1721480443346-3.png)
 
-从节点一层一层反向推，每个节点都要bfs一次，超时
+```
+输入：n = 5, edgeList = [[0,1],[0,2],[0,3],[0,4],[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+输出：[[],[0],[0,1],[0,1,2],[0,1,2,3]]
+解释：
+上图为输入所对应的图。
+- 节点 0 没有任何祖先。
+- 节点 1 有 1 个祖先 0 。
+- 节点 2 有 2 个祖先 0 和 1 。
+- 节点 3 有 3 个祖先 0 ，1 和 2 。
+- 节点 4 有 4 个祖先 0 ，1 ，2 和 3 。
+```
 
-![Untitled](assets/Untitled 108.png)
+ 
+
+**提示：**
+
+- `1 <= n <= 1000`
+- `0 <= edges.length <= min(2000, n * (n - 1) / 2)`
+- `edges[i].length == 2`
+- `0 <= fromi, toi <= n - 1`
+- `fromi != toi`
+- 图中不会有重边。
+- 图是 **有向** 且 **无环** 的。
+
+
+
+思路与课程表2类似 ：从入度为0的节点开始bfs遍历
 
 ```java
-class Solution 
-{
-    public List<List<Integer>> getAncestors(int n, int[][] edges) 
-    {
-        //建入度数组
-        int[] in_degree=new int[n];
-        List<List<Integer>> edge_list=new ArrayList<>();// 指向第i个节点的节点列表
-
-        for(int i=0;i<n;i++)
-        edge_list.add(new ArrayList<>());
-
-        for(int[] i:edges)
-        {
-            edge_list.get(i[1]).add(i[0]);
-            in_degree[i[1]]++;
+class Solution {
+    public List<List<Integer>> getAncestors(int n, int[][] edges) {
+        List<HashSet<Integer>> res=new ArrayList<>(); // 最后排序，不然每次插入都浪费时间
+        List<List<Integer>> connected=new ArrayList<>(); // 节点指向列表
+        int[] indegree=new int[n];  //入度数组
+        for(int i=0;i<n;i++){
+            connected.add(new ArrayList<>());
+            res.add(new HashSet<>());
         }
-
-        List<List<Integer>> res=new ArrayList<>(); //结果
-        for(int i=0;i<n;i++)
-        res.add(new ArrayList<>());
-
-        for(int i=0;i<n;i++)
-        {
-            if(in_degree[i]!=0)
-            {
-                TreeSet<Integer> set=new TreeSet<>();
-                List<Integer> pre=edge_list.get(i);
-                LinkedList<Integer> linklist=new LinkedList<>();
-                for(Integer o:pre)
-                linklist.add(o);
-                while(!linklist.isEmpty())
-                {
-                    Integer tem=linklist.remove();
-                    set.add(tem);
-                    List<Integer> ppre=edge_list.get(tem);
-                    if(ppre.size()!=0)
-                    {
-                        for(Integer oo:ppre)
-                        linklist.add(oo);
-                    }
+        for(int[] e:edges){
+            connected.get(e[0]).add(e[1]);
+            indegree[e[1]]++;
+        }
+        LinkedList<Integer> list=new LinkedList<>();
+        for(int i=0;i<n;i++){
+            if(indegree[i]==0){
+                list.add(i);
+            }
+        }
+		//bfs从入度为0的节点开始遍历
+        while(!list.isEmpty()){
+            Integer tem=list.remove();
+            List<Integer> next=connected.get(tem);
+            for(Integer o:next){
+                indegree[o]--;
+                if(indegree[o]==0){
+                    list.add(o);
                 }
-                for(int ooo:set)
-                res.get(i).add(ooo);
-  
+                //移走节点后将该节点和该节点的父节点列表加入 -> 子节点的父节点列表
+                res.get(o).add(tem);
+                res.get(o).addAll(res.get(tem));
             }
         }
 
-        return res;
-
+        List<List<Integer>> aws=new ArrayList<>();
+        for(int i=0;i<n;i++){
+            List<Integer> t=new ArrayList<>();
+            t.addAll(res.get(i));
+            t.sort((o1,o2)->o1-o2);
+            aws.add(t);
+        }
+        return aws;
     }
 }
 ```
