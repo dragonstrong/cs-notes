@@ -6906,6 +6906,105 @@ class Solution {
 }
 ```
 
+## 6.[查找和最小的 K 对数字](https://leetcode.cn/problems/find-k-pairs-with-smallest-sums/)
+
+给定两个以 **非递减顺序排列** 的整数数组 `nums1` 和 `nums2` , 以及一个整数 `k` 。
+
+定义一对值 `(u,v)`，其中第一个元素来自 `nums1`，第二个元素来自 `nums2` 。
+
+请找到和最小的 `k` 个数对 `(u1,v1)`, ` (u2,v2)` ...  `(uk,vk)` 。
+
+**示例 1:**
+
+```
+输入: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+输出: [1,2],[1,4],[1,6]
+解释: 返回序列中的前 3 对数：
+     [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]
+```
+
+**示例 2:**
+
+```
+输入: nums1 = [1,1,2], nums2 = [1,2,3], k = 2
+输出: [1,1],[1,1]
+解释: 返回序列中的前 2 对数：
+     [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]
+```
+
+ 
+
+**提示:**
+
+- `1 <= nums1.length, nums2.length <= 105`
+- `-109 <= nums1[i], nums2[i] <= 109`
+- `nums1` 和 `nums2` 均为 **升序排列**
+- `1 <= k <= 104`
+- `k <= nums1.length * nums2.length`
+
+
+
+思路：全部用优先队列排一遍爆内存。
+
+记`nums1`和`nums2`数组长度分别为`m,n`
+
+优先队列`PriorityQueue<int[]> queue存nums1和nums2`的下标，按数对和从小到大排序，因此队首的和必最小。
+
+- 初始化队列：将`[0,0]、[1,0]、[2,0]......`加入队列，即`nums1`往右遍历，`nums2`取最小值。
+- 弹出队首元素`int[] index=queue.poll()`和次小元素`int[] a=queue.peek();` 次小元素对应的数对和`b=nums1[a[0]]+nums2[a[1]]`。然后固定数对中第一个元素`nums1[index[0]],` 第二个元素的下标`j`从`index[1]]`往右遍历，若`nums1[index[0]]+nums2[j]<=b`表明当前数对和小于队列中最小数对和，可以放心加入结果列表，否则终止遍历，并将`{index[0],j}`加入队列。
+- 特殊情况：当`index[0]=m-1`时表明数对的第一个元素已经为`nums1`的最后一个元素了，此时`queue`中没有元素作为次小元素与之比较，若结果还未达到k个，应该继续遍历。
+
+```java
+class Solution {
+    // [-10,-4,0,0,6]
+    // [3,5,6,7,8,100]
+    // queue: {[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]}
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        // 优先队列存nums1和nums2的下标
+        PriorityQueue<int[]> queue=new PriorityQueue<>((o1,o2)->{
+            int t=nums1[o1[0]]+nums2[o1[1]]-nums1[o2[0]]-nums2[o2[1]];
+            return t==0?o1[0]-o2[0]:t; // 题目没说和相等时按nums1下标从小到大排，但测试用例是这样的
+        });
+        int m=nums1.length,n=nums2.length;
+        for(int i=0;i<Math.min(m,k);i++){
+            queue.add(new int[]{i,0});
+        }
+        int count=0;
+        List<List<Integer>> res=new ArrayList<>();
+        while(count<k&&!queue.isEmpty()){
+            int[] index=queue.poll();
+            if(!queue.isEmpty()||index[0]==m-1){// 注意当index[0]==m-1即到nums1的最后一个下标时，若没凑够k个数，还要继续
+                if(!queue.isEmpty()){
+                    int[] a=queue.peek();
+                    int b=nums1[a[0]]+nums2[a[1]];
+                    for(int j=index[1];j<n;j++){
+                        if(nums1[index[0]]+nums2[j]<=b){// 比队列里最小的更小，放心nums2从index[1]往右
+                            res.add(Arrays.asList(nums1[index[0]],nums2[j]));
+                            count++;
+                            if(count==k){
+                                return res;
+                            }
+                        }else{ //比队列里最小的更大，入队
+                            queue.add(new int[]{index[0],j}); 
+                            break;
+                        }
+                    }
+                }else{ // index[0]到nums1的最后一个下标时，没凑够k个数
+                        for(int j=index[1];j<n;j++){
+                            res.add(Arrays.asList(nums1[index[0]],nums2[j]));
+                            count++;
+                            if(count==k){
+                                return res;
+                            }   
+                        }
+                }       
+            }  
+        }
+        return res;
+    }
+}
+```
+
 
 
 # 十二. 桶
@@ -8106,6 +8205,228 @@ class Solution {
 - `s` 表示一个 **有效表达式**
 - 表达式中的所有整数都是非负整数，且在范围 `[0, 231 - 1]` 内
 - 题目数据保证答案是一个 **32-bit 整数**
+
+## 4.[基本计算器 III](http://101.201.28.47:8050/problems/basic-calculator-iii/)（模板）
+
+实现一个基本的计算器来计算简单的表达式字符串。
+
+表达式字符串只包含非负整数，算符 `+`、`-`、`*`、`/` ，左括号 `(` 和右括号 `)` 。整数除法需要 **向下截断** 。
+
+你可以假定给定的表达式总是有效的。所有的中间结果的范围均满足 `[-231, 231 - 1]` 。
+
+**注意：**你不能使用任何将字符串作为表达式求值的内置函数，比如 `eval()` 。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "1+1"
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：s = "6-4/2"
+输出：4
+```
+
+**示例 3：**
+
+```
+输入：s = "2*(5+5*2)/3+(6/2+8)"
+输出：21
+```
+
+ 
+
+**提示：**
+
+- `1 <= s <= 104`
+- `s` 由整数、`'+'`、`'-'`、`'*'`、`'/'`、`'('` 和 `')'` 组成
+- `s` 是一个 **有效的** 表达式
+
+
+
+递归写法：遇到左括号就找对应的右括号，然后基于基本计算器 II的思路调用自身计算出括号内的值。
+
+```java
+class Solution {
+    public int calculate(String s) {
+        LinkedList<Integer> stack=new LinkedList<>();
+        int n=s.length();
+        char preSign='+';
+        int num=0;
+        int res=0;
+        for(int i=0;i<n;i++){
+            if(s.charAt(i)=='('){  // 遇到左括号 
+                int countLeft=1; // 左右括号之差
+                int j=i+1;
+                for(;j<n;j++){
+                    if(s.charAt(j)=='('){
+                        countLeft++;
+                    }
+                    if(s.charAt(j)==')'){
+                        countLeft--;
+                    }
+                    if(countLeft==0){
+                        break;
+                    }
+                }
+                num=calculate(s.substring(i+1,j)); // 递归调用自身
+                i=j;
+            }
+
+            if(Character.isDigit(s.charAt(i))){
+                num=10*num+s.charAt(i)-'0'; //注意这种计算方式，不用Integer.parseInt
+            }
+            if((!Character.isDigit(s.charAt(i))&&s.charAt(i)!=' ')||i==n-1){
+                switch(preSign){
+                    case '+':{
+                        stack.push(num);
+                        break;
+                    }
+                    case '-':{
+                        stack.push(-num);
+                        break;
+                    }
+                    case '*':{
+                        stack.push(stack.pop()*num);
+                        break;
+                    }
+                    case '/':{
+                        stack.push(stack.pop()/num);
+                        break;
+                    }
+                    default:break;
+                }
+                preSign=s.charAt(i);
+                num=0;
+            }
+        }
+        while(!stack.isEmpty()){
+            res +=stack.pop();
+        }
+        return res;
+    }
+}
+```
+
+## 5. [逆波兰表达式求值](https://leetcode.cn/problems/evaluate-reverse-polish-notation/)[Easy]
+
+给你一个字符串数组 `tokens` ，表示一个根据 [逆波兰表示法](https://baike.baidu.com/item/逆波兰式/128437) 表示的算术表达式。
+
+请你计算该表达式。返回一个表示表达式值的整数。
+
+**注意：**
+
+- 有效的算符为 `'+'`、`'-'`、`'*'` 和 `'/'` 。
+- 每个操作数（运算对象）都可以是一个整数或者另一个表达式。
+- 两个整数之间的除法总是 **向零截断** 。
+- 表达式中不含除零运算。
+- 输入是一个根据逆波兰表示法表示的算术表达式。
+- 答案及所有中间计算结果可以用 **32 位** 整数表示。
+
+ 
+
+**示例 1：**
+
+```
+输入：tokens = ["2","1","+","3","*"]
+输出：9
+解释：该算式转化为常见的中缀算术表达式为：((2 + 1) * 3) = 9
+```
+
+**示例 2：**
+
+```
+输入：tokens = ["4","13","5","/","+"]
+输出：6
+解释：该算式转化为常见的中缀算术表达式为：(4 + (13 / 5)) = 6
+```
+
+**示例 3：**
+
+```
+输入：tokens = ["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
+输出：22
+解释：该算式转化为常见的中缀算术表达式为：
+  ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
+= ((10 * (6 / (12 * -11))) + 17) + 5
+= ((10 * (6 / -132)) + 17) + 5
+= ((10 * 0) + 17) + 5
+= (0 + 17) + 5
+= 17 + 5
+= 22
+```
+
+ 
+
+**提示：**
+
+- `1 <= tokens.length <= 104`
+- `tokens[i]` 是一个算符（`"+"`、`"-"`、`"*"` 或 `"/"`），或是在范围 `[-200, 200]` 内的一个整数
+
+ 
+
+**逆波兰表达式：**
+
+逆波兰表达式是一种后缀表达式，所谓后缀就是指算符写在后面。
+
+- 平常使用的算式则是一种中缀表达式，如 `( 1 + 2 ) * ( 3 + 4 )` 。
+- 该算式的逆波兰表达式写法为 `( ( 1 2 + ) ( 3 4 + ) * )` 。
+
+逆波兰表达式主要有以下两个优点：
+
+- 去掉括号后表达式无歧义，上式即便写成 `1 2 + 3 4 + * `也可以依据次序计算出正确结果。
+- 适合用栈操作运算：遇到数字则入栈；遇到算符则取出栈顶两个数字进行计算，并将结果压入栈中
+
+
+
+思路：栈
+
+栈中存操作数，遇到操作符弹出栈顶的两个元素进行计算，然后将结果再压入栈
+
+```java
+class Solution {
+    public int evalRPN(String[] tokens) {
+        int n=tokens.length;
+        LinkedList<Integer> stack=new LinkedList<>();
+        for(int i=0;i<n;i++){
+            if(isDigit(tokens[i])){
+                stack.push(Integer.parseInt(tokens[i]));
+            }else{
+                switch(tokens[i]){
+                    case "+":{
+                        stack.push(stack.pop()+stack.pop());
+                        break;
+                    }
+                    case "-":{
+                        int a=stack.pop();
+                        stack.push(stack.pop()-a);
+                        break;
+                    }
+                    case "*":{
+                        stack.push(stack.pop()*stack.pop());
+                        break;
+                    }
+                    case "/":{
+                        int a=stack.pop();
+                        stack.push(stack.pop()/a);
+                        break;
+                    }
+                    default:break;
+                }
+            }   
+        }
+        return stack.pop(); 
+    }
+    public boolean isDigit(String s){
+        return !(s.equals("+")||s.equals("-")||s.equals("*")||s.equals("/"));
+    } 
+}
+```
 
 
 
@@ -12122,3 +12443,916 @@ class Solution {
 }
 ```
 
+## 4.[基本计算器 II](https://leetcode.cn/problems/basic-calculator-ii/)
+
+给你一个字符串表达式 `s` ，请你实现一个基本计算器来计算并返回它的值。
+
+整数除法仅保留整数部分。
+
+你可以假设给定的表达式总是有效的。所有中间结果将在 `[-231, 231 - 1]` 的范围内。
+
+**注意：**不允许使用任何将字符串作为数学表达式计算的内置函数，比如 `eval()` 。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "3+2*2"
+输出：7
+```
+
+**示例 2：**
+
+```
+输入：s = " 3/2 "
+输出：1
+```
+
+**示例 3：**
+
+```
+输入：s = " 3+5 / 2 "
+输出：5
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 3 * 105`
+- `s` 由整数和算符 `('+', '-', '*', '/')` 组成，中间由一些空格隔开
+- `s` 表示一个 **有效表达式**
+- 表达式中的所有整数都是非负整数，且在范围 `[0, 231 - 1]` 内
+- 题目数据保证答案是一个 **32-bit 整数**
+
+
+
+思路：栈中只存操作数，不存符号（注意：该题不涉及括号）
+
+用字符preSign标记数字之前最靠近的运算符，变量num记录遇到下一个符号之前操作数大小
+
+- 加减直接压入栈，减法统一变加法-5  -> +（-5）
+- 乘除法：将num与stack.pop()运算后将结果压入栈
+
+```java
+class Solution {
+    public int calculate(String s) {
+        LinkedList<Integer> stack=new LinkedList<>();
+        int n=s.length();
+        char preSign='+';
+        int num=0;
+        int res=0;
+        for(int i=0;i<n;i++){
+            if(Character.isDigit(s.charAt(i))){
+                num=10*num+s.charAt(i)-'0'; //注意这种计算方式，不用Integer.parseInt
+            }
+            if((!Character.isDigit(s.charAt(i))&&s.charAt(i)!=' ')||i==n-1){
+                switch(preSign){
+                    case '+':{
+                        stack.push(num);
+                        break;
+                    }
+                    case '-':{
+                        stack.push(-num);
+                        break;
+                    }
+                    case '*':{
+                        stack.push(stack.pop()*num);
+                        break;
+                    }
+                    case '/':{
+                        stack.push(stack.pop()/num);
+                        break;
+                    }
+                    default:break;
+                }
+                preSign=s.charAt(i);
+                num=0;
+            }
+        }
+        while(!stack.isEmpty()){
+            res +=stack.pop();
+        }
+        return res;
+    }
+}
+```
+
+## 5.[基本计算器 III](http://101.201.28.47:8050/problems/basic-calculator-iii/)[计算器模板，必须掌握]
+
+实现一个基本的计算器来计算简单的表达式字符串。
+
+表达式字符串只包含非负整数，算符 `+`、`-`、`*`、`/` ，左括号 `(` 和右括号 `)` 。整数除法需要 **向下截断** 。
+
+你可以假定给定的表达式总是有效的。所有的中间结果的范围均满足 `[-231, 231 - 1]` 。
+
+**注意：**你不能使用任何将字符串作为表达式求值的内置函数，比如 `eval()` 。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "1+1"
+输出：2
+```
+
+**示例 2：**
+
+```
+输入：s = "6-4/2"
+输出：4
+```
+
+**示例 3：**
+
+```
+输入：s = "2*(5+5*2)/3+(6/2+8)"
+输出：21
+```
+
+ 
+
+**提示：**
+
+- `1 <= s <= 104`
+- `s` 由整数、`'+'`、`'-'`、`'*'`、`'/'`、`'('` 和 `')'` 组成
+- `s` 是一个 **有效的** 表达式
+
+
+
+递归写法：遇到左括号就找对应的右括号，然后基于基本计算器 II的思路调用自身计算出括号内的值。
+
+```java
+class Solution {
+    public int calculate(String s) {
+        LinkedList<Integer> stack=new LinkedList<>();
+        int n=s.length();
+        char preSign='+';
+        int num=0;
+        int res=0;
+        for(int i=0;i<n;i++){
+            if(s.charAt(i)=='('){  // 遇到左括号 
+                int countLeft=1; // 左右括号之差
+                int j=i+1;
+                for(;j<n;j++){
+                    if(s.charAt(j)=='('){
+                        countLeft++;
+                    }
+                    if(s.charAt(j)==')'){
+                        countLeft--;
+                    }
+                    if(countLeft==0){
+                        break;
+                    }
+                }
+                num=calculate(s.substring(i+1,j)); // 递归调用自身
+                i=j;
+            }
+
+            if(Character.isDigit(s.charAt(i))){
+                num=10*num+s.charAt(i)-'0'; //注意这种计算方式，不用Integer.parseInt
+            }
+            if((!Character.isDigit(s.charAt(i))&&s.charAt(i)!=' ')||i==n-1){
+                switch(preSign){
+                    case '+':{
+                        stack.push(num);
+                        break;
+                    }
+                    case '-':{
+                        stack.push(-num);
+                        break;
+                    }
+                    case '*':{
+                        stack.push(stack.pop()*num);
+                        break;
+                    }
+                    case '/':{
+                        stack.push(stack.pop()/num);
+                        break;
+                    }
+                    default:break;
+                }
+                preSign=s.charAt(i);
+                num=0;
+            }
+        }
+        while(!stack.isEmpty()){
+            res +=stack.pop();
+        }
+        return res;
+    }
+}
+```
+
+## 6.[逆波兰表达式求值](https://leetcode.cn/problems/evaluate-reverse-polish-notation/)[Easy]
+
+给你一个字符串数组 `tokens` ，表示一个根据 [逆波兰表示法](https://baike.baidu.com/item/逆波兰式/128437) 表示的算术表达式。
+
+请你计算该表达式。返回一个表示表达式值的整数。
+
+**注意：**
+
+- 有效的算符为 `'+'`、`'-'`、`'*'` 和 `'/'` 。
+- 每个操作数（运算对象）都可以是一个整数或者另一个表达式。
+- 两个整数之间的除法总是 **向零截断** 。
+- 表达式中不含除零运算。
+- 输入是一个根据逆波兰表示法表示的算术表达式。
+- 答案及所有中间计算结果可以用 **32 位** 整数表示。
+
+ 
+
+**示例 1：**
+
+```
+输入：tokens = ["2","1","+","3","*"]
+输出：9
+解释：该算式转化为常见的中缀算术表达式为：((2 + 1) * 3) = 9
+```
+
+**示例 2：**
+
+```
+输入：tokens = ["4","13","5","/","+"]
+输出：6
+解释：该算式转化为常见的中缀算术表达式为：(4 + (13 / 5)) = 6
+```
+
+**示例 3：**
+
+```
+输入：tokens = ["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
+输出：22
+解释：该算式转化为常见的中缀算术表达式为：
+  ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
+= ((10 * (6 / (12 * -11))) + 17) + 5
+= ((10 * (6 / -132)) + 17) + 5
+= ((10 * 0) + 17) + 5
+= (0 + 17) + 5
+= 17 + 5
+= 22
+```
+
+ 
+
+**提示：**
+
+- `1 <= tokens.length <= 104`
+- `tokens[i]` 是一个算符（`"+"`、`"-"`、`"*"` 或 `"/"`），或是在范围 `[-200, 200]` 内的一个整数
+
+ 
+
+**逆波兰表达式：**
+
+逆波兰表达式是一种后缀表达式，所谓后缀就是指算符写在后面。
+
+- 平常使用的算式则是一种中缀表达式，如 `( 1 + 2 ) * ( 3 + 4 )` 。
+- 该算式的逆波兰表达式写法为 `( ( 1 2 + ) ( 3 4 + ) * )` 。
+
+逆波兰表达式主要有以下两个优点：
+
+- 去掉括号后表达式无歧义，上式即便写成 `1 2 + 3 4 + * `也可以依据次序计算出正确结果。
+- 适合用栈操作运算：遇到数字则入栈；遇到算符则取出栈顶两个数字进行计算，并将结果压入栈中
+
+
+
+思路：栈
+
+栈中存操作数，遇到操作符弹出栈顶的两个元素进行计算，然后将结果再压入栈
+
+```java
+class Solution {
+    public int evalRPN(String[] tokens) {
+        int n=tokens.length;
+        LinkedList<Integer> stack=new LinkedList<>();
+        for(int i=0;i<n;i++){
+            if(isDigit(tokens[i])){
+                stack.push(Integer.parseInt(tokens[i]));
+            }else{
+                switch(tokens[i]){
+                    case "+":{
+                        stack.push(stack.pop()+stack.pop());
+                        break;
+                    }
+                    case "-":{
+                        int a=stack.pop();
+                        stack.push(stack.pop()-a);
+                        break;
+                    }
+                    case "*":{
+                        stack.push(stack.pop()*stack.pop());
+                        break;
+                    }
+                    case "/":{
+                        int a=stack.pop();
+                        stack.push(stack.pop()/a);
+                        break;
+                    }
+                    default:break;
+                }
+            }   
+        }
+        return stack.pop(); 
+    }
+    public boolean isDigit(String s){
+        return !(s.equals("+")||s.equals("-")||s.equals("*")||s.equals("/"));
+    } 
+}
+```
+
+## 7.[查找和最小的 K 对数字](https://leetcode.cn/problems/find-k-pairs-with-smallest-sums/)
+
+给定两个以 **非递减顺序排列** 的整数数组 `nums1` 和 `nums2` , 以及一个整数 `k` 。
+
+定义一对值 `(u,v)`，其中第一个元素来自 `nums1`，第二个元素来自 `nums2` 。
+
+请找到和最小的 `k` 个数对 `(u1,v1)`, ` (u2,v2)` ...  `(uk,vk)` 。
+
+**示例 1:**
+
+```
+输入: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+输出: [1,2],[1,4],[1,6]
+解释: 返回序列中的前 3 对数：
+     [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]
+```
+
+**示例 2:**
+
+```
+输入: nums1 = [1,1,2], nums2 = [1,2,3], k = 2
+输出: [1,1],[1,1]
+解释: 返回序列中的前 2 对数：
+     [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]
+```
+
+ 
+
+**提示:**
+
+- `1 <= nums1.length, nums2.length <= 105`
+- `-109 <= nums1[i], nums2[i] <= 109`
+- `nums1` 和 `nums2` 均为 **升序排列**
+- `1 <= k <= 104`
+- `k <= nums1.length * nums2.length`
+
+
+
+思路：全部用优先队列排一边爆内存。
+
+记`nums1`和`nums2`数组长度分别为`m,n`
+
+优先队列`PriorityQueue<int[]> queue存nums1和nums2`的下标，按数对和从小到大排序，因此队首的和必最小。
+
+- 初始化队列：将`[0,0]、[1,0]、[2,0]......`加入队列，即`nums1`往右遍历，`nums2`取最小值。
+- 弹出队首元素`int[] index=queue.poll()`和次小元素`int[] a=queue.peek();` 次小元素对应的数对和`b=nums1[a[0]]+nums2[a[1]]`。然后固定数对中第一个元素`nums1[index[0]],` 第二个元素的下标`j`从`index[1]]`往右遍历，若`nums1[index[0]]+nums2[j]<=b`表明当前数对和小于队列中最小数对和，可以放心加入结果列表，否则终止遍历，并将`{index[0],j}`加入队列。
+- 特殊情况：当`index[0]=m-1`时表明数对的第一个元素已经为`nums1`的最后一个元素了，此时`queue`中没有元素作为次小元素与之比较，若结果还未达到k个，应该继续遍历。
+
+```java
+class Solution {
+    // [-10,-4,0,0,6]
+    // [3,5,6,7,8,100]
+    // queue: {[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]}
+
+    public List<List<Integer>> kSmallestPairs(int[] nums1, int[] nums2, int k) {
+        // 优先队列存nums1和nums2的下标
+        PriorityQueue<int[]> queue=new PriorityQueue<>((o1,o2)->{
+            int t=nums1[o1[0]]+nums2[o1[1]]-nums1[o2[0]]-nums2[o2[1]];
+            return t==0?o1[0]-o2[0]:t; // 题目没说和相等时按nums1下标从小到大排，但测试用例是这样的
+        });
+        int m=nums1.length,n=nums2.length;
+        for(int i=0;i<Math.min(m,k);i++){
+            queue.add(new int[]{i,0});
+        }
+        int count=0;
+        List<List<Integer>> res=new ArrayList<>();
+        while(count<k&&!queue.isEmpty()){
+            int[] index=queue.poll();
+            if(!queue.isEmpty()){ // 注意当index[0]==m-1即到nums1的最后一个下标时，若没凑够k个数，还要继续
+                int[] a=queue.peek();
+                int b=nums1[a[0]]+nums2[a[1]];
+                for(int j=index[1];j<n;j++){
+                    if(nums1[index[0]]+nums2[j]<=b){// 比队列里最小的更小，放心nums2从index[1]往右
+                        res.add(Arrays.asList(nums1[index[0]],nums2[j]));
+                        count++;
+                        if(count==k){
+                            return res;
+                        }
+                    }else{ //比队列里最小的更大，入队
+                        queue.add(new int[]{index[0],j}); 
+                        break;
+                    }
+                }
+            }else if(index[0]==m-1){ // index[0]到nums1的最后一个下标时，没凑够k个数
+                for(int j=index[1];j<n;j++){
+                    res.add(Arrays.asList(nums1[index[0]],nums2[j]));
+                    count++;
+                    if(count==k){
+                        return res;
+                    }   
+                }
+            }       
+             
+        }
+        return res;
+    }
+}
+```
+
+
+
+## 8.[单词接龙](https://leetcode.cn/problems/word-ladder/)
+
+字典 `wordList` 中从单词 `beginWord` 到 `endWord` 的 **转换序列** 是一个按下述规格形成的序列 `beginWord -> s1 -> s2 -> ... -> sk`：
+
+- 每一对相邻的单词只差一个字母。
+- 对于 `1 <= i <= k` 时，每个 `si` 都在 `wordList` 中。注意， `beginWord` 不需要在 `wordList` 中。
+- `sk == endWord`
+
+给你两个单词 `beginWord` 和 `endWord` 和一个字典 `wordList` ，返回 *从 `beginWord` 到 `endWord` 的 **最短转换序列** 中的 **单词数目*** 。如果不存在这样的转换序列，返回 `0` 。
+
+**示例 1：**
+
+```
+输入：beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+输出：5
+解释：一个最短转换序列是 "hit" -> "hot" -> "dot" -> "dog" -> "cog", 返回它的长度 5。
+```
+
+**示例 2：**
+
+```
+输入：beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+输出：0
+解释：endWord "cog" 不在字典中，所以无法进行转换。
+```
+
+ 
+
+**提示：**
+
+- `1 <= beginWord.length <= 10`
+- `endWord.length == beginWord.length`
+- `1 <= wordList.length <= 5000`
+- `wordList[i].length == beginWord.length`
+- `beginWord`、`endWord` 和 `wordList[i]` 由小写英文字母组成
+- `beginWord != endWord`
+- `wordList` 中的所有字符串 **互不相同**
+
+
+
+思路：普通做法建图单项bfs超时。
+
+优化点：
+
+- 假设字符串长度m，wordList长度n，判断字符串s1,s2是否可以转化时，常规做法是s1和s2逐个字符比对，不同字符为1则可以互相转换，因此需判断$n*(n-1)+(n-1)*(n-2)+...+1$对字符串，每对字符串耗时m，时间复杂度$O(mn^2)$。考虑另一种思路，使用HashSet存wordList，然后对于字符串s1，每次只改变一个字符得到字符串s，若s在HashSet中则表示s1和s能相互转换，时间复杂度为$O(26mn)$，当n很大时，优化效果很好。
+- 使用双向BFS：同时从beginWord和endWord搜，相遇时返回。（<font color=red>**有些细节没看懂，有空再看**</font>）
+
+```java
+class Solution {
+    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+        int n=wordList.size();
+        HashSet<String> set=new HashSet<>(wordList);
+        HashSet<String> beginSet=possible(beginWord,set);
+        HashSet<String> visitSet=new HashSet<>();
+        if(beginSet.contains(endWord)){
+            return 2;
+        }
+        if(!set.contains(endWord)||beginSet.isEmpty()||possible(endWord,set).isEmpty()){
+            return 0;
+        }
+        
+        // 从beginWord开始搜
+        LinkedList<String> list=new LinkedList<>();
+        list.addAll(beginSet);
+        int count=1;
+        while(!list.isEmpty()){
+            int size=list.size();
+            for(int i=0;i<size;i++){
+                String tem= list.remove();
+                visitSet.add(tem);
+                if(tem.equals(endWord)){
+                    return count+1;
+                }
+
+                for(String word:possible(tem,set)){
+                    if(!visitSet.contains(word)){
+                        visitSet.add(word);
+                        list.add(word);
+                    }
+                }
+            }
+            count++;
+        }
+        return 0;
+    }
+    // 找字符串s在wordList中所有可转换的字符串
+    public HashSet<String> possible(String s,HashSet<String> wordSet){
+        int a=s.length();
+        HashSet<String> set=new HashSet<>();
+        for(int i=0;i<a;i++){ 
+            for(char c='a';c<='z';c++){ // 改变1个字符，枚举26
+                if(c!=s.charAt(i)){
+                    String tem=s.substring(0,i)+c+s.substring(i+1,a);
+                    if(wordSet.contains(tem)){
+                        set.add(tem);
+                    }
+                }
+            }
+        }
+        return set;
+    }
+}
+```
+
+
+
+## 9.[二叉搜索树迭代器](https://leetcode.cn/problems/binary-search-tree-iterator/)
+
+实现一个二叉搜索树迭代器类`BSTIterator` ，表示一个按中序遍历二叉搜索树（BST）的迭代器：
+
+- `BSTIterator(TreeNode root)` 初始化 `BSTIterator` 类的一个对象。BST 的根节点 `root` 会作为构造函数的一部分给出。指针应初始化为一个不存在于 BST 中的数字，且该数字小于 BST 中的任何元素。
+- `boolean hasNext()` 如果向指针右侧遍历存在数字，则返回 `true` ；否则返回 `false` 。
+- `int next()`将指针向右移动，然后返回指针处的数字。
+
+注意，指针初始化为一个不存在于 BST 中的数字，所以对 `next()` 的首次调用将返回 BST 中的最小元素。
+
+你可以假设 `next()` 调用总是有效的，也就是说，当调用 `next()` 时，BST 的中序遍历中至少存在一个下一个数字。
+
+要求：`next()` 和 `hasNext()` 操作均摊时间复杂度为 `O(1)` ，并使用 `O(h)` 内存。其中 `h` 是树的高度。
+
+ 
+
+**示例：**
+
+<img src="assets/image-20240727230848596.png" alt="image-20240727230848596" style="zoom:50%;" />
+
+```
+输入
+["BSTIterator", "next", "next", "hasNext", "next", "hasNext", "next", "hasNext", "next", "hasNext"]
+[[[7, 3, 15, null, null, 9, 20]], [], [], [], [], [], [], [], [], []]
+输出
+[null, 3, 7, true, 9, true, 15, true, 20, false]
+
+解释
+BSTIterator bSTIterator = new BSTIterator([7, 3, 15, null, null, 9, 20]);
+bSTIterator.next();    // 返回 3
+bSTIterator.next();    // 返回 7
+bSTIterator.hasNext(); // 返回 True
+bSTIterator.next();    // 返回 9
+bSTIterator.hasNext(); // 返回 True
+bSTIterator.next();    // 返回 15
+bSTIterator.hasNext(); // 返回 True
+bSTIterator.next();    // 返回 20
+bSTIterator.hasNext(); // 返回 False
+```
+
+ 
+
+**提示：**
+
+- 树中节点的数目在范围 `[1, 105]` 内
+- `0 <= Node.val <= 106`
+- 最多调用 `105` 次 `hasNext` 和 `next` 操作
+
+ 
+
+思路：【单调栈】常规把中序遍历结果存入List的方法空间复杂度为$O(n)$，其中n为节点数量，不满足要求。
+
+因此设计迭代器时，应避免提前把所有的值都遍历出来；最好能设计成遍历过程中求 next 节点。把递归转成迭代，基本想法就是用栈：栈中只保留左节点。中序遍历的访问顺序是 左子树 -> 根节点 -> 右子树，并且对 左子树 和 右子树 也进行递归。
+
+结合下图，实际访问节点的顺序是：
+
+<img src="assets/image-20240727231235135.png" alt="image-20240727231235135" style="zoom:50%;" />
+
+- 从 根节点12 开始一路到底遍历到所有左节点，路径保存到栈中；此时栈为 [12, 6, 5]。
+
+- 弹出栈顶节点，即 叶子节点5 ；
+- 下一个栈顶元素是 该叶子节点 的 根节点6；
+- 然后把 该新的根节点的右子树9 一路到底遍历其所有左节点；栈为 [12, 9, 8, 7]。
+- 继续运行下去，直到栈为空。
+
+```java
+class BSTIterator {
+    private TreeNode cur;
+    private Deque<TreeNode> stack;
+
+    public BSTIterator(TreeNode root) {
+        cur = root;
+        stack = new LinkedList<TreeNode>();
+    }
+    
+    public int next() {
+        while (cur != null) {
+            stack.push(cur);
+            cur = cur.left;
+        }
+        cur = stack.pop();
+        int ret = cur.val;
+        cur = cur.right;
+        return ret;
+    }
+    
+    public boolean hasNext() {
+        return cur != null || !stack.isEmpty();
+    }
+}
+```
+
+
+
+## 10.[环形子数组的最大和](https://leetcode.cn/problems/maximum-sum-circular-subarray/)
+
+给定一个长度为 `n` 的**环形整数数组** `nums` ，返回 *`nums` 的非空 **子数组** 的最大可能和* 。
+
+**环形数组** 意味着数组的末端将会与开头相连呈环状。形式上， `nums[i]` 的下一个元素是 `nums[(i + 1) % n]` ， `nums[i]` 的前一个元素是 `nums[(i - 1 + n) % n]` 。
+
+**子数组** 最多只能包含固定缓冲区 `nums` 中的每个元素一次。形式上，对于子数组 `nums[i], nums[i + 1], ..., nums[j]` ，不存在 `i <= k1, k2 <= j` 其中 `k1 % n == k2 % n` 。
+
+ 要求：时间复杂度$O(n)$
+
+**示例 1：**
+
+```
+输入：nums = [1,-2,3,-2]
+输出：3
+解释：从子数组 [3] 得到最大和 3
+```
+
+**示例 2：**
+
+```
+输入：nums = [5,-3,5]
+输出：10
+解释：从子数组 [5,5] 得到最大和 5 + 5 = 10
+```
+
+**示例 3：**
+
+```
+输入：nums = [3,-2,2,-3]
+输出：3
+解释：从子数组 [3] 和 [3,-2,2] 都可以得到最大和 3
+```
+
+ 
+
+**提示：**
+
+- `n == nums.length`
+- `1 <= n <= 3 * 104`
+- `-3 * 104 <= nums[i] <= 3 * 10^4`
+
+
+
+思路：动态规划
+
+分非环形字串和环形字串分别求解：
+
+- 非环形字串：传统dp套路
+- 环形字串：左边形如......,num[n-1]即必经过nums[n-1]；右边形如nums[0],nums[1],....。因此若右边固定，设其终止下标为i，即：nums[0],nums[1]，...,nums[i]，则求出nums[i+2],nums[i+3],....,nums[n-1]的以nums[n-1]结尾的字串最大和即可，从右往左dp，可以求出该值。
+
+```java
+class Solution {
+    public int maxSubarraySumCircular(int[] nums) {
+        int n=nums.length;
+        int[] dp=new int[n]; // 从左往右：以nums[i]结尾的字串最大和
+        dp[0]=nums[0];
+        int res=dp[0];
+        // 非环形字串
+        for(int i=1;i<n;i++){
+            dp[i]=Math.max(nums[i],nums[i]+dp[i-1]);
+            res=Math.max(res,dp[i]);
+        }
+        int[] DP=new int[n]; // 从右往左：以nums[n-1]开始，结尾下标在n-1~i中的字串最大和（环形必要连接nums[n-1]）
+        DP[n-1]=nums[n-1];
+        int sum=nums[n-1];
+        for(int i=n-2;i>=0;i--){
+            sum +=nums[i];
+            DP[i]=Math.max(sum,DP[i+1]);
+        }
+        sum=0;
+        // 环形字串
+        for(int i=0;i<n-2;i++){// ....nums[n-1]，nums[0],nums[1],...,nums[i]
+            sum +=nums[i];
+            if(i+2<=n-1){// 固定nums[0:i]
+                res=Math.max(res,sum+DP[i+2]);
+            }
+        }
+        return res;
+    }
+}
+```
+
+## 11. [除法求值](https://leetcode.cn/problems/evaluate-division/)
+
+给你一个变量对数组 `equations` 和一个实数值数组 `values` 作为已知条件，其中 `equations[i] = [Ai, Bi]` 和 `values[i]` 共同表示等式 `Ai / Bi = values[i]` 。每个 `Ai` 或 `Bi` 是一个表示单个变量的字符串。
+
+另有一些以数组 `queries` 表示的问题，其中 `queries[j] = [Cj, Dj]` 表示第 `j` 个问题，请你根据已知条件找出 `Cj / Dj = ?` 的结果作为答案。
+
+返回 **所有问题的答案** 。如果存在某个无法确定的答案，则用 `-1.0` 替代这个答案。如果问题中出现了给定的已知条件中没有出现的字符串，也需要用 `-1.0` 替代这个答案。
+
+**注意：**输入总是有效的。你可以假设除法运算中不会出现除数为 0 的情况，且不存在任何矛盾的结果。
+
+**注意：**未在等式列表中出现的变量是未定义的，因此无法确定它们的答案。
+
+ 
+
+**示例 1：**
+
+```
+输入：equations = [["a","b"],["b","c"]], values = [2.0,3.0], queries = [["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]
+输出：[6.00000,0.50000,-1.00000,1.00000,-1.00000]
+解释：
+条件：a / b = 2.0, b / c = 3.0
+问题：a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ?
+结果：[6.0, 0.5, -1.0, 1.0, -1.0 ]
+注意：x 是未定义的 => -1.0
+```
+
+**示例 2：**
+
+```
+输入：equations = [["a","b"],["b","c"],["bc","cd"]], values = [1.5,2.5,5.0], queries = [["a","c"],["c","b"],["bc","cd"],["cd","bc"]]
+输出：[3.75000,0.40000,5.00000,0.20000]
+说明:"bc"是一个变量，不能拆成b*c
+```
+
+**示例 3：**
+
+```
+输入：equations = [["a","b"]], values = [0.5], queries = [["a","b"],["b","a"],["a","c"],["x","y"]]
+输出：[0.50000,2.00000,-1.00000,-1.00000]
+```
+
+ 
+
+**提示：**
+
+- `1 <= equations.length <= 20`
+- `equations[i].length == 2`
+- `1 <= Ai.length, Bi.length <= 5`
+- `values.length == equations.length`
+- `0.0 < values[i] <= 20.0`
+- `1 <= queries.length <= 20`
+- `queries[i].length == 2`
+- `1 <= Cj.length, Dj.length <= 5`
+- `Ai, Bi, Cj, Dj` 由小写英文字母与数字组成
+
+
+
+法1：带权并查集（看官解）
+
+法2：建图+BFS
+
+```java
+class Solution {
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        int count = 0; // 节点计数（编号）
+        Map<String, Integer> point = new HashMap<String, Integer>(); // 节点编号  key:字符串 value:节点编号
+
+        int n = equations.size();
+        for (int i = 0; i < n; i++) {
+            if (point.get(equations.get(i).get(0))==null) {
+                point.put(equations.get(i).get(0), count++); // equations.get(i).get(0)节点编号为count
+            }
+            if (point.get(equations.get(i).get(1))==null) {
+                point.put(equations.get(i).get(1), count++);
+            }
+        }
+
+        // 对于每个点，存储其直接连接到的所有点及对应的权值
+        HashMap<Integer,List<Point>> edges = new HashMap<>();
+        for (int i = 0; i < count; i++) {
+            edges.put(i,new ArrayList<Point>());
+        }
+        for (int i = 0; i < n; i++) {
+            int from = point.get(equations.get(i).get(0)), to = point.get(equations.get(i).get(1));
+            edges.get(from).add(new Point(to, values[i]));
+            edges.get(to).add(new Point(from, 1.0 / values[i]));
+        }
+
+        n = queries.size();
+        double[] res = new double[n];
+        for (int i = 0; i < n; i++) {
+            List<String> query = queries.get(i);
+            double distance = -1.0;
+            Integer from=point.get(query.get(0)),to=point.get(query.get(1));
+            if (from!=null&&to!=null) {
+                if (from == to) {
+                    distance = 1.0;
+                } else {
+                    LinkedList<Integer> list = new LinkedList<Integer>();
+                    list.add(from);
+                    double[] weights = new double[count]; // weights[i]: 从from到i的权重，不能到达为-1
+                    Arrays.fill(weights, -1.0);  // 初始置为不可达
+                    // bfs:从from开始搜,不断修改权重
+                    weights[from] = 1.0;  
+                    while (!list.isEmpty() && weights[to] < 0) {
+                        int current = list.remove();
+                        for (Point next : edges.get(current)) {
+                            if (weights[next.index] < 0) { // 跳过已访问的节点
+                                weights[next.index] = weights[current] * next.value;
+                                list.add(next.index);
+                            }
+                        }
+                    }
+                    distance = weights[to];
+                }
+            }
+            res[i] = distance;
+        }
+        return res;
+    }
+}
+
+class Point {
+    int index; // 下一节点编号
+    double value; // 权重
+
+    Point(int index, double value) {
+        this.index = index;
+        this.value = value;
+    }
+}
+
+```
+
+<img src="assets/image-20240729153602159.png" alt="image-20240729153602159" style="zoom:50%;" />
+
+法3：建图+DFS
+
+```java
+class Solution {
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        HashMap<String,HashSet<String>> edges=new HashMap<>(); // 连接关系：key=s, value：字符串s可达的字符串集合
+        HashMap<String,Double> weights=new HashMap<>();  // key: 路径（如A->B）  value: 权重
+        int n=values.length;
+        // 建图
+        for(int i=0;i<n;i++){
+            String a=equations.get(i).get(0);
+            String b=equations.get(i).get(1);
+            if(edges.get(a)==null){
+                edges.put(a,new HashSet<>());
+            }
+            if(edges.get(b)==null){
+                edges.put(b,new HashSet<>());
+            }
+            edges.get(a).add(b);
+            edges.get(b).add(a);
+            weights.put(a+"->"+b,values[i]);
+            weights.put(b+"->"+a,1/values[i]);
+        }
+        
+        double[] aws=new double[queries.size()];
+        int count=0;
+        for(List<String> query:queries){ 
+            if(weights.get(query.get(0)+"->"+query.get(1))!=null){
+                aws[count++]=weights.get(query.get(0)+"->"+query.get(1));
+            }else{
+                tem=1.0d;
+                result=-1.0d;
+                path=new HashSet<>();
+                dfs(edges,weights,query.get(0),query.get(1)); // 逐个搜索
+                aws[count++]=result;
+                weights.put(query.get(0)+"->"+query.get(1),result);
+                weights.put(query.get(1)+"->"+query.get(0),1/result);
+                if(result!=-1.0){
+                    edges.get(query.get(0)).add(query.get(1));
+                    edges.get(query.get(1)).add(query.get(0));
+                }
+            }
+        }
+        return aws;
+
+    }
+    double tem=1.0d;
+    double result=-1.0d;
+    HashSet<String> path=new HashSet<>();
+    public void dfs(HashMap<String,HashSet<String>> edges,HashMap<String,Double> weights,String begin,String end){ // begin:起点 end：终点
+        if(edges.get(begin)==null||edges.get(end)==null){
+            return;
+        }
+        if(end.equals(begin)){ // 抵达终点
+            result=tem; // 保存结果
+            return;
+        }
+        path.add(begin);
+        for(String next:edges.get(begin)){
+            if(!path.contains(next)){
+                double copy=tem;
+                tem *=weights.get(begin+"->"+next);
+                dfs(edges,weights,next,end); // 往下搜
+                if(result!=-1.0d){ // 可达
+                    return;
+                }
+                tem=copy;
+            }
+        }
+        path.remove(begin);
+    }
+}
+```
+
+![image-20240729162659740](assets/image-20240729162659740.png)
