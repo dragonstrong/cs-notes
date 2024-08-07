@@ -313,7 +313,7 @@ stdout_logfile=/data/supervisor/java-ccos.out.log
 ```bash
 docker pull mysql
 docker run -d --restart=always --name mysql-ccos -e MYSQL_ROOT_PASSWORD="181181@Lq" -p 4006:3306 mysql:latest  #起mysql容器并设置root密码 端口映射(-p 宿主机端口:容器端口) 开机自启
-
+docker update --restart=always 容器ID #已启动的容器设置开机自启
 #可选（挂载） 宿主机路径：容器路径，-> 直接在宿主机查看容器内的文件
 docker run -d --restart=always --name mysql-ccos 
 -v /mdata/mysql/log:/var/log/mysql   #日志

@@ -9574,6 +9574,21 @@ class Solution {
 方法一：用HashMap统计每个字母出现的次数，比较两个Map中的元素是否相等，同时用第三个Map缓存判断过的字符串
 
 注意：**<font color=red size=3>判断两个Integer数字是否相等用equals，包括所有的包装类型，==是判断引用地址是否相等，只有在缓存数组中的才相等（比如12)，而不在的是判断地址（如1000）, 二者是不相等的。</font>**
+```java
+public boolean judge(HashMap<Character,Integer> map,HashMap<Character,Integer> win){
+        if(map.size()!=win.size()){
+            return false;
+        }
+        Iterator<Map.Entry<Character,Integer>> iterator=map.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry<Character,Integer> tem=iterator.next();
+            if(win.get(tem.getKey())==null||!win.get(tem.getKey()).equals(tem.getValue())){ // 包装类型一定不能写成win.get(tem.getKey())!=tem.getValue()
+                return false;
+            }
+        }
+        return true;
+    }
+```
 
 方法二：滑动串口，关键点：
 
@@ -9845,26 +9860,22 @@ class Solution {
 
 ```java
 class Solution {
-    Map<Node, Node> cachedNode = new HashMap<Node, Node>();
+    Map<Node, Node> cachedNode = new HashMap<Node, Node>(); 
 
     public Node copyRandomList(Node head) {
         if (head == null) {
             return null;
         }
-        if (!cachedNode.containsKey(head)) {
+        if (!cachedNode.containsKey(head)) { // 缓存中不存在则新建
             Node headNew = new Node(head.val);
-            cachedNode.put(head, headNew);
+            cachedNode.put(head, headNew); 
             headNew.next = copyRandomList(head.next);
             headNew.random = copyRandomList(head.random);
         }
-        return cachedNode.get(head);
+        return cachedNode.get(head);  // 缓存中存在直接取出地址
     }
 }
 ```
-
-
-
-
 
 ## 7.[对称二叉树](https://leetcode.cn/problems/symmetric-tree/)
 
@@ -9935,7 +9946,7 @@ class Solution {
     public boolean isSymmetric(TreeNode root) {
         TreeNode back=copy(root);
         TreeNode newRoot=inverse(root);
-        return judge(back,newRoot);
+        return equals(back,newRoot);
     }
     // 保存副本
     public TreeNode copy(TreeNode root){
@@ -9952,7 +9963,6 @@ class Solution {
     }
     
     // 翻转二叉树
-
     public TreeNode inverse(TreeNode root){
         if(root==null||(root.left==null&&root.right==null)){
             return root;
@@ -9965,16 +9975,12 @@ class Solution {
     }
 
     // 判断两棵树是否相等
-    public boolean judge(TreeNode node1,TreeNode node2){
-        if(node1==null&&node2==null){
-            return true;
+    public boolean equals(TreeNode root1,TreeNode root2){
+        if(root1==null||root2==null){
+            return root1==root2;
         }
-        if((node1==null&&node2!=null)||(node1!=null&&node2==null)){
-            return false;
-        }
-        return node1.val==node2.val&&judge(node1.left,node2.left)&&judge(node1.right,node2.right);
+        return root1.val==root2.val&&equals(root1.left,root2.left)&&equals(root1.right,root2.right);
     }
-
 }
 ```
 
@@ -10327,7 +10333,7 @@ class Solution {
 
 
 
-法二：dfs+判断回文串用动态规划    耗时14ms ，打败99%  （**官解**）
+法二：dfs+判断回文串用动态规划    耗时7ms ，打败99%  （**官解**）
 
 判断回文串用动态规划，设字符串$s，dp[i][j]$表示$s.substring(i,j+1)$是否为回文串，有递推公式：
 
@@ -12377,6 +12383,57 @@ class Solution {
     }
 }
 ```
+
+
+
+```java
+class Solution {
+    public List<Integer> findSubstring(String s, String[] words) {
+        int m=s.length(),n=words.length,k=words[0].length();
+        List<Integer> res=new ArrayList<>();
+        if(m<n*k){
+            return res;
+        }
+        HashMap<String,Integer> wordsMap=new HashMap<>();
+        for(String w:words){
+            wordsMap.put(w,wordsMap.getOrDefault(w,0)+1);
+        }
+        for(int i=0;i<k&&i+k*n-1<m;i++){// 不同起始位置：滑动窗口次数
+            HashMap<String,Integer> winMap=new HashMap<>();
+            for(int j=0;j<n;j++){
+                String t=s.substring(i+j*k,i+(j+1)*k);
+                winMap.put(t,winMap.getOrDefault(t,0)+1);
+            }
+            if(subSquece(wordsMap,winMap)){
+                res.add(i);
+            }
+           
+            for(int j=i+k;j+k*n-1<m;j +=k){
+                String delete=s.substring(j-k,j);
+                String add=s.substring(j+k*(n-1),j+k*n);
+                winMap.put(delete,winMap.get(delete)-1);
+                winMap.put(add,winMap.getOrDefault(add,0)+1);
+                if(subSquece(wordsMap,winMap)){
+                    res.add(j);
+                }
+            }
+        }
+        return res;
+    }
+    public boolean subSquece(HashMap<String,Integer> wordsMap,HashMap<String,Integer> winMap){
+        Iterator<Map.Entry<String,Integer>> iterator=wordsMap.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry<String,Integer> entry=iterator.next();
+            if(winMap.get(entry.getKey())==null||!winMap.get(entry.getKey()).equals(entry.getValue())){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+
 
 ## 3.[基本计算器](https://leetcode.cn/problems/basic-calculator/)
 

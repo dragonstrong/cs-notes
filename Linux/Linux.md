@@ -229,6 +229,7 @@ docker inspect containerID  #获取Docker容器的元数据、配置、网络设
 exit #退出容器
 docker ps -a #查看所有容器
 docker images 
+docker update --restart=always 容器ID #已启动的容器设置开机自启
 
 #更改docker路径
 docker info |grep Dir  #查看默认路径

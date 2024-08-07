@@ -146,7 +146,7 @@ Exchange有4种类型：direct（默认）、fanout、topic、headers，不同�
 
 ### 3.2 Exchanges测试
 
-消息流向：消息由消费者产生，首先到达RabbitMQ服务器的消息代理，然后由代理交给指定的交换机（Exchange），后面交换机路由到那个消息队列由消息里的路由键决定（一个交换机可以绑定多个队列，一个队列也可以绑定多个交换机）。
+消息流向：消息由生产者产生，首先到达RabbitMQ服务器的消息代理，然后由代理交给指定的交换机（Exchange），后面交换机路由到na个消息队列由消息里的路由键决定（一个交换机可以绑定多个队列，一个队列也可以绑定多个交换机）。
 
 #### 3.2.1 **Direct Exchange**
 
@@ -804,7 +804,7 @@ public class MyRabbitConfig {
 
 #### 5.1.1 **改进-设置消息唯一ID**
 
-在发消息那里指定消息唯一ID：加一个参数new CorrelationData(UUID.randomUUID().toString())，使用UUID随机产生。这样做的好处：产生消息并发给交换机时可以将消息唯一ID和内容保存到MySQL数据库，如果MQ服务器或消费者没收到消费者发的消息，可以将状态同步到数据库中，之后遍历数据库就能找出未成功抵达的消息，重新投递，保证可靠性。而且这样消费者还能知道收到的是哪个消息。
+在发消息那里指定消息唯一ID：加一个参数new CorrelationData(UUID.randomUUID().toString())，使用UUID随机产生。这样做的好处：消息发给交换机时可以将消息唯一ID和内容保存到MySQL数据库，如果MQ服务器或消费者没收到生产者发的消息，可以将状态同步到数据库中，之后遍历数据库就能找出未成功抵达的消息，重新投递，保证可靠性，消费者还能知道收到的是哪个消息。
 
 ```java
 @Override
@@ -825,10 +825,6 @@ ConfirmCallback中可以看到消息id了：
 
 ![image-20240719011752247](assets/image-20240719011752247.png)
 
-
-
-
-
 ### 5.2 returnCallback-投递队列失败回调
 
 <font color=orange>**触发：消息投送指定队列失败**</font>
@@ -845,7 +841,7 @@ spring:
 
 
 
-设置消息抵达确认回调，在MyRabbitConfig中定制化RabbitTemplate：若投递到指定队列失败，打印投递失败的消息详细信息、状态码、回复内容、交换机、路由键信息。
+设置消息抵达确认回调，在MyRabbitConfig中定制化RabbitTemplate：重写returnedMessage方法，若投递到指定队列失败，打印投递失败的消息详细信息、状态码、回复内容、交换机、路由键信息。
 
 ```java
 @Slf4j
@@ -926,13 +922,11 @@ public class MyRabbitConfig {
 
 Queue无消费者，消息依然会被存储，直至被消费者消费。
 
-消费者收到消息，默认会自动ack。但如果无法啊确定此消息是否被处理完成，或者成功处理。我们可以开启手动ack模式。
+消费者收到消息，默认会自动ack。但若无法确定此消息是否被成功处理完成，可以开启手动ack模式。
 
-- 消息处理成功：ack()，接收下一个消息，此消息broker就会移除
+- 消息处理成功：ack()，接收下一个消息，此消息就会被broker移除
 - 消息处理失败，nack()/ reject()，重新发送给其他人进行处理，或者容错处理后ack
 - 消息一直未调用ack/nack方法，broker认为此消息正在被处理，不会投递给别人，此时客户端断开，消息不会被broker移除，会投递给别人。
-
-
 
 
 
@@ -960,7 +954,7 @@ spring:
         acknowledge-mode: manual # 消费者开启消息手动确认模式
 ```
 
-<font color=orange>**手动签收模式下，只要没明确高速MQ消息被签收，即使消费者宕机，消息也一直是unacked状态，不会丢失。**</font>
+<font color=orange>**手动签收模式下，只要没明确告诉MQ消息被签收，即使消费者宕机，消息也一直是unacked状态，不会丢失。**</font>
 
 如何手动签收?
 
@@ -999,7 +993,7 @@ public void receiveMessage2(Message message,CategoryEntity content,Channel chann
 
 ![image-20240719020850232](assets/image-20240719020850232.png)
 
-可以看到，<font color=orange>**即使中断了，程序仍然会运行下去**</font>（处理消息3、4、5，但是处理会失败，如果没有设置手动签收模式，那么相当于高速MQ服务器全部签收完成了）<
+可以看到，<font color=orange>**即使中断了，程序仍然会运行下去**</font>（处理消息3、4、5，但是处理会失败，如果没有设置手动签收模式，那么相当于高速MQ服务器全部签收完成了）
 
 ![image-20240719021047556](assets/image-20240719021047556.png)
 
