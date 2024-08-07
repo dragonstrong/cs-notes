@@ -3958,31 +3958,17 @@ class Solution {
 
 **题目没有声明二叉树中不含重复元素，所以不能用（前序、中序、后序）中的两种进行编码** 。
 
-[4、重建二叉树](https://www.notion.so/4-fc9743be8c8b4df09c987ba87df4c57c?pvs=21) 
+正确思路：由于层序遍历后节点下标确定，假设当前节点下标为i，则其左子节点下标为2i+1，右子节点下标为2i+2，利用此规律可进行编解码。
 
-正确思路为：
+1、编码：****
 
-1、编码：**带null节点的层序遍历, 2次bfs**
+存储非节点的值和下标，中间用逗号隔开
 
-（1）定义一个NodewithDepth类，进行第1次bfs，求出二叉树的最大深度max_depth （层：0~maxdepth-1）
+2、解码
 
-(2)第2次bfs，将null节点加入，生成编码字符串：
+拿到`data.split(",")`后的字符串数组s，从后往前遍历，每2个一组，分别是节点值`value`和下标`index`，创建当前节点`node=new TreeNode(value);`
 
-遍历时若当前节点为null，根据所在层是不是最后一层决定加不加左右子节点null进list
-
-不是最后一层，list加两个null子节点进去；
-
-是，不加
-
-2、解码：**由层序遍历重建，类似华为机试**
-
-(1)将字符串数组用空格split得到字符串数组s
-
-(2)s[0]就是根节点值，然后根据数学规律获取左右子树的字符数组，再调用自身重建左右子树，加到root节点并返回。
-
-自己写的：超时
-
-![Untitled](assets/Untitled 59.png)
+并用一个`HashMap<Integer,TreeNode>`存储下标对应的节点，若`map.get(2*index+1)`非空，表明当前节点有左子树，令`node.left=map.get(2*index+1);`若`map.get(2*index+2)`非空，表明当前节点有右子树，令`node.right=map.get(2*index+2)`。结果返回`map.get(0)`即可。
 
 ```java
 /**
@@ -3994,110 +3980,73 @@ class Solution {
  *     TreeNode(int x) { val = x; }
  * }
  */
-public class Codec 
-{
+ // 利用广度遍历的下标规律（下标确定）
+ // i-> 2i+1(左)  2i+2(右)
+public class Codec {
+
     // Encodes a tree to a single string.
-    public String serialize(TreeNode root) 
-    {
-        if(root==null)
-        return "";
-        LinkedList<NodewithDepth> list=new LinkedList<>();
-        int max_depth=0;  //最大深度 从0开始
-        
-        //第1次bfs ：求二叉树的最大深度
-        list.add(new NodewithDepth(root,0));
-        while(!list.isEmpty())
-        {
-            NodewithDepth tem=list.remove();
-            max_depth=Math.max(max_depth,tem.depth); 
-            if(tem.node.left!=null)
-            list.add(new NodewithDepth(tem.node.left,tem.depth+1));
-            if(tem.node.right!=null)
-            list.add(new NodewithDepth(tem.node.right,tem.depth+1)); 
+    public String serialize(TreeNode root) {
+        if(root==null){
+            return "";
         }
-        
-        //第2次bfs ：生成具有null节点的层序遍历，结果放入字符串s
-         String s="";
-        list.add(new NodewithDepth(root,0));
-        while(!list.isEmpty())
-        {
-            NodewithDepth tem=list.remove();
-            if(tem.node==null)  //当前节点为null
-            {
-                s=s+"null"+" ";
-                if(tem.depth!=max_depth)  //不是最后一层，继续加左右节点（null)
-                {
-                    list.add(new NodewithDepth(null,tem.depth+1));
-                    list.add(new NodewithDepth(null,tem.depth+1));
-                }
-            }
-            else //当前节点不为null
-            {
-                s=s+tem.node.val+" ";
-                if(tem.depth!=max_depth) //不是最后一层
-                {
-                    list.add(new NodewithDepth(tem.node.left,tem.depth+1));
-                    list.add(new NodewithDepth(tem.node.right,tem.depth+1));
-                }      
-            }
-        }
-        System.out.println(s.substring(0,s.length()-1)); //去掉最后最后一个空格
-        return s.substring(0,s.length()-1); 
-    }
 
+        // [1,2,3,null,null,4,5] 节点i的  左子节点：2i+1 右子节点：2i+2
+        String data="";
+        LinkedList<NodeWithIndex> list=new LinkedList<>();
+        list.add(new NodeWithIndex(root,0));
+        while(!list.isEmpty()){
+            NodeWithIndex t=list.remove();
+            data=data+t.node.val+","+t.index+","; // data只存非空节点的val和index
+            if(t.node.left!=null){
+                list.add(new NodeWithIndex(t.node.left,2*t.index+1));
+            }
+            if(t.node.right!=null){
+                list.add(new NodeWithIndex(t.node.right,2*t.index+2));
+            } 
+        }
+        return data.substring(0,data.length()-1);
+    }
+   
+    
     // Decodes your encoded data to tree.
-    public TreeNode deserialize(String data) 
-    {
-        if(data.equals(""))
-        return null;
-
-        String[] s=data.split(" ");
-        return rebuile(s); 
-    }
-
-    public TreeNode rebuile(String[] s)
-    {
-        if(s.length==0||s[0].equals("null")) //空或者根节点为null
-        return null;
-        if(s.length==1) 
-            return new TreeNode(Integer.parseInt(s[0]));
-        
-        int n=(int)(Math.log(s.length+1)/Math.log(2)); //深度:0~n-1
-        //根节点值
-        int root=Integer.parseInt(s[0]);
-        //获得左右子树数组
-        String[] left=new String[(int)(s.length-1)/2];
-        String[] right=new String[(int)(s.length-1)/2];
-        int index1=0,index2=0,index3=1;
-        for(int i=1;i<n;i++) //第i层
-        {
-            int len=(int)Math.pow(2,i-1);
-            for(int j=0;j<len;j++)
-                left[index1++]=s[index3++];
-            for(int j=0;j<len;j++)
-                right[index2++]=s[index3++];       
+    public TreeNode deserialize(String data) {
+        if(data.equals("")){
+            return null;
         }
-
-        TreeNode ROOT=new TreeNode(root);
-        ROOT.left=rebuile(left);
-        ROOT.right=rebuile(right);
-        return ROOT;
-    } 
+        String[] s=data.split(",");
+        HashMap<Integer,TreeNode> map=new HashMap<>(); // 保存下标对应的节点
+        for(int i=s.length-1;i>=0;i -=2){
+            int value=Integer.parseInt(s[i-1]);
+            int index=Integer.parseInt(s[i]);
+            TreeNode node=new TreeNode(value);
+            if(map.get(2*index+1)!=null){
+                node.left=map.get(2*index+1);
+            }
+            if(map.get(2*index+2)!=null){
+                node.right=map.get(2*index+2);
+            }
+            map.put(index,node);    
+        }
+        return map.get(0);
+    }
 }
 
-class NodewithDepth
-{
-    TreeNode node;
-    int depth;
-    public NodewithDepth(TreeNode node,int depth)
-    {
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.deserialize(codec.serialize(root));
+class NodeWithIndex{
+    TreeNode node; 
+    int index; // 节点下标
+    public NodeWithIndex(TreeNode node,int index){
         this.node=node;
-        this.depth=depth;
+        this.index=index;
     }
 }
 ```
 
-参考别人：
+![image-20240807122302333](assets/image-20240807122302333.png)
+
+别人的：
 
 ```java
 public class Codec {
@@ -4166,6 +4115,8 @@ public class Codec {
     }
 }
 ```
+
+![image-20240807122446219](assets/image-20240807122446219.png)
 
 ## 7. [蛇梯棋](https://leetcode.cn/problems/snakes-and-ladders/)
 
