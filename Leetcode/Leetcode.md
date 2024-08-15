@@ -1075,102 +1075,44 @@ class Solution
 
 
 
-暴力解法：
-
-```java
-class Solution 
-{
-    public int maxProfit(int[] prices) 
-    {
-        if(prices.length==1)
-        return 0;
-        else
-        {
-            int res=0;
-            for(int i=0;i<prices.length-1;i++)  //以prices[i]为界劈开
-            {
-                int[] a=new int[i+1];
-                int[] b=new int[prices.length-i];
-                System.arraycopy(prices,0,a,0,a.length);
-                System.arraycopy(prices,i,b,0,b.length);
-							  //下面不改进，只将max_sigle改为dp，时间复杂度改善很小
-                int reward=max_sigle(a)+max_sigle(b); 
-                res=Math.max(res,reward);
-            }
-            return  res;
-        }
-    }
-
-     public static int max_sigle(int[] prices)
-    {
-        if(prices.length<=1)
-        return 0;
-        else
-        {
-            int res=0;
-            for(int i=0;i<prices.length-1;i++)
-            {
-                for(int j=i+1;j<prices.length;j++)
-                {
-                    int tem=prices[j]-prices[i];
-                    if(tem>0)
-                    res=Math.max(res,tem);
-                }
-            }
-            return  res;
-        }
-    }
-}
-```
-
-![Untitled](assets/Untitled 18.png)
-
 **双向dp**
 
-记$len=prices.length$,遍历数组$prices$, 以$price[i]$为界劈成2个数组：$prices[0:i]$和$prices[i:len-1]$。
-从左往右$dp$得到数组$left$,其中$left[i]$为$prices[0:i]$一次交易的最大值，
-从右往左$dp$得到数组$right$,其中$right[i]$为$prices[i:len-1]$一次交易的最大值。
-$left[i]+right[i]$就是以$prices[i]$劈开的最大收益。
+记`n=prices.length`,遍历数组`prices`, 以`price[i]`为界劈成2个数组：`prices[0:i]和prices[i:n-1]`。
+
+- 从左往右`dp`得到数组`left`,其中`left[i]`为`prices[0:i]`一次交易的最大值，
+
+- 从右往左`dp`得到数组`right`,其中`right[i]`为`prices[i:n-1]`一次交易的最大值。
+
+`left[i]+right[i]`就是以`prices[i]`劈开的最大收益。
 
 ```java
 class Solution {
     public int maxProfit(int[] prices) {
         int n=prices.length;
-        int[] left=new int[n]; // 从左往右dp, left[i]表示prices[0:i]一笔交易最大利润  
-        int minValue=prices[0];
+        int[] left=new int[n]; //  从左往右dp left[i]: 0~i内一笔交易最大利润
+        int[] right=new int[n]; // 从右往左dp right[i]: i~n-1内一笔交易最大利润
         left[0]=0;
+        int minValue=prices[0]; // 记录左边最小值
         for(int i=1;i<n;i++){
-            if(prices[i]-minValue>0){
-                left[i]=Math.max(prices[i]-minValue,left[i-1]);
-            }else{
-                left[i]=left[i-1];
-            }
+            left[i]=Math.max(left[i-1],prices[i]-minValue);
             minValue=Math.min(minValue,prices[i]);
         }
-
-        int[] right=new int[n]; // 从右往左dp，right[i]表示prices[i:n-1]一笔交易最大利润
-        int maxValue=prices[n-1];
         right[n-1]=0;
+        int maxValue=prices[n-1]; // 记录右边最大值
         for(int i=n-2;i>=0;i--){
-            if(maxValue-prices[i]>0){
-                right[i]=Math.max(maxValue-prices[i],right[i+1]);
-            }else{
-                right[i]=right[i+1];
-            }
+            right[i]=Math.max(maxValue-prices[i],right[i+1]);
             maxValue=Math.max(maxValue,prices[i]);
         }
 
+        // 从下标i劈开，分成两笔交易
         int res=0;
-        for(int i=0;i<n;i++){  // 遍历，以price[i]为界分成两个数组：prices[0:i]和prices[i:len-1]
-            System.out.println(left[i]+" "+right[i]);
+        for(int i=0;i<n;i++){
             res=Math.max(res,left[i]+right[i]);
         }
         return res;
     }
 }
 ```
-
-![Untitled](assets/Untitled 19.png)
 
 ## 19. [跳跃游戏 VI](https://leetcode.cn/problems/jump-game-vi/)（DP+滑动窗口）
 
@@ -3904,7 +3846,7 @@ class Solution {
 
 比较简单（正常层序遍历加层深度判断）
 
-## 6. **[序列化二叉树](https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/)（困难，特别留意）**
+## 6. **[序列化二叉树](https://leetcode.cn/problems/xu-lie-hua-er-cha-shu-lcof/)（经典）**
 
 序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
 
@@ -3960,15 +3902,13 @@ class Solution {
 
 正确思路：由于层序遍历后节点下标确定，假设当前节点下标为i，则其左子节点下标为2i+1，右子节点下标为2i+2，利用此规律可进行编解码。
 
-1、编码：****
+1、编码：
 
 存储非节点的值和下标，中间用逗号隔开
 
 2、解码
 
-拿到`data.split(",")`后的字符串数组s，从后往前遍历，每2个一组，分别是节点值`value`和下标`index`，创建当前节点`node=new TreeNode(value);`
-
-并用一个`HashMap<Integer,TreeNode>`存储下标对应的节点，若`map.get(2*index+1)`非空，表明当前节点有左子树，令`node.left=map.get(2*index+1);`若`map.get(2*index+2)`非空，表明当前节点有右子树，令`node.right=map.get(2*index+2)`。结果返回`map.get(0)`即可。
+拿到`data.split(",")`后的字符串数组s，从后往前遍历，每2个一组，分别是节点值`value`和下标`index`，创建当前节点`node=new TreeNode(value);`并用一个`HashMap<Integer,TreeNode>`存储下标对应的节点，若`map.get(2*index+1)`非空，表明当前节点有左子树，令`node.left=map.get(2*index+1);`若`map.get(2*index+2)`非空，表明当前节点有右子树，令`node.right=map.get(2*index+2)`。结果返回`map.get(0)`即可。
 
 ```java
 /**
@@ -13267,7 +13207,84 @@ class Solution {
 
 法1：带权并查集（看官解）
 
-法2：建图+BFS
+法2：建图+DFS
+
+```java
+class Solution {
+    HashMap<String,HashSet<Node>> edges=new HashMap<>(); //建图：可达点和权重
+    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+        int m=values.length;
+        // 建图
+        for(int i=0;i<m;i++){
+            List<String> eq=equations.get(i);
+            if(edges.get(eq.get(0))==null){
+                HashSet<Node> set=new HashSet<>();
+                set.add(new Node(eq.get(1),values[i]));
+                edges.put(eq.get(0),set);
+            }else{
+                edges.get(eq.get(0)).add(new Node(eq.get(1),values[i]));
+            }
+
+            if(edges.get(eq.get(1))==null){
+                HashSet<Node> set=new HashSet<>();
+                set.add(new Node(eq.get(0),1/values[i]));
+                edges.put(eq.get(1),set);
+            }else{
+                edges.get(eq.get(1)).add(new Node(eq.get(0),1/values[i]));
+            }
+        }
+        double[] res=new double[queries.size()];
+        int count=0;
+        // dfs搜索
+        for(List<String> q:queries){
+            String start=q.get(0),end=q.get(1);
+            aws=-1.0;tem=1.0;visited=new HashSet<>();
+            dfs(start,end);
+            res[count++]=aws;
+        }
+        return res;
+    }
+
+    // dfs搜索
+    double aws=-1.0; // 结果
+    double tem=1.0; // 临时权重
+    HashSet<String> visited=new HashSet<>(); // 搜过的点
+    public void dfs(String current,String end){ // 当前位置   终点
+        if(visited.contains(current)||edges.get(current)==null||edges.get(end)==null){
+            return;
+        }
+        if(current.equals(end)){ // 抵达终点
+            aws=tem;
+            return;
+        }
+        visited.add(current);
+        for(Node node:edges.get(current)){
+            String nextLocation=node.location;
+            double nextWeight=node.weight;
+            if(!visited.contains(nextLocation)){
+                double copy=tem;
+                tem *=nextWeight;
+                dfs(nextLocation,end); // 继续往下一位置搜索
+                tem=copy;
+            }
+        }
+        visited.remove(current);
+    }
+}
+
+class Node{
+    String location;
+    double weight; // 权重
+    public Node(String location,double weight){
+        this.location=location;
+        this.weight=weight;
+    }
+}
+```
+
+
+
+法3：建图+BFS
 
 ```java
 class Solution {
@@ -13339,86 +13356,7 @@ class Point {
         this.value = value;
     }
 }
-
 ```
-
-<img src="assets/image-20240729153602159.png" alt="image-20240729153602159" style="zoom:50%;" />
-
-法3：建图+DFS
-
-```java
-class Solution {
-    public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
-        HashMap<String,HashSet<String>> edges=new HashMap<>(); // 连接关系：key=s, value：字符串s可达的字符串集合
-        HashMap<String,Double> weights=new HashMap<>();  // key: 路径（如A->B）  value: 权重
-        int n=values.length;
-        // 建图
-        for(int i=0;i<n;i++){
-            String a=equations.get(i).get(0);
-            String b=equations.get(i).get(1);
-            if(edges.get(a)==null){
-                edges.put(a,new HashSet<>());
-            }
-            if(edges.get(b)==null){
-                edges.put(b,new HashSet<>());
-            }
-            edges.get(a).add(b);
-            edges.get(b).add(a);
-            weights.put(a+"->"+b,values[i]);
-            weights.put(b+"->"+a,1/values[i]);
-        }
-        
-        double[] aws=new double[queries.size()];
-        int count=0;
-        for(List<String> query:queries){ 
-            if(weights.get(query.get(0)+"->"+query.get(1))!=null){
-                aws[count++]=weights.get(query.get(0)+"->"+query.get(1));
-            }else{
-                tem=1.0d;
-                result=-1.0d;
-                path=new HashSet<>();
-                dfs(edges,weights,query.get(0),query.get(1)); // 逐个搜索
-                aws[count++]=result;
-                weights.put(query.get(0)+"->"+query.get(1),result);
-                weights.put(query.get(1)+"->"+query.get(0),1/result);
-                if(result!=-1.0){
-                    edges.get(query.get(0)).add(query.get(1));
-                    edges.get(query.get(1)).add(query.get(0));
-                }
-            }
-        }
-        return aws;
-
-    }
-    double tem=1.0d;
-    double result=-1.0d;
-    HashSet<String> path=new HashSet<>();
-    public void dfs(HashMap<String,HashSet<String>> edges,HashMap<String,Double> weights,String begin,String end){ // begin:起点 end：终点
-        if(edges.get(begin)==null||edges.get(end)==null){
-            return;
-        }
-        if(end.equals(begin)){ // 抵达终点
-            result=tem; // 保存结果
-            return;
-        }
-        path.add(begin);
-        for(String next:edges.get(begin)){
-            if(!path.contains(next)){
-                double copy=tem;
-                tem *=weights.get(begin+"->"+next);
-                dfs(edges,weights,next,end); // 往下搜
-                if(result!=-1.0d){ // 可达
-                    return;
-                }
-                tem=copy;
-            }
-        }
-        path.remove(begin);
-    }
-}
-```
-
-![image-20240729162659740](assets/image-20240729162659740.png)
 
 ## 12.[交错字符串](https://leetcode.cn/problems/interleaving-string/)
 
