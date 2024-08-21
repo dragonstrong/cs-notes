@@ -700,37 +700,35 @@ class Solution  //14:30-  19:46-
 
 （1）定义dp数组
 
-$dp[i][j]$：表示$text1[0:i-1]和text2[0:j-1]$最长公共子序列的长度
+$dp[i][j]$：表示$text1[0:i]和text2[0:j]$最长公共子序列的长度
 
-(2)边界条件和转移方程
+(2)转移方程
 
-$dp[i][j]=0 \quad (i=0或j=0)$
-
-转移方程
-
-- 当$text1[i-1]=text2[j-1]$时，$dp[i][j]=dp[i-1][j-1]+1$，例如ac与bc的最长子序列等于a与b的最长子序列加1
-- 当$text1[i-1]!=text2[j-1]$时，$dp[i][j]=max(dp[i-1][j],dp[i][j-1])$，例如acf与bce的最后长子序列等于：acf与bc的最长子序列、ac与bce的最长子序列   中的最大值
+- 当`text1.charAt(i)=text2.charAt(j)`时，`dp[i][j]=dp[i-1][j-1]+1`，例如ac与bc的最长子序列等于a与b的最长子序列加1
+- 当`text1.charAt(i)!=text2.charAt(j)`时，`dp[i][j]=max(dp[i-1][j],dp[i][j-1])`，例如acf与bce的最后长子序列等于：acf与bc的最长子序列、ac与bce的最长子序列   中的最大值
 
 ```java
-class Solution 
-{
-    public int longestCommonSubsequence(String text1, String text2) 
-		{
-	        int M = text1.length();
-	        int N = text2.length();
-	        int[][] dp = new int[M + 1][N + 1];
-	        for (int i = 1; i <= M; ++i) 
-					{
-	            for (int j = 1; j <= N; ++j) 
-					    {
-	                if (text1.charAt(i - 1) == text2.charAt(j - 1)) 
-	                    dp[i][j] = dp[i - 1][j - 1] + 1;
-									else 
-	                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-	            }
-	        }
-	        return dp[M][N];
-		}
+class Solution {
+    public int longestCommonSubsequence(String text1, String text2) {
+        int m=text1.length(),n=text2.length();
+        int[][] dp=new int[m][n]; // dp[i][j]: text1[0:i]与text2[0:j]的最长公共子序列
+        for(int i=0;i<m;i++){
+            dp[i][0]=text1.substring(0,i+1).indexOf(text2.charAt(0))!=-1?1:0;
+        }
+        for(int j=0;j<n;j++){
+            dp[0][j]=text2.substring(0,j+1).indexOf(text1.charAt(0))!=-1?1:0;
+        }
+        for(int i=1;i<m;i++){
+            for(int j=1;j<n;j++){
+                if(text1.charAt(i)==text2.charAt(j)){
+                    dp[i][j]=dp[i-1][j-1]+1;
+                }else{
+                    dp[i][j]=Math.max(dp[i-1][j],dp[i][j-1]);
+                }
+            }
+        }
+        return dp[m-1][n-1];
+    }
 }
 ```
 
@@ -1903,94 +1901,47 @@ class Solution {
 - `grid` 和 `target` 仅由大小写英文字母组成
 
 ```java
-class Solution //23:01-23:19
-{
-    boolean is_exist=false;
-    public boolean exist(char[][] board, String word) 
-    {
-        int m=board.length,n=board[0].length;
-        for(int i=0;i<m;i++)
-        {
-            for(int j=0;j<n;j++)
-            {
-                if(word.charAt(0)==board[i][j])
-                {
-                    int[][] visited=new int[m][n];
-                    dfs(i,j,board,visited,word);
-                    if(is_exist)
-                    return true;
-                }
-            }
-        }
-        return is_exist;
-    }
-
-    public void dfs(int i,int j,char[][] board,int[][] visited,String word)
-    {
-        int m=board.length,n=board[0].length;
-        if(i<0||i>=m||j<0||j>=n)  //越界
-        return;
-        if(visited[i][j]==1) //已访问
-        return; 
-        if(word.length()==1&&word.charAt(0)==board[i][j]) //匹配
-        {
-            is_exist=true;
-            return;
-        }
-        if(word.charAt(0)!=board[i][j]) //第一个字母就不匹配
-        return;
-        visited[i][j]=1;
-        dfs(i-1,j,board,visited,word.substring(1));
-        dfs(i+1,j,board,visited,word.substring(1));
-        dfs(i,j-1,board,visited,word.substring(1));
-        dfs(i,j+1,board,visited,word.substring(1));
-        visited[i][j]=0;
-    }
-}
-```
-
-上面的代码有些测试用例已超时，优化如下：**探索4个方向时任意方向找到了都返回**
-
-```jsx
 class Solution {
-    boolean res=false;
     public boolean wordPuzzle(char[][] grid, String target) {
         int m=grid.length,n=grid[0].length;
         for(int i=0;i<m;i++){
             for(int j=0;j<n;j++){
-                if(target.charAt(0)==grid[i][j]){
-                    int[][] visited=new int[m][n];
-                    dfs(grid,i,j,visited,target);
-                    if(res){
+                if(grid[i][j]==target.charAt(0)){
+                    exist=false;
+                    dfs(i,j,grid,target);
+                    if(exist){
                         return true;
                     }
                 }
             }
         }
-        return res;
+        return false;
+    }
+    boolean exist=false;
+    public void dfs(int i,int j,char[][] grid,String target){
+        int m=grid.length,n=grid[0].length;
+        if(!valiad(i,j,m,n)||grid[i][j]=='1'||target.equals("")||exist){
+            return;
+        }
+        if(target.equals(grid[i][j]+"")){
+            exist=true;
+            return;
+        }
+
+        if(grid[i][j]==target.charAt(0)&&target.length()>1){
+            char c=grid[i][j];
+            grid[i][j]='1';
+            String tem=target.substring(1,target.length());
+            int[][] dir={{0,-1},{0,1},{-1,0},{1,0}};
+            for(int[] d:dir){
+                dfs(i+d[0],j+d[1],grid,tem);
+            }
+            grid[i][j]=c;
+        }
     }
 
-    public void dfs(char[][] grid, int i,int j,int[][] visited,String target){
-        int m=grid.length,n=grid[0].length;
-        if(target.equals("")){
-            res=true;
-            return;
-        }
-        if(i<0||i>m-1||j<0||j>n-1||visited[i][j]==1){
-            return;
-        }
-
-        visited[i][j]=1;
-        int[][] dir={{0,-1},{0,1},{-1,0},{1,0}};
-        if(target.charAt(0)==grid[i][j]){
-            for(int[] direction:dir){
-                dfs(grid,i+direction[0],j+direction[1],visited,target.substring(1));
-                if(res){
-                    return;  // 找到了就即刻返回，不用等探索完4个方向，不然最后2个测试用例超时
-                }
-            }
-        }
-        visited[i][j]=0;
+    public boolean valiad(int i,int j,int m,int n){
+        return i>=0&&i<m&&j>=0&&j<n;
     }
 }
 ```
@@ -2063,142 +2014,7 @@ public class Main {
 
 ![Untitled](assets/Untitled 33.png)
 
-**不用恢复现场**
-
-## 4. [课程表](https://leetcode.cn/problems/course-schedule/)
-
-你这个学期必须选修 `numCourses` 门课程，记为 `0` 到 `numCourses - 1` 。在选修某些课程之前需要一些先修课程。 先修课程按数组 `prerequisites` 给出，其中 `prerequisites[i] = [ai, bi]` ，表示如果要学习课程 `ai` 则 **必须** 先学习课程 `bi` 。
-
-- 例如，先修课程对 `[0, 1]` 表示：想要学习课程 `0` ，你需要先完成课程 `1` 。
-
-请你判断是否可能完成所有课程的学习？如果可以，返回 `true` ；否则，返回 `false` 。
-
-**示例 1：**
-
-```
-输入：numCourses = 2, prerequisites = [[1,0]]
-输出：true
-解释：总共有 2 门课程。学习课程 1 之前，你需要完成课程 0 。这是可能的。
-```
-
-**示例 2：**
-
-```
-输入：numCourses = 2, prerequisites = [[1,0],[0,1]]
-输出：false
-解释：总共有 2 门课程。学习课程 1 之前，你需要先完成课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。
-```
-
- 
-
-**提示：**
-
-- `1 <= numCourses <= 2000`
-- `0 <= prerequisites.length <= 5000`
-- `prerequisites[i].length == 2`
-- `0 <= ai, bi < numCourses`
-- `prerequisites[i]` 中的所有课程对 **互不相同**
-
-
-
-感觉下面写的有问题，能过完全是运气 （每换一个起点搜，set要清零，不知道当初怎么想的）
-
-```java
-class Solution 
-{
-
-    boolean is=false;  
-    HashSet<Integer> set=new HashSet<>(); //存修过的课程编号
-    public boolean canFinish(int numCourses, int[][] prerequisites) 
-    {
-        if(prerequisites.length==0)  //没有限制
-        return true;
-        else
-        {
-            for(int i=0;i<numCourses;i++)   //每个初始位置都尝试  只要存在就行
-            {
-                dfs(numCourses,i,prerequisites,set);
-            }
-            return is;
-        }
-    }
-
-    public void dfs(int numCourses,int i,int[][] prerequisites,HashSet<Integer> set) //第i门课能不能修
-    {
-        if(set.size()==numCourses)  //找到
-        {
-            is=true;   
-            return;
-        }
-        if(set.contains(i))   //修过的课程不再访问
-        return;
-        for(int m=0;m<prerequisites.length;m++)  //遍历每一条规则
-        {
-            if(prerequisites[m][0]==i)  //找到课程i相关的规则
-            {
-                if(!set.contains(prerequisites[m][1])) //没修前置课程
-                return;
-            }
-        }
-        //可以修课程i
-        set.add(i);
-        
-        for(int j=0;j<numCourses;j++)   //继续修下一门课
-        {
-            if(j!=i)
-            dfs(numCourses,j,prerequisites,set);
-        }
-    }
-}
-```
-
-拓扑排序解法:
-
-```java
-class Solution 
-{
-    public boolean canFinish(int numCourses, int[][] prerequisites) 
-    {
-
-        int[] in_degree=new int[numCourses]; //入度数组
-        List<List<Integer>> list=new ArrayList<>();  //节点指向的节点序列
-        for(int i=0;i<numCourses;i++)
-        list.add(new ArrayList<>());
-
-        for(int[] tem:prerequisites)
-        {
-            list.get(tem[1]).add(tem[0]);
-            in_degree[tem[0]]++;
-        }
-        LinkedList<Integer> link=new LinkedList<>();
-        for(int i=0;i<numCourses;i++)
-        {
-            if(in_degree[i]==0)
-            link.add(i);
-        }
-
-        HashSet<Integer> set=new HashSet<>();
-
-        while(!link.isEmpty())
-        {
-            Integer tem=link.remove();
-            set.add(tem);
-
-            List<Integer> ss=list.get(tem);
-
-            for(Integer o:ss)
-            {
-                in_degree[o]--;
-                if(in_degree[o]==0)
-                link.add(o);
-            }
-        }
-        return set.size()==numCourses;
-    }
-}
-```
-
-## 5. **[岛屿数量](https://leetcode.cn/problems/number-of-islands/)**
+## 4. **[岛屿数量](https://leetcode.cn/problems/number-of-islands/)**
 
 给你一个由 `'1'`（陆地）和 `'0'`（水）组成的的二维网格，请你计算网格中岛屿的数量。
 
@@ -2419,7 +2235,7 @@ class Solution //9:02-9:18
 }
 ```
 
-## 6. [二叉树中和为目标值的路径](https://leetcode.cn/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
+## 5. [二叉树中和为目标值的路径](https://leetcode.cn/problems/er-cha-shu-zhong-he-wei-mou-yi-zhi-de-lu-jing-lcof/)
 
 给你二叉树的根节点 `root` 和一个整数目标和 `targetSum` ，找出所有 **从根节点到叶子节点** 路径总和等于给定目标和的路径。
 
@@ -2484,7 +2300,7 @@ class Solution {
 }
 ```
 
-## 7. **[剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode.cn/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)**
+## 6. **[剑指 Offer 68 - II. 二叉树的最近公共祖先](https://leetcode.cn/problems/er-cha-shu-de-zui-jin-gong-gong-zu-xian-lcof/)**
 
 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
 
@@ -2604,7 +2420,7 @@ class Solution
 }
 ```
 
-## 8.  **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
+## 7.  **[省份数量](https://leetcode.cn/problems/number-of-provinces/)**
 
 有 `n` 个城市，其中一些彼此相连，另一些没有相连。如果城市 `a` 与城市 `b` 直接相连，且城市 `b` 与城市 `c` 直接相连，那么城市 `a` 与城市 `c` 间接相连。
 
@@ -2785,7 +2601,7 @@ class UF  //并查集
 }
 ```
 
-## 9. [路径总和 III](https://leetcode.cn/problems/path-sum-iii/)（简单）
+## 8. [路径总和 III](https://leetcode.cn/problems/path-sum-iii/)（简单）
 
 给定一个二叉树的根节点 `root` ，和一个整数 `targetSum` ，求该二叉树里节点值之和等于 `targetSum` 的 **路径** 的数目。
 
@@ -2907,7 +2723,7 @@ class Solution {
 
 ![Untitled](assets/Untitled 42.png)
 
-## 10. **[螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)**
+## 9. **[螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/)**
 
 给你一个 `m` 行 `n` 列的矩阵 `matrix` ，请按照 **顺时针螺旋顺序** ，返回矩阵中的所有元素。 
 
@@ -2983,7 +2799,7 @@ class Solution
 }
 ```
 
-## 11. **[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
+## 10. **[二叉树中的最大路径和](https://leetcode.cn/problems/binary-tree-maximum-path-sum/)**
 
 二叉树中的 **路径** 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 **至多出现一次** 。该路径 **至少包含一个** 节点，且不一定经过根节点。
 
@@ -3129,7 +2945,7 @@ class Solution {
 
 
 
-## 12. 字节笔试
+## 11. 字节笔试
 
 [字节笔试 9.25 3/4_笔经面经_牛客网](https://www.nowcoder.com/discuss/1063783?channel=-1&source_id=discuss_terminal_nctrack&trackId=undefined)
 
@@ -3250,7 +3066,7 @@ class Node
 }
 ```
 
-## 13. [组合总和 II](https://leetcode.cn/problems/combination-sum-ii/)
+## 12. [组合总和 II](https://leetcode.cn/problems/combination-sum-ii/)
 
 给定一个候选人编号的集合 `candidates` 和一个目标数 `target` ，找出 `candidates` 中所有可以使数字和为 `target` 的组合。
 
@@ -3352,7 +3168,7 @@ class Solution
 
 
 
-## 14. [二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
+## 13. [二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
 
 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
 
@@ -4181,6 +3997,96 @@ class Solution  //21:31-
 }
 ```
 
+## 8. [判断二分图](https://leetcode.cn/problems/is-graph-bipartite/)
+
+存在一个 **无向图** ，图中有 `n` 个节点。其中每个节点都有一个介于 `0` 到 `n - 1` 之间的唯一编号。给你一个二维数组 `graph` ，其中 `graph[u]` 是一个节点数组，由节点 `u` 的邻接节点组成。形式上，对于 `graph[u]` 中的每个 `v` ，都存在一条位于节点 `u` 和节点 `v` 之间的无向边。该无向图同时具有以下属性：
+
+- 不存在自环（`graph[u]` 不包含 `u`）。
+- 不存在平行边（`graph[u]` 不包含重复值）。
+- 如果 `v` 在 `graph[u]` 内，那么 `u` 也应该在 `graph[v]` 内（该图是无向图）
+- 这个图可能不是连通图，也就是说两个节点 `u` 和 `v` 之间可能不存在一条连通彼此的路径。
+
+**二分图** 定义：如果能将一个图的节点集合分割成两个独立的子集 `A` 和 `B` ，并使图中的每一条边的两个节点一个来自 `A` 集合，一个来自 `B` 集合，就将这个图称为 **二分图** 。
+
+如果图是二分图，返回 `true` ；否则，返回 `false` 。
+
+
+
+**示例 1：**
+
+![img](assets/bi2.jpg)
+
+```
+输入：graph = [[1,2,3],[0,2],[0,1,3],[0,2]]
+输出：false
+解释：不能将节点分割成两个独立的子集，以使每条边都连通一个子集中的一个节点与另一个子集中的一个节点。
+```
+
+**示例 2：**
+
+![img](assets/bi1.jpg)
+
+```
+输入：graph = [[1,3],[0,2],[1,3],[0,2]]
+输出：true
+解释：可以将节点分成两组: {0, 2} 和 {1, 3} 。
+```
+
+ 
+
+**提示：**
+
+- `graph.length == n`
+- `1 <= n <= 100`
+- `0 <= graph[u].length < n`
+- `0 <= graph[u][i] <= n - 1`
+- `graph[u]` 不会包含 `u`
+- `graph[u]` 的所有值 **互不相同**
+- 如果 `graph[u]` 包含 `v`，那么 `graph[v]` 也会包含 `u`
+
+
+
+思路：BFS(类似染色问题)，节点只能归属集合A、B中 的一个，用points数组记录节点归属，初始预制所有节点均无归属。
+
+遍历`graph`，当`graph[i]`长度不为0时，预置节点`i`归属集合A，并将`i`加入`LinkedList`, 然后BFS逐个判断是否矛盾，弹出节点tem，对于与`tem`相邻的每个节点`o`：
+
+- 若o未归属任何集合：设置o归属集合与tem相反，并加入list
+- 若tem和o所属集合相同，不符合二分图定义，返回false，
+
+注意存多个孤立图的情况，因此要进行多次BFS
+
+```java
+class Solution {
+    static final int A=1; // 集合A
+    static final int B=-1; // 集合B
+    public boolean isBipartite(int[][] graph) {
+        int n=graph.length;
+        int[] points=new int[n]; //初始状态0, 未归属任意集合
+        for(int i=0;i<n;i++){
+            if(graph[i].length!=0&&points[i]==0){
+                points[i]=A; // 设置节点i归属集合A
+                // 可能有多个孤立的图
+                LinkedList<Integer> list=new LinkedList<>(); 
+                list.add(i);
+                while(!list.isEmpty()){
+                    Integer tem=list.remove();
+                    int group=points[tem];
+                    for(int o:graph[tem]){ // 与tem相接的点
+                        if(points[o]==0){
+                            points[o]=-group; // 所属集合相反
+                            list.add(o);
+                        }else if(points[o]==group){ // 矛盾
+                            return false;
+                        }  
+                    }
+                }
+            }
+        }
+        return true;    
+    }
+}
+```
+
 # 四. 记忆化搜索（DP+递归）
 
 和简单递归（dfs）的区别：
@@ -4242,82 +4148,68 @@ class Solution  //21:31-
 
 思路：
 
-1、建立合格礼包列表 filterSpecial：总价小于正常价
+1、过滤得到合格礼包列表 illegalSpecial：总价小于正常价
 
 2、递归dfs
 
 传入正常价格、大礼包、购买需求，返回最小花费
 
 ```java
-public int dfs(List<Integer> price,List<List<Integer>> filterSpecial,List<Integer> currNeeds);
+public int dfs(List<Integer> price,List<List<Integer>> illegalSpecial,List<Integer> needs);
 ```
 
 首先用一个HashMap存储  < 需求，最小花费> 键值对，减少重复递归。
 
-逐个遍历大礼包，若当前大礼包不超出购买需求，则该礼包可以使用，更新购买需求，
-
-则
-
-![Untitled](assets/Untitled 66.png)
+逐个遍历大礼包，若当前大礼包不超出购买需求，则该礼包可以使用，更新购买需求。
 
 ```java
 class Solution 
 {
-
     //键：购买需求 值：最小花费
-    HashMap<List<Integer>,Integer> map=new HashMap<>();   
-
+    HashMap<List<Integer>,Integer> cache=new HashMap<>();   
     public int shoppingOffers(List<Integer> price, List<List<Integer>> special, List<Integer> needs) 
     {
-        //去除不合格的礼包
-        List<List<Integer>> filterSpecial=new ArrayList<>();
-        for(List<Integer> tem:special)
-        {
+        //过滤有优惠的礼包
+        List<List<Integer>> illegalSpecial=new ArrayList<>();
+        for(List<Integer> tem:special){
             int n=tem.size();
             //求大礼包正常价格
             int sum=0;
-            for(int i=0;i<n-1;i++)
-            sum +=tem.get(i)*price.get(i);
-
-            if(tem.get(n-1)<=sum)  //合格大礼包
-            filterSpecial.add(tem);
+            for(int i=0;i<n-1;i++){
+                sum +=tem.get(i)*price.get(i);
+            }
+            if(tem.get(n-1)<sum){//合格大礼包
+                illegalSpecial.add(tem);
+            }
         }
-
-        return dfs(price,filterSpecial,needs);
+        return dfs(price,illegalSpecial,needs);
     }
 
-    public int dfs(List<Integer> price,List<List<Integer>> filterSpecial,List<Integer> currNeeds)
-    {
-        if(!map.containsKey(currNeeds))
-        {
+    public int dfs(List<Integer> price,List<List<Integer>> illegalSpecial,List<Integer> needs){
+        if(cache.get(needs)==null){
             //最大花费为正常购买，不用大礼包
             int min_cost=0;
-            for(int i=0;i<currNeeds.size();i++)
-            min_cost +=currNeeds.get(i)*price.get(i);
-
+            for(int i=0;i<needs.size();i++)
+            min_cost +=needs.get(i)*price.get(i);
             //逐个遍历大礼包
-            for(List<Integer> sp:filterSpecial)
-            {
+            for(List<Integer> sp:illegalSpecial){
                 //买了这个大礼包后的消费需求（更新）
-                List<Integer> nextNeeds=new ArrayList<>(); 
-                for(int j=0;j<sp.size()-1;j++)
-                {
-                    if(currNeeds.get(j)<sp.get(j))
-                    break;
-
-                    nextNeeds.add(currNeeds.get(j)-sp.get(j));
+                List<Integer> nextNeeds=new ArrayList<>(); //下一购买需求
+                int j=0;
+                for(;j<sp.size()-1;j++){
+                    if(needs.get(j)<sp.get(j)){
+                        break;
+                    }
+                    nextNeeds.add(needs.get(j)-sp.get(j));//更新购买需求
                 }
-                if(nextNeeds.size()==currNeeds.size())  //当前礼包不超出预算范围
-                {
-                    min_cost=Math.min(min_cost,sp.get(sp.size()-1)+dfs(price,filterSpecial,nextNeeds)); //递归买剩下的
+                if(j==needs.size()){ // 该礼包可用
+                    min_cost=Math.min(min_cost,sp.get(sp.size()-1)+dfs(price,illegalSpecial,nextNeeds)); //递归买剩下的
                 }
             }
-
-            map.put(currNeeds,min_cost);
+            cache.put(needs,min_cost);
         }
-        return map.get(currNeeds);
+        return cache.get(needs);
     }
-   
 }
 ```
 
@@ -5979,118 +5871,51 @@ public class Solution {
 [算法 - 并查集 | CS-Notes](http://www.cyc2018.xyz/%E7%AE%97%E6%B3%95/%E5%9F%BA%E7%A1%80/%E7%AE%97%E6%B3%95%20-%20%E5%B9%B6%E6%9F%A5%E9%9B%86.html#%E5%89%8D%E8%A8%80)
 
 ```java
-class Solution //15:36-15:58
-{
-    public int findCircleNum(int[][] isConnected) 
-    {
-        int n=isConnected.length; //节点个数
-        UF uf=new UF(n);
-        for(int i=0;i<n;i++)
-        {
-            for(int j=i+1;j<isConnected[0].length;j++)
-            {
-                if(isConnected[i][j]==1)
-                    uf.union(i,j);  //连接节点i  j    
-            }
-        }
-        
-        //统计联通分量个数
-        HashSet<Integer> set=new HashSet<>();
-        for(int i=0;i<uf.id.length;i++)
-            set.add(uf.id[i]);
-        
-        return set.size();
-
-    }
-}
-
-class UF //并查集
-{
-
-    public int[] id;  //id[i]表示节点i所在的联通分量编号
-    public UF(int n) //构造含n个节点的并查集
-    {
-        id=new int[n]; 
-        for(int i=0;i<n;i++)
-        id[i]=i;  //初始化：所有节点都孤立，共n个联通分量
-    }
-
-    public boolean connected(int p,int q)  //节点p和节点q是否相连
-    {
-        return find(p)==find(q); 
-    }
-    public int find(int p) //查找节点p所在联通分量编号
-    {
-        return id[p];
-    }
-
-    public void union(int p,int q) //连接节点p和节点q
-    {
-        int set_p=find(p);  //p所在联通分量编号
-        int set_q=find(q);  //q所在联通分量编号
-        if(set_p==set_q)
-        return;  //本身就同属一个联通分量，不操作
-
-        for(int i=0;i<id.length;i++)  //将q所在联通分量（集合）中的所有节点的连通分量编号改为set_p
-        {
-            if(set_q==id[i])
-            id[i]=set_p;
-        }
-    }
-}
-```
-
-```java
 class Solution {
     public int findCircleNum(int[][] isConnected) {
-        UF uf=new UF(isConnected.length,isConnected);
-        uf.merge();
-        return uf.orgCount();
+        UF uf=new UF(isConnected.length);
+        uf.merge(isConnected);
+        return uf.getUnion();
     }
 }
 
 class UF{
+    int n; // 节点数量
+    int[] union; // 节点所属集合
 
-    int num;
-    int cities[];  // 每个城市对应的集合编号
-    int[][] connected;  //连接矩阵
-    public UF(int num,int[][] connected){
-        this.num=num;
-        this.cities=new int[num];
-
-        for(int i=0;i<num;i++){
-            cities[i]=i;   // 初始化每个城市都不相连
+    public UF(int n){
+        this.n=n;
+        union=new int[n];
+        // 初始化：每个节点都孤立
+        for(int i=0;i<n;i++){
+            union[i]=i; 
         }
-        this.connected=connected;
     }
 
-    public void union(int i,int j){ // 将城市i和j相连
-       int org=cities[i];
-       for(int k=0;k<num;k++){
-        if(cities[k]==org){
-            cities[k]=cities[j];
-        }
-       }
-    }
-
-    public void merge(){
-        for(int i=0;i<num;i++){
-            for(int j=i+1;j<num;j++){
-                if(connected[i][j]==1){
-                    union(i,j);
+    public void merge(int[][] isConnected){ // 根据连接关系合并
+        int n=isConnected.length;
+        for(int i=0;i<n;i++){
+            for(int j=i+1;j<n;j++){
+                if(isConnected[i][j]==1&&union[i]!=union[j]){
+                    // 将j所属集合中的点归属编号全部改为i的
+                    int tem=union[j];
+                    for(int k=0;k<n;k++){
+                        if(union[k]==tem){
+                            union[k]=union[i];
+                        }
+                    }
                 }
             }
         }
     }
-
-    public int orgCount(){
+    // 返回集合数量
+    public int getUnion(){
         HashSet<Integer> set=new HashSet<>();
-        for(int i:cities){
-            set.add(i);
+        for(int o:union){
+            set.add(o);
         }
         return set.size();
     }
-
 }
 ```
 
@@ -6346,39 +6171,27 @@ class UF  //并查集
 （2）窗口右侧从i=k起，一直移动到nums数组末尾。移动过程中取出（但不移除）队列中的最大值，**当最大值落在滑动窗口【i-k+1,i】左侧时，移除最大值，直到它落在窗口内**，此时就是满足要求的最大值。
 
 ```java
-class Solution 
-{
-    public int[] maxSlidingWindow(int[] nums, int k) 
-    {
-        //起一个优先队列，存放的元素是nums数组的值和下标：(nums[i],i) 
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        int n=nums.length;
+        int[] res=new int[n-k+1];
+        //优先队列存放: nums数组的值和下标：(nums[i],i) 
         //优先级按元素大小降序排列：队首元素就是最大值
-        PriorityQueue<int[]> queue=new PriorityQueue<>(
-            new Comparator<int[]>()
-            {
-                public int compare(int[] o1,int[] o2)
-                {
-                    return o2[0]-o1[0];
-                }
-            }
-            );
-
+        PriorityQueue<int[]> queue=new PriorityQueue<>((o1,o2)->o1[0]!=o2[0]?o2[0]-o1[0]:o2[1]-o1[1]);
         //将前k个元素加入优先队列，
-        for(int i=0;i<k;i++)
-        queue.add(new int[]{nums[i],i});
-
-        int[] res=new int[nums.length-k+1];
+        for(int i=0;i<k;i++){
+            queue.add(new int[] {nums[i],i});
+        }
         res[0]=queue.peek()[0];
-
-        for(int i=k;i<nums.length;i++)
-        {
-            queue.add(new int[]{nums[i],i});
-            //优先队列中的最大值所在下标落在滑动窗口【i-k+1,i】左侧时，将队首元素移除（因为它并不是窗口里的最大值）
-            while(queue.peek()[1]<i-k+1)
-            {
-                queue.remove();
+        int index=1;
+        for(int i=k;i<n;i++){
+            queue.add(new int[] {nums[i],i});
+             //优先队列中的最大值所在下标落在滑动窗口【i-k+1,i】左侧时，将队首元素移除（不是窗口里的最大值）
+            while(queue.peek()[1]<i-k+1){ // i-k+1  i
+                queue.poll();
             }
             //队列里的最大元素落在滑动窗口内  
-            res[i-k+1]=queue.peek()[0];
+            res[index++]=queue.peek()[0];
         }
         return res;
     }
@@ -7141,56 +6954,41 @@ LinkedList<Integer> list=new Linkedlist<>();
 否则返回res
 
 ```java
-class Solution 
-{
-    public int[] findOrder(int numCourses, int[][] prerequisites) 
-    {
-        //图的拓扑排序  bfs解决，(u,v)表示从u到v的有向边，课程建模成顶点，设修课程A之前要先修课程B，则用有向边(B,A)建模
-        //当一个顶点的入度为0时表示它没有先修课程要求，因此可以排在前面
-        //之后将入度为0的顶点从图中去掉，同时去掉与之相连的顶点之间的有向边，判断与之相连的顶点入度是否为0，若为0加入LinedList
-
-        List<List<Integer>> edges=new ArrayList<>(); //存储有向边
-        int[] in_degree=new int[numCourses]; //存储顶点的入度
-        int[] res=new int[numCourses]; //存储结果 
-
-        for(int i=0;i<numCourses;i++)
-            edges.add(new ArrayList<Integer>());  //初始化：所有顶点孤立
-        
-       //建图，将依赖建模成有向边
-        for(int i=0;i<prerequisites.length;i++)
-        {
-            edges.get(prerequisites[i][1]).add(prerequisites[i][0]); 
-            in_degree[prerequisites[i][0]]++; 
+class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        List<List<Integer>> connect=new ArrayList<>(); //下一可达节点集合
+        int[] inDegree=new int[numCourses]; // 入度
+        for(int i=0;i<numCourses;i++){
+            connect.add(new ArrayList<>());
         }
-
+        // 建图
+        for(int[] pre:prerequisites){
+            connect.get(pre[1]).add(pre[0]);
+            inDegree[pre[0]]++;
+        }
+        int[] res=new int[numCourses]; // 结果 
         LinkedList<Integer> list=new LinkedList<>();
-
-        for(int i=0;i<numCourses;i++)
-        {
-            if(in_degree[i]==0)//将入度为0的节点加入队列
-            list.add(i);
-        }
-        int index=0;  //从下标0开始记录 入度为0的节点 对应res数组的构建
-
-        //bfs
-        while(!list.isEmpty())
-        {
-            Integer tem=list.remove(); //弹出入度为0的节点
-            res[index++]=tem;
-            //节点tem指向的节点列表  
-            List<Integer> direct_nodes=edges.get(tem); 
-            //删除节点tem 并将与之相连的边删除
-            for(Integer o:direct_nodes)
-            {
-                in_degree[o]--;
-                if(in_degree[o]==0)  //将新的入度为0的节点加入list
-                list.add(o);
+        // 初始化队列：将入度为0的节点加入
+        for(int i=0;i<numCourses;i++){
+            if(inDegree[i]==0){
+                list.add(i);
             }
         }
-        if(index!=numCourses)  //到不了numCourses,说明有环，有的节点入度永远不为0
-        return new int[]{};
-        else
-        return res;
+        int count=0;
+        // BFS模板
+        while(!list.isEmpty()){
+            Integer tem=list.remove();
+            res[count++]=tem;
+            // 将当前节点移除，指向的节点入度-1，若为0加入list
+            for(Integer next:connect.get(tem)){ 
+                inDegree[next]--;
+                if(inDegree[next]==0){
+                    list.add(next);
+                }
+            }
+        }
+        //count到不了numCourses,说明有环(有节点入度永不为0)
+        return count==numCourses?res:new int[]{};
     }
 }
 ```
@@ -13442,6 +13240,4 @@ class Solution {
     }
 }
 ```
-
-
 
