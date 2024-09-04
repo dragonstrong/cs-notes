@@ -160,7 +160,39 @@ public class GulimallMemberApplication {
 
 开启nacos 注册中心服务器、调用服务和被调服务
 ![image.png](https://cdn.nlark.com/yuque/0/2024/png/34372585/1710840346407-037fdc20-70f1-47e7-8078-4b7cd30773bd.png#averageHue=%23f0f0ef&clientId=u905252dd-420b-4&from=paste&height=163&id=u23816b32&originHeight=163&originWidth=1275&originalType=binary&ratio=1&rotation=0&showTitle=false&size=26059&status=done&style=none&taskId=u8fb06349-1ecd-49bf-820a-2f8ba4962b4&title=&width=1275)
+
+### 2.3.3 Feign源码分析
+
+![image-20240902225455358](assets/image-20240902225455358.png)
+
+
+
+![image-20240902225629263](assets/image-20240902225629263.png)
+
+调用流程
+
+```java
+/**
+     * Feign的调用流程
+     * 1. 构造请求数据，将对象转为json
+     * RequestTemplate template = this.buildTemplateFromArgs.create(argv);
+     * 2. 发送请求执行(执行成功会解码)
+     * executeAndDecode(template, options);
+     * 3. 执行请求时有重试机制（默认最大重试次数为5）
+     * while(true) {
+     *             try {
+     *                 return this.executeAndDecode(template, options);
+     *             } catch (RetryableException var9) {
+     *                     retryer.continueOrPropagate(e);
+     *                     throw ex; // 重试器有异常会抛出去
+     *                     continue;  // 没异常继续重试
+     *             }
+     *         }
+     **/
+```
+
 ## 2.4 配置中心Nacos Config
+
 ### 2.4.1使用
 配置参考：[链接](https://github.com/alibaba/spring-cloud-alibaba/blob/2022.x/spring-cloud-alibaba-examples/nacos-example/readme.md#spring-cloud-alibaba-nacos-config)
 
