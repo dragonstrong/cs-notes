@@ -714,6 +714,79 @@ public class RabbitMQServiceImpl implements RabbitMQService {
 2024-07-18 19:30:42.863  INFO 35916 --- [ntContainer#0-1] c.a.p.service.impl.RabbitMQServiceImpl   : 接收到消息:{"catId":10,"name":"图书","productUnit":"本"}
 ```
 
+### 4.3 @Bean声明式创建队列、交换机、绑定关系
+
+配置类中@Bean声明式创建队列、交换机、绑定关系，会将它们以Bean的形式注册到IOC容器中
+
+```java
+@Slf4j
+@Configuration
+public class RabbitMQOneConfig {
+    /**
+     * @description: 创建死信队列 order.delay.queue
+     **/
+    @Bean
+    public Queue orderDelayQueue(){
+        Map<String, Object> arguments=new HashMap<>();
+        arguments.put("x-dead-letter-exchange","order-event-exchange");
+        arguments.put("x-dead-letter-routing-key","order.release.order");
+        arguments.put("x-message-ttl",60000); // 单位ms ，即1min
+        Queue queue=new Queue("order.delay.queue", true,false,false,arguments);
+        return queue;
+    }
+
+    /**
+     * @description: 创建队列 order.release.order.queue
+     **/
+    @Bean
+    public Queue orderReleaseOrderQueue(){
+        Queue queue=new Queue("order.release.order.queue", true,false,false);
+        return queue;
+    }
+
+    /**
+     * @description: 创建交换器：order-event-exchange
+     **/
+    @Bean
+    public Exchange orderEventExchange(){
+        TopicExchange topicExchange=new TopicExchange("order-event-exchange",true,false);
+        return topicExchange;
+    }
+    /**
+     * @description: 创建绑定关系：orderCreateOrderBinding
+     **/
+    @Bean
+    public Binding orderCreateOrderBinding(){
+        Binding binding=new Binding("order.delay.queue", Binding.DestinationType.QUEUE,"order-event-exchange","order.create.order",null);
+        return binding;
+    }
+    /**
+     * @description: 创建绑定关系：orderReleaseOrderBinding
+     **/
+    @Bean
+    public Binding orderReleaseOrderBinding(){
+        Binding binding=new Binding("order.release.order.queue", Binding.DestinationType.QUEUE
+                ,"order-event-exchange","order.release.order",null);
+        return binding;
+    }
+
+    /**
+     * @description: 监听队列 order.release.order.queue
+     **/
+    @RabbitListener(queues = "order.release.order.queue")
+    public void listenQueue(OrderEntity order, Channel channel,Message message) throws IOException {
+        log.info("收到过期的订单信息：{}, 准备关闭订单",JSON.toJSONString(order));
+        channel.basicAck(message.getMessageProperties().getDeliveryTag(),false); // 手动确认，非批量
+    }
+}
+```
+
+**<font color=red>必须写一个监听@RabbitListener（不写不会创建）</font>**
+
+做好上述两步，以及其他配置正常，每次启动服务就会创建对应的队列、交换机和绑定关系，前提是之前不存在，之前存在的不会覆盖，需要手动删除：
+
+![image-20240918155108177](assets/image-20240918155108177.png)
+
 ## 5. 第五章 消息确认机制
 
 为了保证消息不丢失，可靠抵达，可以使用事务消息，但性能下降250倍，为此引入确认机制。
@@ -1052,3 +1125,17 @@ public void receiveMessage2(Message message,CategoryEntity content,Channel chann
 前端只剩4条：
 
 ![image-20240719022653691](assets/image-20240719022653691.png)
+
+
+
+
+
+![image-20240918182335832](assets/image-20240918182335832.png)
+
+
+
+![image-20240918182503396](assets/image-20240918182503396.png)
+
+库存锁定成功后订单服务发生异常，订单滚库存不滚，库存工作单详情有内容：
+
+![image-20240918182549149](assets/image-20240918182549149.png)
