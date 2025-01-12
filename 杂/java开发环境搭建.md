@@ -59,9 +59,9 @@ git remote add java-ccos git@github.com:dragonstrong/java-ccos.git # 关联远�
 git push -f java-ccos  #强制提交覆盖，执行该命令前考虑清楚
 ```
 
-![image-20250112224812841](./../../../../AppData/Roaming/Typora/typora-user-images/image-20250112224812841.png)
+![image-20250112224812841](../assets/image-20250112224812841.png)
 
-![image-20250112224932348](./../../../../AppData/Roaming/Typora/typora-user-images/image-20250112224932348.png)
+![image-20250112224932348](../assets/image-20250112224932348.png)
 
 ## 1.4 git常用命令
 
