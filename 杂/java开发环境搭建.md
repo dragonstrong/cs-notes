@@ -47,6 +47,28 @@ ssh-keygen -t rsa -C "Long_Q@outlook.com"   #填注册邮箱，3次回车
 
 ![image-20240314155121563](../assets/image-20240314155121563.png)
 
+## 1.3 单独使用git提交文件夹到远程仓库
+
+进入所在文件夹，然后git bash here，在提交之前需要在github上新建一个分支（假设该分支没有）
+
+```bash
+git init  #以当前路径初始化本地仓库
+git add .  #添加当前路径下所有文件
+git commit -m "migrate to github" 
+git remote add java-ccos git@github.com:dragonstrong/java-ccos.git # 关联远程仓库地址，其中java-ccos相当于为该地址起别名
+git push -f java-ccos  #强制提交覆盖，执行该命令前考虑清楚
+```
+
+![image-20250112224812841](./../../../../AppData/Roaming/Typora/typora-user-images/image-20250112224812841.png)
+
+![image-20250112224932348](./../../../../AppData/Roaming/Typora/typora-user-images/image-20250112224932348.png)
+
+## 1.4 git常用命令
+
+```bash
+git clone -b master https://gitlab.com/java1834509/java-ccos.git  #指定clone master分支
+```
+
 # 2.GitLab
 
 短信验证没有中国地区：https://blog.csdn.net/qq_42831621/article/details/135990384
